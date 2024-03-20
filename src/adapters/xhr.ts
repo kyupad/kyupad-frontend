@@ -28,9 +28,11 @@ const request = async (
   const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT);
 
   if (env.NEXT_PUBLIC_AUTH_METHOD === AUTH_METHOD.HEADER) {
-    const accessToken = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
-    if (accessToken) {
-      defaultHeaders.Authorization = `Bearer ${accessToken}`;
+    if (typeof window !== 'undefined') {
+      const accessToken = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+      if (accessToken) {
+        defaultHeaders.Authorization = `Bearer ${accessToken}`;
+      }
     }
   }
 
