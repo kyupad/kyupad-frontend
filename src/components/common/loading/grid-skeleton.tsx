@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Skeleton } from './skeleton.component';
+import { Skeleton } from './skeleton';
 
 const GridSkeleton = () => {
   return (

@@ -1,3 +1,4 @@
+import Header from '@/components/common/header';
 import WebVitals from '@/components/features/web-vitals';
 import { META_DATA_DEFAULT } from '@/utils/constants/seo';
 import { cn } from '@/utils/helpers';
@@ -5,14 +6,16 @@ import { cn } from '@/utils/helpers';
 import '@styles/globals.css';
 
 import dynamic from 'next/dynamic';
-import { Inter as FontSans } from 'next/font/google';
+import { Nunito } from 'next/font/google';
 
-const NextTopLoader = dynamic(() => require('nextjs-toploader'));
+const NextTopLoader = dynamic(() => require('nextjs-toploader')) as any;
 const SonnerToaster = dynamic(() => import('@/components/common/toast/sonner'));
 
-const fontSans = FontSans({
+const fontSans = Nunito({
   subsets: ['latin'],
   variable: '--font-sans',
+  preload: true,
+  display: 'swap',
 });
 
 const metadata = META_DATA_DEFAULT;
@@ -27,8 +30,10 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         )}
       >
         <WebVitals />
-        <NextTopLoader />
+        <NextTopLoader color="#f2820e" />
+        <Header />
         {children}
+        <footer className="mt-10" />
         <SonnerToaster />
       </body>
     </html>

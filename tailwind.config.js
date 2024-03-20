@@ -1,4 +1,7 @@
+/* eslint-disable quote-props */
 /** @type {import('tailwindcss').Config} */
+
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 const darkMode = ['class'];
 const content = ['./src/**/*.{ts,tsx}'];
@@ -12,6 +15,10 @@ const theme = {
     },
   },
   extend: {
+    fontFamily: {
+      sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
+      heading: ['var(--font-heading)', ...defaultTheme.fontFamily.sans],
+    },
     colors: {
       border: 'hsl(var(--border))',
       input: 'hsl(var(--input))',
@@ -46,6 +53,17 @@ const theme = {
         DEFAULT: 'hsl(var(--card))',
         foreground: 'hsl(var(--card-foreground))',
       },
+      button: {
+        primary: {
+          DEFAULT: 'var(--button-primary)',
+          hover: 'var(--button-primary-hover)',
+          border: 'var(--button-primary-border)',
+        },
+        secondary: {
+          DEFAULT: 'var(--button-secondary)',
+          hover: 'var(--button-secondary-hover)',
+        },
+      },
     },
     borderRadius: {
       lg: 'var(--radius)',
@@ -61,10 +79,18 @@ const theme = {
         from: { height: 'var(--radix-accordion-content-height)' },
         to: { height: '0' },
       },
+      shine: {
+        '100%': { left: '125%' },
+      },
     },
     animation: {
+      shine: 'shine 1s',
+      'shine-loop': 'shine 1s infinite linear',
       'accordion-down': 'accordion-down 0.2s ease-out',
       'accordion-up': 'accordion-up 0.2s ease-out',
+    },
+    maxWidth: {
+      '8xl': '1400px',
     },
   },
 };

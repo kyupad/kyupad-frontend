@@ -1,2 +1,2 @@
-export * from './mock.adapter';
+export * from './mock';
 export * from './xhr';
