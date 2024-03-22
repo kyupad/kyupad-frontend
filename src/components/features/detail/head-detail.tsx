@@ -17,7 +17,7 @@ const HeadDetail = ({ image, CoinName, CoinSymbol, tradePlatform }: Props) => {
           <span className="text-4xl font-bold">{CoinSymbol}</span>
         </div>
       </div>
-      <div className="w-2/4 flex justify-center flex-col items-end *:py-1">
+      <div className="w-2/4 flex justify-center flex-col gap-5 items-end *:py-1">
         <div className="flex gap-2 items-center *:block font-bold ">
           <span className="text-2xl font-bold">Socials</span>
           <a href="#">

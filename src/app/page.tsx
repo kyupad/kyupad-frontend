@@ -12,8 +12,6 @@ const fontHeading = Knewave({
 });
 
 const Home = () => {
-  console.info('hihi');
-
   return (
     <div
       className={cn(

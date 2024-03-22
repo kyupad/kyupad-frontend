@@ -2,12 +2,12 @@ import React from 'react';
 
 const Timeline = () => {
   return (
-    <main className="relative min-h-screen className='py-10' flex flex-col justify-center bg-slate-50 overflow-hidden">
+    <main className="relative min-h-screen py-5' justify-center bg-slate-50 overflow-hidden">
       <div className="flex flex-col justify-center divide-y divide-slate-200 [&>*]:py-16">
         <div className="w-full  pl-[110px] mr-0">
           <div className="-my-6">
             <div className="relative pl-8 sm:pl-32 py-6 group">
-              <div className="flex after:top-3 flex-col sm:flex-row after:content-['1'] items-start mb-1 group-last:before:hidden before:absolute before:left-2 sm:before:left-0 before:h-full before:px-px before:bg-slate-300 sm:before:ml-[6.5rem] before:self-start before:-translate-x-1/2 before:translate-y-3 after:absolute after:left-2 sm:after:left-0 after:w-2 after:h-10 after:w-10  after:bg-[#25252C] after:flex after:justify-center after:items-center after:text-2xl after:text-[#FABF52] after:border-4 after:box-content after:border-slate-50 after:rounded-2xl sm:after:ml-[6.5rem] after:-translate-x-1/2 after:translate-y-1.5">
+              <div className="flex after:top-3 flex-col sm:flex-row after:content-['1'] items-start mb-1 group-last:before:hidden before:absolute before:left-2 sm:before:left-0 before:h-full before:px-px before:bg-slate-300 sm:before:ml-[6.5rem] before:self-start before:-translate-x-1/2 before:translate-y-3 after:absolute after:left-2 sm:after:left-0 after:w-10 after:h-10 after:w-10  after:bg-[#25252C] after:flex after:justify-center after:items-center after:text-2xl after:text-[#FABF52] after:border-4 after:box-content after:border-slate-50 after:rounded-2xl sm:after:ml-[6.5rem] after:-translate-x-1/2 after:translate-y-1.5">
                 <time className="sm:absolute -left-24 top-5 translate-y-0.5 flex flex-col items-start w-fit justify-center font-bold text-2xl rounded-2xl">
                   <p>Registation</p>
                   <p>Period</p>
@@ -26,7 +26,7 @@ const Timeline = () => {
             </div>
 
             <div className="relative pl-8 sm:pl-32 py-6 group">
-              <div className="flex after:top-3 flex-col sm:flex-row after:content-['2'] items-start mb-1 group-last:before:hidden before:absolute before:left-2 sm:before:left-0 before:h-full before:px-px before:bg-slate-300 sm:before:ml-[6.5rem] before:self-start before:-translate-x-1/2 before:translate-y-3 after:absolute after:left-2 sm:after:left-0 after:w-2 after:h-10 after:w-10  after:bg-[#25252C] after:flex after:justify-center after:items-center after:text-2xl after:text-[#FABF52] after:border-4 after:box-content after:border-slate-50 after:rounded-2xl sm:after:ml-[6.5rem] after:-translate-x-1/2 after:translate-y-1.5">
+              <div className="flex after:top-3 flex-col sm:flex-row after:content-['2'] items-start mb-1 group-last:before:hidden before:absolute before:left-2 sm:before:left-0 before:h-full before:px-px before:bg-slate-300 sm:before:ml-[6.5rem] before:self-start before:-translate-x-1/2 before:translate-y-3 after:absolute after:left-2 sm:after:left-0 after:w-10 after:h-10 after:w-10  after:bg-[#25252C] after:flex after:justify-center after:items-center after:text-2xl after:text-[#FABF52] after:border-4 after:box-content after:border-slate-50 after:rounded-2xl sm:after:ml-[6.5rem] after:-translate-x-1/2 after:translate-y-1.5">
                 <time className="sm:absolute -left-24 top-5 translate-y-0.5 flex flex-col items-start w-fit justify-center font-bold text-2xl rounded-2xl">
                   <p>Snapshot</p>
                   <p>Period</p>
@@ -50,7 +50,7 @@ const Timeline = () => {
             </div>
 
             <div className="relative pl-8 sm:pl-32 py-6 group">
-              <div className="flex after:top-3 flex-col sm:flex-row after:content-['3'] items-start mb-1 group-last:before:hidden before:absolute before:left-2 sm:before:left-0 before:h-full before:px-px before:bg-slate-300 sm:before:ml-[6.5rem] before:self-start before:-translate-x-1/2 before:translate-y-3 after:absolute after:left-2 sm:after:left-0 after:w-2 after:h-10 after:w-10  after:bg-[#25252C] after:flex after:justify-center after:items-center after:text-2xl after:text-[#FABF52] after:border-4 after:box-content after:border-slate-50 after:rounded-2xl sm:after:ml-[6.5rem] after:-translate-x-1/2 after:translate-y-1.5">
+              <div className="flex after:top-3 flex-col sm:flex-row after:content-['3'] items-start mb-1 group-last:before:hidden before:absolute before:left-2 sm:before:left-0 before:h-full before:px-px before:bg-slate-300 sm:before:ml-[6.5rem] before:self-start before:-translate-x-1/2 before:translate-y-3 after:absolute after:left-2 sm:after:left-0 after:w-10 after:h-10 after:w-10  after:bg-[#25252C] after:flex after:justify-center after:items-center after:text-2xl after:text-[#FABF52] after:border-4 after:box-content after:border-slate-50 after:rounded-2xl sm:after:ml-[6.5rem] after:-translate-x-1/2 after:translate-y-1.5">
                 <time className="sm:absolute -left-24 top-5 translate-y-0.5 flex flex-col items-start w-fit justify-center font-bold text-2xl rounded-2xl">
                   <p>Investment</p>
                   <p>Period</p>
@@ -67,7 +67,7 @@ const Timeline = () => {
             </div>
 
             <div className="relative pl-8 sm:pl-32 py-6 group">
-              <div className="flex after:top-3 flex-col sm:flex-row after:content-['4'] items-start mb-1 group-last:before:hidden before:absolute before:left-2 sm:before:left-0 before:h-full before:px-px before:bg-slate-300 sm:before:ml-[6.5rem] before:self-start before:-translate-x-1/2 before:translate-y-3 after:absolute after:left-2 sm:after:left-0 after:w-2  after:h-10 after:w-10  after:bg-[#25252C] after:flex after:justify-center after:items-center after:text-2xl after:text-[#FABF52] after:border-4 after:box-content after:border-slate-50 after:rounded-2xl sm:after:ml-[6.5rem] after:-translate-x-1/2 after:translate-y-1.5">
+              <div className="flex after:top-3 flex-col sm:flex-row after:content-['4'] items-start mb-1 group-last:before:hidden before:absolute before:left-2 sm:before:left-0 before:h-full before:px-px before:bg-slate-300 sm:before:ml-[6.5rem] before:self-start before:-translate-x-1/2 before:translate-y-3 after:absolute after:left-2 sm:after:left-0 after:w-10  after:h-10 after:w-10  after:bg-[#25252C] after:flex after:justify-center after:items-center after:text-2xl after:text-[#FABF52] after:border-4 after:box-content after:border-slate-50 after:rounded-2xl sm:after:ml-[6.5rem] after:-translate-x-1/2 after:translate-y-1.5">
                 <time className="sm:absolute -left-24 top-5 translate-y-0.5 flex flex-col items-start w-fit justify-center font-bold text-2xl rounded-2xl">
                   <p>Claim</p>
                   <p>Period</p>

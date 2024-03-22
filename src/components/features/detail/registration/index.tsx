@@ -8,7 +8,7 @@ import RegisterElement from '../timer-countdown';
 
 const Registation = () => {
   // @ts-ignore
-  const { image, coinName, coinSymbol, tradePlatform, step } =
+  const { image, coinName, coinSymbol, tradePlatform, registration } =
     useContext(detailContext);
   return (
     <div>
@@ -18,7 +18,7 @@ const Registation = () => {
         CoinSymbol={coinSymbol}
         tradePlatform={tradePlatform}
       />
-      <Step step={step} />
+      <Step step={registration.registed} />
       <RegisterElement />
       <ProjectView />
     </div>

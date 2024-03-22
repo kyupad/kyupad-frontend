@@ -1,4 +1,10 @@
+/* stylelint-disable no-descending-specificity */
 .stepblock {
+  position: relative;
+  width: 25%;
+}
+
+.stepdone {
   position: relative;
   width: 25%;
 }
@@ -11,6 +17,32 @@
   position: absolute;
   top: 57px;
   width: 100%;
+}
+
+.stepblock:first-child::after {
+  background-color: #dcdcdc;
+}
+
+.stepdone::before {
+  background-color: #f2820e;
+  content: '';
+  height: 3px;
+  left: 20px;
+  position: absolute;
+  top: 57px;
+  width: 100%;
+  z-index: 100;
+}
+
+.blockactive::before {
+  background-color: #f2820e;
+  content: '';
+  height: 3px;
+  left: 20px;
+  position: absolute;
+  top: 57px;
+  width: 40%;
+  z-index: 2;
 }
 
 .stepblock:last-child {
@@ -27,12 +59,17 @@
   position: relative;
   margin-left: 0;
   display: block;
-  font-size: 20px;
   height: 20px;
   width: 20px;
-  background: #e7d04c;
   border-radius: 50%;
   transition: all 0.3s ease;
+  border: 1px solid #b6b7c3;
+  background-color: white;
+}
+
+.stepblock:first-child .rounddot {
+  background: white;
+  border: 1px solid #f2820e;
 }
 
 .stepblock:nth-child(2),
@@ -46,16 +83,59 @@
   z-index: 50;
 }
 
-.rounddot::before {
+.stepblock:first-child .rounddot::after {
   content: '';
   position: absolute;
-  top: 20%;
-  left: 40%;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+  top: 35%;
+  left: 35%;
+  width: 6px;
+  height: 6px;
+  border: solid;
+  border-radius: 50%;
+  border-color: #f2820e;
+}
+
+/* stylelint-disable-next-line rule-empty-line-before */
+.blockactive .rounddot {
+  border-color: #4a4a5a;
+}
+
+/* stylelint-disable-next-line no-duplicate-selectors */
+.blockactive .rounddot::before {
+  content: '';
+  position: absolute;
+  top: 35%;
+  left: 30%;
+  width: 6px;
+  height: 6px;
+  border: solid;
+  border-radius: 50%;
+  border-color: #b6b7c3;
+}
+
+.stepdone .rounddot {
+  background: #f2820e !important;
+}
+
+.stepdone .rounddot::after {
+  top: 15% !important;
+  left: 38% !important;
+  width: 5px !important;
+  height: 10px !important;
+  border: solid white !important;
+  border-width: 0 2px 2px 0 !important;
+  transform: rotate(45deg) !important;
+  border-radius: 0 !important;
+}
+
+.rounddot::before {
+  border: none !important;
+  background-color: #b6b7c3;
+}
+
+.rounddot::after {
+  border: none !important;
+  background-color: #f2820e;
 }
 
 .text {

@@ -8,14 +8,14 @@ const CountdownTimer = dynamic(() => import('@/utils/helpers/countdownTimer'), {
 });
 
 const RegisterElement = () => {
-  // @ts-ignore
   const {
     registration,
     handleRegisted,
     handleChangeRegisterStatus,
     handleChangeView,
+    registedView,
   } = useContext<ContexType | any>(detailContext);
-  console.warn('registration', registration.registed);
+
   return (
     <div className="flex justify-between  w-full py-9 items-center text-2xl font-bold">
       <span className="flex gap-3">
@@ -26,13 +26,15 @@ const RegisterElement = () => {
         />
       </span>
       <ButtonCustom
-        disabled={registration.status}
+        disabled={registration.status || registedView}
         onClick={registration.registed ? handleChangeView : handleRegisted}
       >
         {!registration.status
           ? !registration.registed
-            ? 'register Now'
-            : 'View Registration'
+            ? 'Register Now'
+            : registedView
+              ? 'Registed'
+              : 'View Registration'
           : 'Registation Ended'}
       </ButtonCustom>
     </div>

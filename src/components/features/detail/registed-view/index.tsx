@@ -12,7 +12,7 @@ const RegisteredView = () => {
     useContext(detailContext);
 
   return (
-    <div>
+    <div className="">
       <HeadDetail
         image={image}
         CoinName={coinName}

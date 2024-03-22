@@ -12,8 +12,8 @@ const PointChart = () => {
           width={600}
           height={600}
         />
-        <div className="flex justify-center flex-col items-center *:py-2 absolute right-[51%] top-[50%]">
-          <p className="text-6xl font-bold text-[#18CF6A]">0.13%</p>
+        <div className="flex justify-center flex-col items-center *:py-2 absolute right-[45%] top-[50%]">
+          <p className="text-6xl font-bold text-[#EC5347]">0.13%</p>
           <p className="font-bold text-2xl">change of winning</p>
         </div>
       </div>
