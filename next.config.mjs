@@ -10,21 +10,6 @@ const millionConfig = {
   auto: false,
 };
 
-const cspHeader = `
-    default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline';
-    style-src 'self' 'unsafe-inline';
-    worker-src 'self' blob:;
-    img-src 'self' blob: data:;
-    font-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    frame-ancestors 'none';
-    block-all-mixed-content;
-    upgrade-insecure-requests;
-`;
-
 const runWithBundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
@@ -82,10 +67,6 @@ const nextConfig = runWithBundleAnalyzer({
         source: '/:path*',
         headers: [
           ...securityHeaders,
-          {
-            key: 'Content-Security-Policy',
-            value: cspHeader.replace(/\n/g, ''),
-          },
         ],
       },
     ];
