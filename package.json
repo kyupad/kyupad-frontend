@@ -5,7 +5,7 @@
   "author": "Noah Duong",
   "license": "MIT",
   "engines": {
-    "node": ">=20.11.1"
+    "node": ">=18.19.1"
   },
   "keywords": [
     "next",
