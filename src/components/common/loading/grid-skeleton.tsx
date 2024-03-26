@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-import { Skeleton } from './skeleton';
+import Skeleton from './skeleton';
 
 const GridSkeleton = () => {
   return (
@@ -14,4 +14,4 @@ const GridSkeleton = () => {
   );
 };
 
-export default GridSkeleton;
+export default memo(GridSkeleton);

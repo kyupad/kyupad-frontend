@@ -19,11 +19,13 @@ const env = createEnv({
       z.literal('production'),
       z.string().nullish(),
     ]),
+    NEXT_PUBLIC_NETWORK: z.union([z.literal('mainnet'), z.literal('testnet')]),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
     NEXT_PUBLIC_AUTH_METHOD: process.env.NEXT_PUBLIC_AUTH_METHOD,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_NETWORK: process.env.NEXT_PUBLIC_NETWORK,
   },
 });
 

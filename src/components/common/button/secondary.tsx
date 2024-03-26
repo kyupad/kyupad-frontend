@@ -10,7 +10,7 @@ const SecondaryButton = ({ className, children }: IPrimaryButtonProps) => {
   return (
     <button
       className={cn(
-        'transition-all py-2 px-4 bg-button-secondary font-bold text-button-secondary-border rounded-[8px] border-2 border-button-secondary-border hover:bg-button-secondary-hover hover:shadow-[8px_8px_0px_0px_#2a273a26] active:shadow-none group relative overflow-hidden w-full hover:text-[#D8D9DF]',
+        'transition-all py-2 px-4 bg-button-secondary font-bold text-button-primary-border rounded-[8px] border-2 border-button-primary-border hover:bg-button-secondary-hover hover:shadow-[8px_8px_0px_0px_#2a273a26] active:shadow-none group relative overflow-hidden w-full hover:text-[#D8D9DF] text-xl',
         className,
       )}
     >

@@ -78,6 +78,29 @@ const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
 
+function listenCookieChange(
+  callback: ({
+    oldValue,
+    newValue,
+  }: {
+    oldValue: string;
+    newValue: string;
+  }) => void,
+  interval = 1000,
+) {
+  let lastCookie = document.cookie;
+  setInterval(() => {
+    const cookie = document.cookie;
+    if (cookie !== lastCookie) {
+      try {
+        callback({ oldValue: lastCookie, newValue: cookie });
+      } finally {
+        lastCookie = cookie;
+      }
+    }
+  }, interval);
+}
+
 export {
   removeUndefinedAndNull,
   isEmpty,
@@ -85,4 +108,5 @@ export {
   logger,
   getInfoDevice,
   cn,
+  listenCookieChange,
 };

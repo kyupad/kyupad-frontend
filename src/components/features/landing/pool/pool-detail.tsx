@@ -2,10 +2,9 @@ import React, { memo } from 'react';
 import Image from 'next/image';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
-import CountdownTime from '@/components/common/countdown-time';
+import CountdownTime from '@/components/common/coutdown';
 import { cn } from '@/utils/helpers';
 import { currencyFormatter } from '@/utils/helpers/currency';
-import { v4 as uuidv4 } from 'uuid';
 
 interface IPoolDetailProps {
   active?: boolean;
@@ -47,36 +46,62 @@ const PoolDetail = ({
 
         <div className="min-h-[180px] bg-[#FDEDC8] rounded-[24px] border-2 border-[#FCD88B] p-5 flex gap-5 overflow-hidden items-center">
           <div
-            className={`min-w-[100px] lg:min-w-[140px] h-[100px] lg:h-[140px] rounded-full overflow-hidden relative border-2 ${active ? 'border-button-primary' : 'border-[#25252C]'}`}
+            className={cn(
+              `min-w-[100px] lg:min-w-[140px] h-[100px] lg:h-[140px] rounded-full overflow-hidden relative border-2 ${active ? 'border-button-primary' : 'border-[#25252C]'}`,
+              direction === 'column' ? '!min-w-[100px] !h-[100px]' : '',
+            )}
           >
             <Image
               alt="logo"
-              src={`https://robohash.org/${uuidv4()}`}
+              src={`/images/home/robot.webp`}
               draggable="false"
               fill
               style={{ objectFit: 'cover' }}
-              sizes="140px"
+              sizes="100vw"
             />
           </div>
           <div className="flex gap-2 flex-col">
-            <h4 className="font-bold text-lg sm:text-2xl xl:text-[32px] text-[#25252C] line-clamp-2">
+            <h4
+              className={cn(
+                'font-bold text-lg sm:text-2xl xl:text-[32px] text-[#25252C] line-clamp-2',
+                direction === 'column' ? '!text-2xl' : '',
+              )}
+            >
               Bunny Protocol
             </h4>
-            <div className="font-bold sm:text-xl xl:text-2xl text-[#25252C]">
+            <div
+              className={cn(
+                'font-bold sm:text-xl xl:text-2xl text-[#25252C]',
+                direction === 'column' ? '!text-xl' : '',
+              )}
+            >
               $BPT
             </div>
+
             <div className="flex gap-[10px] flex-wrap">
-              <span className="rounded-[16px] py-2 px-4 text-xs sm:text-sm bg-[#FCD88B] text-[#25252C]">
-                Perp DEX
-              </span>
-              <span className="rounded-[16px] py-2 px-4 text-xs sm:text-sm bg-[#FCD88B] text-[#25252C]">
-                DeFi
-              </span>
+              {['Perp DEX', 'DeFi'].map((item) => {
+                return (
+                  <span
+                    key={item}
+                    className={cn(
+                      'rounded-[16px] lg:rounded py-2 px-4 text-xs sm:text-sm bg-[#FCD88B] text-[#25252C]',
+                      direction === 'column' ? '!rounded-[16px]' : '',
+                    )}
+                  >
+                    {item}
+                  </span>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        <div className="text-button-primary-border lg:text-xl">
+        <div
+          className={cn(
+            'text-button-primary-border lg:text-xl',
+            direction === 'column' ? '!text-base' : '',
+          )}
+        >
           Dive into intense multiplayer battles in the most competitive space
           shooter ever!{' '}
         </div>
@@ -137,7 +162,11 @@ const PoolDetail = ({
         </div>
 
         <div>
-          {!ended_at && <PrimaryButton>Join now</PrimaryButton>}
+          {!ended_at && (
+            <PrimaryButton block className={cn(active ? 'font-heading' : '')}>
+              Join now
+            </PrimaryButton>
+          )}
           {ended_at && <SecondaryButton>Details</SecondaryButton>}
         </div>
       </div>
@@ -147,7 +176,7 @@ const PoolDetail = ({
           className={cn(
             'lg:w-7/12 relative rounded-tl-[8px] border-b-4 rounded-tr-[8px] lg:rounded-[8px] overflow-hidden border-[#25252C] order-1 lg:order-2 pb-[56.25%] lg:pb-0 lg:border-2',
             direction === 'column'
-              ? '!order-1 !w-full !pb-[56.25%] !rounded-bl-none !rounded-br-none !border-b-4'
+              ? '!order-1 !w-full !pb-[56.25%] !rounded-bl-none !rounded-br-none !border-b-4 !border-r-0 !border-l-0 !border-t-0'
               : '',
           )}
         >
@@ -157,30 +186,9 @@ const PoolDetail = ({
             alt="cover"
             draggable={false}
             style={{ objectFit: 'cover', objectPosition: 'center' }}
+            sizes="100vw"
           />
         </div>
-      )}
-
-      {active && (
-        <>
-          <div className="absolute -top-[49px] lg:-top-[60px] left-1/4 w-[53px] lg:w-[93px] h-[58px]">
-            <Image
-              src="/images/home/cat-left-ear.svg"
-              alt="Cat left ear"
-              fill
-              sizes="93px"
-            />
-          </div>
-
-          <div className="absolute -top-[49px] lg:-top-[60px] right-1/4 w-[53px] lg:w-[93px] h-[58px]">
-            <Image
-              src="/images/home/cat-right-ear.svg"
-              alt="Cat left ear"
-              fill
-              sizes="93px"
-            />
-          </div>
-        </>
       )}
     </div>
   );
