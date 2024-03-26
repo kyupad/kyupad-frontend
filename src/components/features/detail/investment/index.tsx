@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { ButtonCustom } from '@/components/common/button';
-import { ContexType, detailContext } from '@/components/features/detail';
-
-import { Item, ModalItems } from '../item';
+import ButtonCustom from '@/components/common/button/button-custom';
+import {
+  DetailContext,
+  DetailContextProps,
+} from '@/components/common/context/detai-context';
+import { Item, ModalItems } from '@/components/features/detail/item';
 
 const CountdownTimer = dynamic(() => import('@/utils/helpers/countdownTimer'), {
   ssr: false,
@@ -12,7 +14,6 @@ const CountdownTimer = dynamic(() => import('@/utils/helpers/countdownTimer'), {
 
 const Investment = () => {
   const {
-    // @ts-ignore
     image,
     coinName,
     coinSymbol,
@@ -23,12 +24,13 @@ const Investment = () => {
     totalTickets,
     handleChangeInvestmentStatus,
     handleInvested,
-  } = useContext<ContexType | any>(detailContext);
+  } = useContext<DetailContextProps>(DetailContext);
+
   return (
     <div className="flex flex-row justify-center items-center p-3 ">
       <div className="flex flex-col gap-4 flex-auto">
         <div className="flex gap-5 ">
-          <Image src={image} alt="logo" width={200} height={200} quality={1} />
+          <Image src={image} alt="logo" width={200} height={200} />
           <div className="pt-7 w-full *:leading-relaxed">
             <h1 className="text-5xl font-bold">{coinName}</h1>
             <span className="text-4xl font-medium">{coinSymbol}</span>
@@ -67,7 +69,7 @@ const Investment = () => {
               />
               <Item
                 title="Total Winners"
-                value={totalWinners}
+                value={totalWinners.toLocaleString('en-US')}
                 className="w-full "
               />
               <Item
@@ -78,7 +80,7 @@ const Investment = () => {
               />
               <Item
                 title="Total ticket"
-                value={totalTickets}
+                value={totalTickets.toLocaleString('en-US')}
                 className="w-full"
               />
             </ModalItems>
@@ -113,7 +115,7 @@ const Investment = () => {
       </div>
       {investment?.status && !investment?.timeEnded ? (
         <Image
-          src={'/images/detail/prettyCat.svg'}
+          src={'/images/detail/pretty-cat.svg'}
           className="inline-block "
           alt="sad cat"
           width={600}
@@ -121,7 +123,7 @@ const Investment = () => {
         />
       ) : (
         <Image
-          src={'/images/detail/sadCat.svg'}
+          src={'/images/detail/sad-cat.svg'}
           className="inline-block "
           alt="sad cat"
           width={600}

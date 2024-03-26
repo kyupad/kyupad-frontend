@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
 
 type Props = {
@@ -11,7 +11,7 @@ const HeadDetail = ({ image, CoinName, CoinSymbol, tradePlatform }: Props) => {
   return (
     <div className="*:py-2 flex flex-row">
       <div className="flex gap-5 w-2/4">
-        <Image src={image} alt="logo" width={200} height={200} quality={100} />
+        <Image src={image} alt="logo" width={200} height={200} priority />
         <div className="pt-7 w-full *:leading-relaxed">
           <h1 className="text-5xl font-bold">{CoinName}</h1>
           <span className="text-4xl font-bold">{CoinSymbol}</span>
@@ -31,9 +31,9 @@ const HeadDetail = ({ image, CoinName, CoinSymbol, tradePlatform }: Props) => {
           <a href="#">
             <Image
               src={'/images/detail/tele.svg'}
-              className="h-fit m-0 p-0"
+              className="h-auto w-auto aspect-square m-0 p-0"
               alt="telegram"
-              width={24}
+              width={25}
               height={25}
             />
           </a>
@@ -71,4 +71,4 @@ const HeadDetail = ({ image, CoinName, CoinSymbol, tradePlatform }: Props) => {
   );
 };
 
-export default HeadDetail;
+export default memo(HeadDetail);

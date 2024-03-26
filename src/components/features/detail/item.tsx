@@ -1,5 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
+import { cn } from '@/utils/helpers';
 
 type Props = {
   title: string;
@@ -16,12 +16,12 @@ const Item = ({
   labelClassName,
   valueClassName,
 }: Props) => (
-  <div className={clsx('w-2/5 py-2', className)}>
-    <span className={clsx('w-2/4 inline-block text-xl', labelClassName)}>
+  <div className={cn('w-2/5 py-2', className)}>
+    <span className={cn('w-2/4 inline-block text-xl', labelClassName)}>
       {title}
     </span>
     <span
-      className={clsx(
+      className={cn(
         'w-2/4 inline-block text-2xl font-medium text-end',
         valueClassName,
       )}
@@ -37,6 +37,6 @@ const ModalItems = ({
 }: {
   children: React.ReactNode;
   className?: string;
-}) => <div className={clsx('', className)}>{children}</div>;
+}) => <div className={cn('', className)}>{children}</div>;
 
 export { Item, ModalItems };

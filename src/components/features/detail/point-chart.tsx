@@ -1,13 +1,13 @@
 import React from 'react';
 import Image from 'next/image';
-import Tooltip from '@/components/common/tooltip';
+import Tooltip from '@/components/common/tooltip/tooltip-custom';
 
 const PointChart = () => {
   return (
     <div className="flex ">
       <div className="flex flex-row flex-auto relative">
         <Image
-          src={'/images/detail/cat_holding_a_table.svg'}
+          src={'/images/detail/cat-holding-table.svg'}
           alt="cat"
           width={600}
           height={600}

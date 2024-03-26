@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import clsx, { ClassValue } from 'clsx';
+import dayjs from 'dayjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { twMerge } from 'tailwind-merge';
 
@@ -77,7 +78,12 @@ const getInfoDevice = () => {
 const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
+const convertUTCtime = (time: string) => {
+  const dt = dayjs(time);
+  const formattedDateTime = dt.format('MMM DD, YYYY HH:mm [UTC]');
 
+  return formattedDateTime;
+};
 export {
   removeUndefinedAndNull,
   isEmpty,
@@ -85,4 +91,5 @@ export {
   logger,
   getInfoDevice,
   cn,
+  convertUTCtime,
 };

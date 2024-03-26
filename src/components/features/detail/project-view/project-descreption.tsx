@@ -23,7 +23,7 @@ const ProjectDescreption = () => {
         Ecosystem.
       </p>
       <Image
-        src="/images/detail/image_Heroes.svg"
+        src="/images/detail/image-heroes.svg"
         alt="image"
         width={1000}
         height={750}

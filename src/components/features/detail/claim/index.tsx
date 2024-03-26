@@ -1,15 +1,15 @@
 import React, { useContext } from 'react';
 import Image from 'next/image';
-import { ButtonCustom } from '@/components/common/button';
-import { detailContext } from '@/components/features/detail';
-
-import { ContexType } from '..';
-import HeadDetail from '../head-detail';
-import { Item, ModalItems } from '../item';
+import ButtonCustom from '@/components/common/button/button-custom';
+import {
+  DetailContext,
+  DetailContextProps,
+} from '@/components/common/context/detai-context';
+import HeadDetail from '@/components/features/detail/head-detail';
+import { Item, ModalItems } from '@/components/features/detail/item';
 
 const InvesmentView = () => {
   const {
-    // @ts-ignore
     image,
     coinName,
     coinSymbol,
@@ -19,7 +19,7 @@ const InvesmentView = () => {
     vestingType,
     tge,
     claimPeiod,
-  } = useContext<ContexType | any>(detailContext);
+  } = useContext<DetailContextProps>(DetailContext);
 
   return (
     <div className="py-5 w-full">
@@ -40,12 +40,12 @@ const InvesmentView = () => {
         <div className="flex justify-evenly">
           <Item
             title="Total Invested"
-            value={totalInvested}
+            value={totalInvested.toLocaleString('en-US') + ' USDT'}
             valueClassName="text-[#F2820E]"
           />
           <Item
             title="Total Token Received"
-            value={totalTokenReceived}
+            value={totalTokenReceived.toLocaleString('en-US') + ' STAR'}
             valueClassName="text-[#F2820E]"
           />
         </div>
@@ -86,7 +86,7 @@ const InvesmentView = () => {
           </table>
         </div>
         <Image
-          src="images/detail/catpilot.svg"
+          src="images/detail/cat-pilot.svg"
           className="absolute -right-48"
           width={517}
           height={353}

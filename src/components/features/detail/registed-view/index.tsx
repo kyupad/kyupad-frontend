@@ -1,16 +1,16 @@
 import React, { useContext } from 'react';
-import { detailContext } from '@/components/features/detail';
-
-import HeadDetail from '../head-detail';
-import Point from '../point';
-import PointChart from '../point-chart';
-import RegisterElement from '../timer-countdown';
+import {
+  DetailContext,
+  DetailContextProps,
+} from '@/components/common/context/detai-context';
+import HeadDetail from '@/components/features/detail/head-detail';
+import Point from '@/components/features/detail/point';
+import PointChart from '@/components/features/detail/point-chart';
+import RegisterElement from '@/components/features/detail/timer-countdown';
 
 const RegisteredView = () => {
-  // @ts-ignore
   const { image, coinName, coinSymbol, tradePlatform } =
-    useContext(detailContext);
-
+    useContext<DetailContextProps>(DetailContext);
   return (
     <div className="">
       <HeadDetail

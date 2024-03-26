@@ -1,7 +1,10 @@
 import React, { useContext } from 'react';
 import dynamic from 'next/dynamic';
-import { ButtonCustom } from '@/components/common/button';
-import { ContexType, detailContext } from '@/components/features/detail';
+import ButtonCustom from '@/components/common/button/button-custom';
+import {
+  DetailContext,
+  DetailContextProps,
+} from '@/components/common/context/detai-context';
 
 const CountdownTimer = dynamic(() => import('@/utils/helpers/countdownTimer'), {
   ssr: false,
@@ -14,7 +17,7 @@ const RegisterElement = () => {
     handleChangeRegisterStatus,
     handleChangeView,
     registedView,
-  } = useContext<ContexType | any>(detailContext);
+  } = useContext<DetailContextProps>(DetailContext);
 
   return (
     <div className="flex justify-between  w-full py-9 items-center text-2xl font-bold">

@@ -1,15 +1,16 @@
 import React, { useContext } from 'react';
-import { detailContext } from '@/components/features/detail';
-
-import HeadDetail from '../head-detail';
-import ProjectView from '../project-view';
-import Step from '../step';
-import RegisterElement from '../timer-countdown';
+import {
+  DetailContext,
+  DetailContextProps,
+} from '@/components/common/context/detai-context';
+import HeadDetail from '@/components/features/detail/head-detail';
+import ProjectView from '@/components/features/detail/project-view';
+import Step from '@/components/features/detail/step';
+import RegisterElement from '@/components/features/detail/timer-countdown';
 
 const Registation = () => {
-  // @ts-ignore
-  const { image, coinName, coinSymbol, tradePlatform, registration } =
-    useContext(detailContext);
+  const { image, coinName, coinSymbol, tradePlatform, description } =
+    useContext<DetailContextProps>(DetailContext);
   return (
     <div>
       <HeadDetail
@@ -18,7 +19,8 @@ const Registation = () => {
         CoinSymbol={coinSymbol}
         tradePlatform={tradePlatform}
       />
-      <Step step={registration.registed} />
+      <span className="text-xl my-6 block">{description}</span>
+      <Step />
       <RegisterElement />
       <ProjectView />
     </div>

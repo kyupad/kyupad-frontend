@@ -15,8 +15,8 @@ const CountdownTimer = ({
 }) => {
   const calculateTimeLeft = (): time => {
     const difference = +new Date(time) - +new Date();
-    // @ts-ignore
-    let timeLeft: time = {};
+
+    let timeLeft = {} as time;
 
     if (difference > 0) {
       timeLeft = {
@@ -38,7 +38,7 @@ const CountdownTimer = ({
       const newTimeLeft = calculateTimeLeft();
       if (Object.keys(newTimeLeft).length === 0) {
         setEnded(true);
-        action();
+        return action();
       } else {
         setTimeLeft(newTimeLeft);
       }
