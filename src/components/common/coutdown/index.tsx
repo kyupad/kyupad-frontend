@@ -2,6 +2,8 @@
 
 import React, { memo, useEffect, useState } from 'react';
 
+import CountdownItem from './item';
+
 const CountdownTime = ({ time }: { time: number }) => {
   const [days, setDays] = useState<number>(0);
   const [hours, setHours] = useState<number>(0);
@@ -41,9 +43,12 @@ const CountdownTime = ({ time }: { time: number }) => {
   }, [time]);
 
   return (
-    <span className="font-bold text-sm sm:text-xl text-[#18CF6A] whitespace-nowrap">
-      {days}d : {hours}h : {minutes}m : {seconds}s
-    </span>
+    <div className="flex font-bold text-sm sm:text-xl text-[#18CF6A] whitespace-nowrap gap-1">
+      <CountdownItem num={days} text="d" /> :
+      <CountdownItem num={hours} text="h" /> :
+      <CountdownItem num={minutes} text="m" /> :
+      <CountdownItem num={seconds} text="s" />
+    </div>
   );
 };
 

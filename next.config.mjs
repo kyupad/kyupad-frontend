@@ -10,21 +10,6 @@ const millionConfig = {
   auto: false,
 };
 
-const cspHeader = `
-    default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline';
-    style-src 'self' 'unsafe-inline';
-    worker-src 'self' blob:;
-    img-src 'self' blob: data:;
-    font-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    frame-ancestors 'none';
-    block-all-mixed-content;
-    upgrade-insecure-requests;
-`;
-
 const runWithBundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
@@ -80,13 +65,7 @@ const nextConfig = runWithBundleAnalyzer({
     return [
       {
         source: '/:path*',
-        headers: [
-          ...securityHeaders,
-          {
-            key: 'Content-Security-Policy',
-            value: cspHeader.replace(/\n/g, ''),
-          },
-        ],
+        headers: [...securityHeaders],
       },
     ];
   },
@@ -95,7 +74,7 @@ const nextConfig = runWithBundleAnalyzer({
   images: {
     minimumCacheTTL: process.env.NODE_ENV === 'production' ? 86400 : 0,
     formats: ['image/webp'],
-    remotePatterns: [{ hostname: 'robohash.org' }],
+    remotePatterns: [],
   },
 });
 

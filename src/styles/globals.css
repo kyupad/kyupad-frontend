@@ -29,6 +29,18 @@
     --button-primary-border: #31313a;
     --button-secondary: #b6b7c3;
     --button-secondary-hover: #5a5b6f;
+    --kyu-color-1: #fff9eb;
+    --kyu-color-2: #fdedc8;
+    --kyu-color-3: #fcd88b;
+    --kyu-color-4: #fabf52;
+    --kyu-color-5: #f2820e;
+    --kyu-color-6: #d8d9df;
+    --kyu-color-7: #b6b7c3;
+    --kyu-color-8: #5a5b6f;
+    --kyu-color-9: #3f3f4d;
+    --kyu-color-10: #31313a;
+    --kyu-color-11: #25252c;
+    --kyu-color-12: #f7f7f8;
   }
 
   .dark {
@@ -60,7 +72,8 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    background: var(--kyu-color-12);
+    color: var(--kyu-color-10);
   }
 }
 
@@ -80,15 +93,24 @@
   height: 100%;
 }
 
-.text-shadow-primary {
-  text-shadow:
-    3px 0 0 var(--button-primary-border),
-    -3px 0 0 var(--button-primary-border),
-    0 3px 0 var(--button-primary-border),
-    0 -3px 0 var(--button-primary-border),
-    2px 2px var(--button-primary-border),
-    -2px -2px 0 var(--button-primary-border),
-    2px -2px 0 var(--button-primary-border),
-    -2px 2px 0 var(--button-primary-border);
-  letter-spacing: 3px;
+.text-shadow-primary-mobile {
+  -webkit-text-stroke: 2px var(--kyu-color-10);
+  -moz-text-stroke: 2px var(--kyu-color-10);
+  -ms-text-stroke: 2px var(--kyu-color-10);
+  color: transparent;
+  -webkit-text-fill-color: #fabf52;
+  -moz-text-fill-color: #fabf52;
+  -ms-text-fill-color: #fabf52;
+}
+
+@media screen and (width >= 640px) {
+  .text-shadow-primary-mobile {
+    -webkit-text-stroke: 3px var(--kyu-color-10) !important;
+    -moz-text-stroke: 3px var(--kyu-color-10) !important;
+    -ms-text-stroke: 3px var(--kyu-color-10) !important;
+  }
+}
+
+.accordion-button[data-state='open'] #arrow-down {
+  transform: rotate(180deg);
 }

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { cn } from '@utils/helpers';
 
 function Skeleton({
@@ -12,4 +13,4 @@ function Skeleton({
   );
 }
 
-export { Skeleton };
+export default memo(Skeleton);
