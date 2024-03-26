@@ -1,5 +1,5 @@
-const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
-const REFRESH_TOKEN_STORAGE_KEY = 'refreshToken';
+const ACCESS_TOKEN_STORAGE_KEY = 'access_token';
+const REFRESH_TOKEN_STORAGE_KEY = 'refresh_token';
 
 const MAX_AGE_ACCESS_TOKEN = 60 * 5; // 5 minutes
 const MAX_AGE_REFRESH_TOKEN = 60 * 60 * 24 * 7; // 7 days

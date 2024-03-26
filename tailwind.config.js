@@ -64,6 +64,18 @@ const theme = {
           hover: 'var(--button-secondary-hover)',
         },
       },
+      'kyu-color-1': '#fff9eb',
+      'kyu-color-2': '#fdedc8',
+      'kyu-color-3': '#fcd88b',
+      'kyu-color-4': '#fabf52',
+      'kyu-color-5': '#f2820e',
+      'kyu-color-6': '#d8d9df',
+      'kyu-color-7': '#b6b7c3',
+      'kyu-color-8': '#5a5b6f',
+      'kyu-color-9': '#3f3f4d',
+      'kyu-color-10': '#31313a',
+      'kyu-color-11': '#25252c',
+      'kyu-color-12': '#f7f7f8',
     },
     borderRadius: {
       lg: 'var(--radius)',
@@ -96,4 +108,5 @@ const theme = {
 };
 const plugins = [require('tailwindcss-animate')];
 
+// eslint-disable-next-line import/no-unused-modules
 export { plugins, content, darkMode, prefix, theme };

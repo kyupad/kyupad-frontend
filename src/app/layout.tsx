@@ -1,3 +1,4 @@
+import Footer from '@/components/common/footer';
 import Header from '@/components/common/header';
 import WebVitals from '@/components/features/web-vitals';
 import { META_DATA_DEFAULT } from '@/utils/constants/seo';
@@ -24,16 +25,13 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body
-        className={cn(
-          'min-h-screen bg-background font-sans antialiased bg-gray-100',
-          fontSans.variable,
-        )}
+        className={cn('min-h-screen font-sans antialiased', fontSans.variable)}
       >
         <WebVitals />
         <NextTopLoader color="#f2820e" />
         <Header />
-        {children}
-        <footer className="mt-10" />
+        <main className="overflow-hidden relative">{children}</main>
+        <Footer />
         <SonnerToaster />
       </body>
     </html>
@@ -43,4 +41,5 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 // eslint-disable-next-line import/no-unused-modules
 export default RootLayout;
 
+// eslint-disable-next-line import/no-unused-modules
 export { metadata };
