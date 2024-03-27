@@ -11,7 +11,9 @@ const CountdownTime = ({ time }: { time: number }) => {
   const [seconds, setSeconds] = useState<number>(0);
 
   useEffect(() => {
-    const updateTime = setInterval(() => {
+    let animationFrameId: number;
+
+    const updateTime = () => {
       const now = new Date().getTime();
 
       const difference = time - now;
@@ -29,17 +31,20 @@ const CountdownTime = ({ time }: { time: number }) => {
       setHours(newHours);
       setMinutes(newMinutes);
       setSeconds(newSeconds);
+      animationFrameId = requestAnimationFrame(updateTime);
 
       if (difference <= 0) {
-        clearInterval(updateTime);
+        cancelAnimationFrame(animationFrameId);
         setDays(0);
         setHours(0);
         setMinutes(0);
         setSeconds(0);
       }
-    }, 1);
+    };
 
-    return () => clearInterval(updateTime);
+    updateTime();
+
+    return () => cancelAnimationFrame(animationFrameId);
   }, [time]);
 
   return (
