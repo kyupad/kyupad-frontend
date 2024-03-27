@@ -104,9 +104,33 @@ function listenCookieChange(
 const convertUTCtime = (time: string) => {
   const dt = dayjs(time);
   const formattedDateTime = dt.format('MMM DD, YYYY HH:mm [UTC]');
-
   return formattedDateTime;
 };
+
+function listenCookieChange(
+  callback: ({
+    oldValue,
+    newValue,
+  }: {
+    oldValue: string;
+    newValue: string;
+  }) => void,
+  interval = 1000,
+) {
+  let lastCookie = document.cookie;
+  setInterval(() => {
+    const cookie = document.cookie;
+    if (cookie !== lastCookie) {
+      try {
+        callback({ oldValue: lastCookie, newValue: cookie });
+      } finally {
+        lastCookie = cookie;
+      }
+    }
+  }, interval);
+}
+
+
 export {
   removeUndefinedAndNull,
   isEmpty,
@@ -116,4 +140,5 @@ export {
   cn,
   listenCookieChange,
   convertUTCtime,
+  listenCookieChange,
 };
