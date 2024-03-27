@@ -28,7 +28,10 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body
-        className={cn('min-h-screen font-sans antialiased', fontSans.variable)}
+        className={cn(
+          'min-h-screen font-sans antialiased scrollbar',
+          fontSans.variable,
+        )}
       >
         <WebVitals />
         <NextTopLoader color="#f2820e" />
