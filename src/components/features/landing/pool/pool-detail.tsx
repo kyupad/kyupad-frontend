@@ -6,6 +6,9 @@ import CountdownTime from '@/components/common/coutdown';
 import { cn } from '@/utils/helpers';
 import { currencyFormatter } from '@/utils/helpers/currency';
 
+import meow from '/public/images/home/meow.jpeg';
+import robot from '/public/images/home/robot.webp';
+
 interface IPoolDetailProps {
   active?: boolean;
   direction?: 'row' | 'column';
@@ -53,7 +56,7 @@ const PoolDetail = ({
           >
             <Image
               alt="logo"
-              src={`/images/home/robot.webp`}
+              src={robot}
               draggable="false"
               fill
               style={{ objectFit: 'cover' }}
@@ -181,7 +184,7 @@ const PoolDetail = ({
           )}
         >
           <Image
-            src="/images/home/meow.jpeg"
+            src={meow}
             fill
             alt="cover"
             draggable={false}

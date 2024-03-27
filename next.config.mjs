@@ -42,8 +42,8 @@ const nextConfig = runWithBundleAnalyzer({
   output: 'standalone',
   experimental: {
     webVitalsAttribution: ['FCP', 'TTFB'],
-     serverActions: {
-      allowedOrigins: process.env.ALLOWED_ORIGINS.split(','),
+    serverActions: {
+      allowedOrigins: process.env.NEXT_PUBLIC_ALLOWED_ORIGINS.split(','),
     },
   },
   compiler: {
@@ -85,7 +85,6 @@ const nextConfig = runWithBundleAnalyzer({
       fullUrl: true,
     },
   },
-
 });
 
 export default process.env.NODE_ENV === 'production'

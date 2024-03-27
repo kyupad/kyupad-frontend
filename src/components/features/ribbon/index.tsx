@@ -1,0 +1,35 @@
+'use client';
+
+import React, { memo, useEffect, useState } from 'react';
+
+function Ribbon() {
+  const [env, setEnv] = useState('');
+
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    switch (hostname) {
+      case 'localhost':
+        setEnv('LOCAL');
+        break;
+      case 'dev.kyupad.xyz':
+        setEnv('DEV');
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  return (
+    <>
+      {env && (
+        <div className="fixed left-0 top-0 h-16 w-16">
+          <div className="absolute transform -rotate-45 bg-kyu-color-4 text-center text-kyu-color-10 font-bold py-1 left-[-50px] top-[20px] w-[170px] font-sans shadow">
+            {env}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+export default memo(Ribbon);

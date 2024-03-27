@@ -10,6 +10,7 @@ import { WEB_ROUTES } from '@/utils/constants';
 
 import Skeleton from '../loading/skeleton';
 import MobileMenu from './mobile-menu';
+import kyupadLogo from '/public/images/header/kyupad-logo.svg';
 
 const WalletConnect = dynamic(() => import('./wallet-connect'), {
   ssr: false,
@@ -21,13 +22,7 @@ const Header = () => {
     <header className="flex w-full max-w-8xl mx-auto justify-between px-4 lg:px-[24px] py-5 flex-wrap gap-8">
       <div className="max-w-[144px] min-w-[144px]">
         <Link href={WEB_ROUTES.HOME}>
-          <Image
-            src="/images/header/kyupad-logo.svg"
-            alt="Kyupad Logo"
-            width={336}
-            height={112}
-            draggable={false}
-          />
+          <Image src={kyupadLogo} alt="Kyupad Logo" draggable={false} />
         </Link>
       </div>
       <div className="lg:hidden">
