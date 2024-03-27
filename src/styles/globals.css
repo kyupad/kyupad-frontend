@@ -77,6 +77,28 @@
   }
 }
 
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: var(--kyu-color-12);
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: var(--kyu-color-4);
+    border-radius: 100vh;
+    border: 2px solid var(--kyu-color-10);
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--kyu-color-5);
+  }
+}
+
 .min-h-100 {
   @include min-height(100vh);
 }
