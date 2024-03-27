@@ -1,5 +1,6 @@
 import Footer from '@/components/common/footer';
 import Header from '@/components/common/header';
+import Ribbon from '@/components/features/ribbon';
 import WebVitals from '@/components/features/web-vitals';
 import { META_DATA_DEFAULT } from '@/utils/constants/seo';
 import { cn } from '@/utils/helpers';
@@ -33,6 +34,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <main className="overflow-hidden relative">{children}</main>
         <Footer />
         <SonnerToaster />
+        <Ribbon />
       </body>
     </html>
   );
