@@ -29,3 +29,4 @@ jobs:
           NEXT_PUBLIC_BASE_URL: 'http://localhost:3000'
           NEXT_PUBLIC_AUTH_METHOD: 'cookie'
           NEXT_PUBLIC_NETWORK: 'testnet'
+          ALLOWED_ORIGINS: 'localhost:3000'

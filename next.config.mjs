@@ -42,6 +42,9 @@ const nextConfig = runWithBundleAnalyzer({
   output: 'standalone',
   experimental: {
     webVitalsAttribution: ['FCP', 'TTFB'],
+     serverActions: {
+      allowedOrigins: process.env.ALLOWED_ORIGINS.split(','),
+    },
   },
   compiler: {
     removeConsole:
@@ -72,10 +75,17 @@ const nextConfig = runWithBundleAnalyzer({
   poweredByHeader: false,
 
   images: {
-    minimumCacheTTL: process.env.NODE_ENV === 'production' ? 86400 : 0,
+    minimumCacheTTL: process.env.NODE_ENV === 'production' ? 60 : 0,
     formats: ['image/webp'],
     remotePatterns: [],
   },
+
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
+
 });
 
 export default process.env.NODE_ENV === 'production'
