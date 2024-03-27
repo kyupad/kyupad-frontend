@@ -1,8 +1,8 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import PrimaryButton from '@/components/common/button/primary';
-import Pool from '@/components/features/landing/pool';
 import { cn } from '@/utils/helpers';
 
 import catBanner from '/public/images/home/cat-banner.png';
@@ -12,6 +12,8 @@ import latDecorator from '/public/images/home/last-decorator.svg';
 import catLeft from '/public/images/home/meo-left.png';
 import catRight from '/public/images/home/meo-right.png';
 import rocket from '/public/images/home/rocket.png';
+
+const Pool = dynamic(() => import('@/components/features/landing/pool'));
 
 const fontHeading = Knewave({
   subsets: ['latin'],

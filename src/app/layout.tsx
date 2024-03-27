@@ -1,7 +1,5 @@
-import Footer from '@/components/common/footer';
 import Header from '@/components/common/header';
 import Ribbon from '@/components/features/ribbon';
-import WebVitals from '@/components/features/web-vitals';
 import { META_DATA_DEFAULT } from '@/utils/constants/seo';
 import { cn } from '@/utils/helpers';
 
@@ -9,6 +7,10 @@ import '@styles/globals.css';
 
 import dynamic from 'next/dynamic';
 import { Nunito } from 'next/font/google';
+
+const Footer = dynamic(() => import('@/components/common/footer'));
+
+const WebVitals = dynamic(() => import('@/components/features/web-vitals'));
 
 const NextTopLoader = dynamic(() => require('nextjs-toploader')) as any;
 const SonnerToaster = dynamic(() => import('@/components/common/toast/sonner'));
