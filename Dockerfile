@@ -6,6 +6,8 @@ FROM base AS deps
 RUN apk update && \
     apk add --no-cache build-base python3
 RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
