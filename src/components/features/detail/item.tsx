@@ -16,13 +16,13 @@ const Item = ({
   labelClassName,
   valueClassName,
 }: Props) => (
-  <div className={cn('w-2/5 py-2', className)}>
-    <span className={cn('w-2/4 inline-block text-xl', labelClassName)}>
+  <div className={cn('w-2/5 py-2 flex justify-between', className)}>
+    <span className={cn('w-2/4  inline-block text-xl', labelClassName)}>
       {title}
     </span>
     <span
       className={cn(
-        'w-2/4 inline-block text-2xl font-medium text-end',
+        'w-2/5  inline-block text-2xl font-medium text-end text-nowrap',
         valueClassName,
       )}
     >

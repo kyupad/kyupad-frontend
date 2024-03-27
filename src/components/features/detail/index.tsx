@@ -5,27 +5,27 @@ import React, { useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Provider } from '@/components/common/context/detai-context';
 import RegisteredView from '@/components/features/detail/registed-view';
 import { DetailDataTypes } from '@/components/features/detail/types';
+import DetailContext from '@/contexts/detai-context';
 import { initData } from '@/mocks/detail-data';
 
 const Snapshot = dynamic(
   () => import('@/components/features/detail/snapshot'),
   {
-    ssr: false,
+    ssr: true,
   },
 );
 const Claim = dynamic(() => import('@/components/features/detail/claim'), {
-  ssr: false,
+  ssr: true,
 });
 const Registration = dynamic(
   () => import('@/components/features/detail/registration'),
-  { ssr: false },
+  { ssr: true },
 );
 const Investment = dynamic(
   () => import('@/components/features/detail/investment'),
-  { ssr: false },
+  { ssr: true },
 );
 
 const Detail = () => {
@@ -51,7 +51,7 @@ const Detail = () => {
   const handleChangeRegisterStatus = useCallback(() => {
     setData({
       ...data,
-      registration: { ...data.registration, status: true },
+      registration: { ...data.registration, timeEnded: true },
     });
     if (data.registration.registed) {
       setData({
@@ -68,7 +68,12 @@ const Detail = () => {
       investment: { ...data.investment, status: true },
     });
   }, []);
-
+  const handleChangeSnapshotStatus = useCallback(() => {
+    setData({
+      ...data,
+      step: 'investment',
+    });
+  }, []);
   const renderStep = (step: string) => {
     switch (step) {
       case 'registration':
@@ -85,7 +90,7 @@ const Detail = () => {
   };
 
   return (
-    <Provider
+    <DetailContext.Provider
       value={{
         ...data,
         handleChangeView,
@@ -93,25 +98,26 @@ const Detail = () => {
         handleRegisted,
         handleChangeRegisterStatus,
         handleChangeInvestmentStatus,
+        handleChangeSnapshotStatus,
         registedView,
       }}
     >
-      <div className="px-10 flex items-center bg-[#F7F7F8] p-4 max-w-[1440px] h-auto min-h-[calc(100dvh_-_90px)] mx-auto ">
-        <div className="w-full h-fit">
-          <div>
+      <div className="flex items-center size-full  h-auto  mx-auto ">
+        <div className="size-full relative">
+          <div className="flex w-full max-w-8xl mx-auto justify-between px-4 lg:px-[24px] py-5 flex-wrap gap-8">
             <Image
               src="/images/detail/arrow-left.svg"
               width={30}
               height={30}
               alt="arrow-left"
-              className="cursor-pointer"
+              className="cursor-pointer "
               onClick={router.back}
             />
           </div>
           {renderStep(data.step)}
         </div>
       </div>
-    </Provider>
+    </DetailContext.Provider>
   );
 };
 export default Detail;

@@ -1,14 +1,11 @@
 import React, { useContext } from 'react';
-import {
-  DetailContext,
-  DetailContextProps,
-} from '@/components/common/context/detai-context';
+import { DetailContext, DetailContextProps } from '@/contexts/detai-context';
 import { convertUTCtime } from '@/utils/helpers';
 
 const Timeline = () => {
   const { stepInfo } = useContext<DetailContextProps>(DetailContext);
   return (
-    <main className="relative min-h-screen py-5' justify-center bg-slate-50 overflow-hidden">
+    <main className="relative min-h-screen max-w-8xl mx-auto py-5' justify-center bg-slate-50 overflow-hidden">
       <div className="flex flex-col justify-center divide-y divide-slate-200 [&>*]:py-16">
         <div className="w-full  pl-[110px] mr-0">
           <div className="-my-6">

@@ -40,7 +40,7 @@ const Tabs = ({
                 activeTab === child.key
                   ? 'bg-black rounded-t-lg !text-[#FDEDC8] '
                   : ''
-              } px-4 text-gray-700 font-bold text-2xl py-2`}
+              } px-4 text-gray-700 font-bold text-base md:text-2xl py-2`}
               onClick={(e: React.MouseEvent) => handleClick(e, child.key)}
             >
               {child.label}
@@ -48,7 +48,7 @@ const Tabs = ({
           ))}
         </div>
       </div>
-      <div className="py-4 ">
+      <div className="py-4 mx-2 md:mx-auto ">
         {data.map((child: tabItems) => {
           if (child.key === activeTab) {
             return <div key={child.key}>{child.children}</div>;

@@ -4,10 +4,10 @@ import { Item, ModalItems } from '../item';
 
 const TokenSale = () => {
   return (
-    <div>
-      <div className="py-10">
-        <h2 className="text-2xl font-bold py-2">Contract metrics & Vesting</h2>
-        <ModalItems className="w-full xl:w-3/5">
+    <div className="max-w-8xl mx-auto">
+      <div className="py-10 ">
+        <h2 className="text-2xl  font-bold py-2">Contract metrics & Vesting</h2>
+        <ModalItems className="w-full xl:w-4/5">
           <div className="w-full border-b border-b-[#444451]">
             <Item
               valueClassName="text-base font-bold"

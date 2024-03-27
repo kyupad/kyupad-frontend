@@ -8,10 +8,11 @@ export interface DetailContextProps extends DetailDataTypes {
   handleChangeRegisterStatus: () => void;
   handleChangeInvestmentStatus: () => void;
   handleChangeView: () => void;
+  handleChangeSnapshotStatus: () => void;
   registedView?: boolean;
 }
 
 export const DetailContext = createContext<DetailContextProps>(
   {} as DetailContextProps,
 );
-export const { Provider } = DetailContext;
+export default DetailContext;

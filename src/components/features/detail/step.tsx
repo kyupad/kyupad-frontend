@@ -1,8 +1,5 @@
 import React, { memo, useContext } from 'react';
-import {
-  DetailContext,
-  DetailContextProps,
-} from '@/components/common/context/detai-context';
+import { DetailContext, DetailContextProps } from '@/contexts/detai-context';
 import { cn, convertUTCtime } from '@/utils/helpers';
 
 const Step = () => {
@@ -13,7 +10,7 @@ const Step = () => {
     <div className="*:py-2">
       <div
         className={cn(
-          'flex p-8 border-2 border-[#31313A] rounded-md w-full ',
+          'flex p-8 border-2 border-[#31313A] rounded-lg w-full ',
           registration.registed &&
             '[&>*:nth-child(2)]:before:absolute [&>*:nth-child(2)>:nth-child(2)>:first-child]:before:bg-[#f2820e] [&>*:nth-child(2)>:nth-child(2)>:first-child]:border-[#f2820e]   [&>*:nth-child(2)]:before:top-[50%] [&>*:nth-child(2)]:before:left-0 [&>*:nth-child(2)]:before:bg-[#f2820e]  [&>*:nth-child(2)]:before:w-2/4 [&>*:nth-child(2)]:before:h-1 [&>*:nth-child(2)]:before:z-10',
         )}

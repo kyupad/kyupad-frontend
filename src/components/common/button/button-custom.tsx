@@ -19,7 +19,7 @@ const ButtonCustom = ({
   return (
     <button
       className={cn(
-        'bg-[#FABF52] w-[200px] hover:bg-button-primary-hover transition-all hover:shadow-[8px_8px_0px_0px_#2a273a26] active:shadow-none group relative overflow-hidden font-bold h-[52px]  text-[#31313A] rounded-lg text-xl disabled:bg-[#B6B7C3] disabled:text-[#251F1F] border-2 border-solid border-[#31313A]',
+        'bg-[#FABF52] lg:w-[200px] hover:bg-button-primary-hover transition-all hover:shadow-[8px_8px_0px_0px_#2a273a26] active:shadow-none group relative overflow-hidden font-bold h-[52px]  text-[#31313A] rounded-lg text-xl disabled:bg-[#B6B7C3] disabled:text-[#251F1F] border-2 border-solid border-[#31313A]',
         className,
       )}
       onClick={disabled ? () => null : onClick}

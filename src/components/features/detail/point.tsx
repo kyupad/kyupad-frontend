@@ -1,8 +1,5 @@
 import React, { useContext } from 'react';
-import {
-  DetailContext,
-  DetailContextProps,
-} from '@/components/common/context/detai-context';
+import { DetailContext, DetailContextProps } from '@/contexts/detai-context';
 import { currencyFormatter } from '@/utils/helpers/currency';
 
 import { Item, ModalItems } from './item';
@@ -19,12 +16,12 @@ const Point = () => {
         <span className="font-bold ">Your Catnip Points is {point}.</span>{' '}
         Increase it to win more tickets and earn higher allocation
       </p>
-      <ModalItems className=" mx-auto bg-[#EEEDF1] py-4 rounded-sm border-2 border-[#25252C]">
-        <div className="flex justify-around">
+      <ModalItems className=" mx-auto bg-[#EEEDF1] py-4 px-6 rounded-lg border-2 border-[#25252C]">
+        <div className="flex justify-between">
           <Item title={'Your Catnip Points'} value={point} />
           <Item title={'Multipier'} value={multiplier} />
         </div>
-        <div className="flex justify-around">
+        <div className="flex justify-between">
           <Item
             title={'Total Assets Connected'}
             value={currencyFormatter.format(totalAssetsConnected)}

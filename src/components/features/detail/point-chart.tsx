@@ -4,7 +4,7 @@ import Tooltip from '@/components/common/tooltip/tooltip-custom';
 
 const PointChart = () => {
   return (
-    <div className="flex ">
+    <div className="flex">
       <div className="flex flex-row flex-auto relative">
         <Image
           src={'/images/detail/cat-holding-table.svg'}
@@ -14,10 +14,10 @@ const PointChart = () => {
         />
         <div className="flex justify-center flex-col items-center *:py-2 absolute right-[45%] top-[50%]">
           <p className="text-6xl font-bold text-[#EC5347]">0.13%</p>
-          <p className="font-bold text-2xl">change of winning</p>
+          <p className="font-bold text-2xl">Change of winning</p>
         </div>
       </div>
-      <div className="p-4 flex-auto max-w-[50%]">
+      <div className="p-4 flex-auto flex flex-col  justify-center items-start max-w-[50%]">
         <div className="font-medium text-2xl flex items-center gap-2">
           You have <span className="text-[#F2820E]">low</span> chance of winning
           <Tooltip
@@ -44,9 +44,11 @@ const PointChart = () => {
             <div className=" w-[205px] bg-[#18CF6A] "></div>
           </div>
         </div>
-        <div className="p-4 border-2 border-[#31313A] rounded-md bg-[#FDEDC8] mt-8">
-          <h2 className="font-bold py-2">How to increase your power:</h2>
-          <ul className="">
+        <div className="p-8 border-2 border-[#31313A] rounded-lg bg-[#FDEDC8] mt-8">
+          <h2 className="font-bold py-2 text-2xl">
+            How to increase your power:
+          </h2>
+          <ul className="list-disc ml-5 *:text-2xl">
             <li>Hold more Solana Assets ( SOL, JUP, JTO, USDC)</li>
             <li>Hold a Mad labs, SMB NFT </li>
             <li>Follow and share all the news of us on X</li>

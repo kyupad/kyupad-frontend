@@ -6,12 +6,12 @@ const initData: DetailDataTypes = {
   coinSymbol: '$STAR',
   tradePlatform: ['Perp DEX', 'DeFi'],
   point: 0.31,
-  multiplier: '1x',
+  multiplier: '1.5x',
   totalAssetsConnected: 11232657.13,
   description:
     'Dive into intense multiplayer battles in the most competitive space shooter ever! Developed by industry veterans from Cyberpunk 2077, the Witcher, and Ubisoft- Powered by GameSwift and a Microsoft grant, with 400k * pre - registered players!',
   paticipants: 11342,
-  totalRaised: 1000000,
+  totalRaised: 200000,
   tokenOffered: 100000000,
   priceTransfer: 0.1,
   ticketSize: 300,
@@ -19,31 +19,31 @@ const initData: DetailDataTypes = {
   numberOfWinners: 1,
   totalWinners: 3000,
   totalTickets: 1000,
-  step: 'registration', // step of the process
+  step: 'registration', // step of the process => ['registration', 'snapshot', 'investment', 'claim']
   registration: {
-    timer: '2024-03-27T10:34:00',
+    timer: '2024-05-22T10:34:00', // thời gian đăng ký
     registed: false, // trạng thái đã đăng ký
-    status: false, // trạng thái thời gian đăng ký
+    timeEnded: false, // trạng thái đã hết thời gian đăng ký
   },
   snapshot: {
-    timer: '2024-03-28T18:00:00',
+    timer: '2024-05-23T18:00:00', // thời gian snapshot
   },
   investment: {
-    timer: '2024-03-29T18:00:00',
+    timer: '2024-05-24T18:00:00', // thời gian đầu tư
     invested: false, // trạng thái đã đầu tư
-    timeEnded: false, // trạng thái thời gian đầu tư
-    status: true, // trạng thái investment
+    timeEnded: false, // trạng thái đã hết thời gian đầu tư
+    status: true, // trạng thái investment được mở invest không.
   },
   claim: {
-    timer: '2024-03-30T18:00:00',
-    claimed: false,
+    timer: '2024-05-25T18:00:00', // thời gian nhận token
+    claimed: false, // trạng thái đã nhận token
   },
   stepInfo: [
     {
       id: 'registration',
       step: 'Step 1',
       title: 'Registration',
-      datetime: '2024-03-27T10:34:00',
+      datetime: '2024-03-28T10:34:00',
       description:
         'Participants must have at least $200 USDT tokens (Solana Chain) in their connected wallet. The more you engage on socials, the greater the chances of winning. Create an account to make the checkout process during the lottery phase smoother.',
     },

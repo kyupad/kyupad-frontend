@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { memo, ReactNode, useState } from 'react';
 
 const Tooltip = ({
   message,
@@ -29,4 +29,4 @@ const Tooltip = ({
   );
 };
 
-export default Tooltip;
+export default memo(Tooltip);

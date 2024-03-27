@@ -1,10 +1,7 @@
 import React, { useContext } from 'react';
 import dynamic from 'next/dynamic';
 import ButtonCustom from '@/components/common/button/button-custom';
-import {
-  DetailContext,
-  DetailContextProps,
-} from '@/components/common/context/detai-context';
+import { DetailContext, DetailContextProps } from '@/contexts/detai-context';
 
 const CountdownTimer = dynamic(() => import('@/utils/helpers/countdownTimer'), {
   ssr: false,
@@ -29,10 +26,10 @@ const RegisterElement = () => {
         />
       </span>
       <ButtonCustom
-        disabled={registration.status || registedView}
+        disabled={registration.timeEnded || registedView}
         onClick={registration.registed ? handleChangeView : handleRegisted}
       >
-        {!registration.status
+        {!registration.timeEnded
           ? !registration.registed
             ? 'Register Now'
             : registedView

@@ -1,8 +1,4 @@
-import {
-  ACCESS_TOKEN_STORAGE_KEY,
-  AUTH_METHOD,
-  THROW_EXCEPTION,
-} from '@/utils/constants';
+import { ACCESS_TOKEN_STORAGE_KEY, AUTH_METHOD } from '@/utils/constants';
 import { env } from 'env.mjs';
 import qs from 'qs';
 
@@ -10,7 +6,7 @@ const defaultHeaders: HeadersInit = {
   'Content-Type': 'application/json',
 };
 
-const BASE_URL = env.NEXT_PUBLIC_BASE_URL;
+const BASE_URL = env.NEXT_PUBLIC_API_ENDPOINT;
 const DEFAULT_TIMEOUT = 20000;
 
 const request = async (
@@ -63,7 +59,7 @@ const request = async (
     const result = await res.json();
     return result;
   } catch {
-    return { message: THROW_EXCEPTION.UNKNOWN };
+    return { message: 'Meow. Please try again later!' };
   } finally {
     clearTimeout(timeout);
   }

@@ -29,7 +29,7 @@ export type DetailDataTypes = {
   registration: {
     timer: string;
     registed: boolean;
-    status: boolean;
+    timeEnded: boolean;
   };
   snapshot: {
     timer: string;

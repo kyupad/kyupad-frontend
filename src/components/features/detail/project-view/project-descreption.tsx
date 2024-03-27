@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 const ProjectDescreption = () => {
   return (
-    <div className="*:py-1 py-10">
+    <div className="*:py-1 py-10 max-w-8xl mx-auto">
       <h2 className="font-bold text-2xl py-2">What is Star Heroes?</h2>
       <p className="text-[#5A5B6F] font-medium">
         Star Heroes is a reputable and reliable launchpad platform on the Sui
