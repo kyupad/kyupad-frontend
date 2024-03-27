@@ -5,6 +5,14 @@ import PrimaryButton from '@/components/common/button/primary';
 import Pool from '@/components/features/landing/pool';
 import { cn } from '@/utils/helpers';
 
+import catBanner from '/public/images/home/cat-banner.png';
+import catSpace from '/public/images/home/cat-space.png';
+import goldCloud from '/public/images/home/gold-cloud.svg';
+import latDecorator from '/public/images/home/last-decorator.svg';
+import catLeft from '/public/images/home/meo-left.png';
+import catRight from '/public/images/home/meo-right.png';
+import rocket from '/public/images/home/rocket.png';
+
 const fontHeading = Knewave({
   subsets: ['latin'],
   variable: '--font-heading',
@@ -16,32 +24,23 @@ const Home = () => {
   return (
     <>
       <Image
-        src="/images/home/gold-cloud.svg"
-        width={1920}
-        height={1427}
+        src={goldCloud}
         alt="Gold cloud"
         style={{
           zIndex: -1,
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
         }}
         draggable="false"
-        className="top-[88vw] sm:top-[78vw] lg:top-[74vw] xl:top-[700px]"
+        className="top-[88vw] sm:top-[78vw] lg:top-[74vw] xl:top-[700px] absolute left-1/2 -translate-x-1/2"
       />
 
       <Image
-        src="/images/home/rocket.png"
-        width={668}
-        height={448}
+        src={rocket}
         alt="rocket"
         style={{
           zIndex: -1,
-          position: 'absolute',
-          transform: 'translateX(-50%)',
         }}
         draggable="false"
-        className="top-[88vw] left-[88%] max-w-[100px] sm:max-w-[180px] lg:max-w-[334px] lg:top-[73vw] xl:top-[780px] xl:left-[73%]"
+        className="top-[88vw] left-[88%] max-w-[100px] sm:max-w-[180px] lg:max-w-[334px] lg:top-[73vw] xl:top-[780px] xl:left-[73%] absolute -translate-x-1/2"
       />
 
       <div
@@ -51,14 +50,7 @@ const Home = () => {
         )}
       >
         <div className="max-w-[1000px]">
-          <Image
-            src="/images/home/cat-banner.png"
-            width={2002}
-            height={1188}
-            alt="Cat Banner"
-            draggable="false"
-            priority
-          />
+          <Image src={catBanner} alt="Cat Banner" draggable="false" priority />
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[80px] font-heading text-shadow-primary-mobile pt-[26px] pb-2 sm:py-[26px] text-center">
             The Whisker-Winning
@@ -81,33 +73,26 @@ const Home = () => {
 
         <div className="lg:px-[24px] relative">
           <Image
-            src="/images/home/meo-left.png"
-            width={622}
-            height={608}
-            alt="rocket"
+            src={catLeft}
+            alt="cat left"
             style={{
               zIndex: -1,
-              position: 'absolute',
-              transform: 'translateX(-50%)',
             }}
             draggable="false"
-            className="top-[-40px] left-[40px] max-w-[100px] sm:max-w-[180px] sm:top-[-120px] sm:left-[80px] md:left-[30px] lg:max-w-[237px] lg:top-[-130px] lg:left-[-50px] xl:left-[120px] 2xl:left-[-80px] 2xl:top-[-140px]"
+            className="top-[-40px] left-[40px] max-w-[100px] sm:max-w-[180px] sm:top-[-120px] sm:left-[80px] md:left-[30px] lg:max-w-[237px] lg:top-[-130px] lg:left-[-50px] xl:left-[120px] 2xl:left-[-80px] 2xl:top-[-140px] absolute -translate-x-1/2"
           />
           <Pool title="Upcoming Launches" data={[1, 2, 3]} upcoming />
         </div>
 
         <div className="lg:px-[24px] relative">
           <Image
-            src="/images/home/meo-right.png"
-            width={890}
-            height={741}
-            alt="rocket"
+            src={catRight}
+            alt="cat right"
             style={{
               zIndex: -1,
-              position: 'absolute',
             }}
             draggable="false"
-            className="right-[-475px] top-[-100px] max-w-[403px]"
+            className="right-[-475px] top-[-100px] max-w-[403px] absolute"
           />
           <Pool
             paging
@@ -122,13 +107,7 @@ const Home = () => {
 
         <div className="flex flex-col gap-8 items-center">
           <div className="max-w-[1091px]">
-            <Image
-              src="/images/home/cat-space.png"
-              width={2182}
-              height={824}
-              alt="Cat Space"
-              draggable={false}
-            />
+            <Image src={catSpace} alt="Cat Space" draggable={false} />
           </div>
           <div className="flex gap-4 flex-col items-center">
             <div className="text-2xl font-heading sm:text-4xl text-center">
@@ -142,11 +121,10 @@ const Home = () => {
         </div>
       </div>
       <Image
-        src="/images/home/last-decorator.svg"
-        alt=""
-        width={1920}
-        height={482}
+        src={latDecorator}
+        alt="decorator"
         className="mx-auto 2xl:-mt-16"
+        draggable={false}
       />
     </>
   );

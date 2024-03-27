@@ -3,19 +3,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { WEB_ROUTES } from '@/utils/constants';
 
+import logoFooter from '/public/images/footer/logo-footer.svg';
+import telegram from '/public/images/footer/telegram.svg';
+import x from '/public/images/footer/x.svg';
+
 function Footer() {
   return (
     <footer className="bg-kyu-color-4 flex items-center justify-center min-h-[244px]">
       <div className="max-w-8xl w-full flex flex-col items-center gap-3">
         <div className="flex justify-between items-center w-full px-[60px] py-5 gap-8 xl:gap-[60px] flex-col lg:flex-row">
           <div className="max-w-[150px] xl:min-w-[240px]">
-            <Image
-              src="/images/footer/logo-footer.svg"
-              alt="Logo Footer"
-              width={240}
-              height={80}
-              draggable={false}
-            />
+            <Image src={logoFooter} alt="Logo Footer" draggable={false} />
           </div>
 
           <div className="flex gap-5 sm:text-xl xl:gap-[60px] flex-wrap justify-center">
@@ -39,20 +37,10 @@ function Footer() {
             </div>
             <div className="flex gap-3">
               <a href={WEB_ROUTES.HOME}>
-                <Image
-                  src="/images/footer/telegram.svg"
-                  width={40}
-                  height={40}
-                  alt="Telegram"
-                />
+                <Image src={telegram} alt="Telegram" />
               </a>
               <a href={WEB_ROUTES.HOME}>
-                <Image
-                  src="/images/footer/x.svg"
-                  width={40}
-                  height={40}
-                  alt="X"
-                />
+                <Image src={x} alt="X" />
               </a>
             </div>
           </div>

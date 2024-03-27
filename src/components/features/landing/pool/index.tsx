@@ -3,6 +3,8 @@ import Image from 'next/image';
 
 import PoolDetail from './pool-detail';
 import UpcomingPool from './upcoming-pool';
+import arrowLeft from '/public/images/home/arrow-left.svg';
+import arrowRight from '/public/images/home/arrow-right.svg';
 
 interface IPoolProps {
   title?: string;
@@ -42,21 +44,11 @@ const Pool = ({ title, active, data, upcoming, paging }: IPoolProps) => {
       {paging && (
         <div className="flex justify-center items-center gap-12 pt-8">
           <button className="p-4">
-            <Image
-              src="/images/home/arrow-left.svg"
-              width={24}
-              height={24}
-              alt="Previous"
-            />
+            <Image src={arrowLeft} alt="Previous" />
           </button>
           <div className="font-bold text-2xl">1/5</div>
           <button className="p-4">
-            <Image
-              src="/images/home/arrow-right.svg"
-              width={24}
-              height={24}
-              alt="Next"
-            />
+            <Image src={arrowRight} alt="Next" />
           </button>
         </div>
       )}
