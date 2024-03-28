@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
 import { cn } from '@/utils/helpers';
+import catUpcoming from 'public/images/home/cat-upcoming.png';
 
 function UpcomingPoll() {
   return (
@@ -14,12 +15,7 @@ function UpcomingPoll() {
         <span className="text-4xl font-bold">+9 Projects</span>
       </div>
       <div className="max-w-[333px]">
-        <Image
-          src="/images/home/cat-upcoming.png"
-          alt="Upcoming"
-          width={667}
-          height={762}
-        />
+        <Image src={catUpcoming} alt="Upcoming" draggable={false} />
       </div>
     </div>
   );

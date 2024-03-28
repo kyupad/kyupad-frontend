@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useState } from 'react';
 import Image from 'next/image';
+import { useGlobalStore } from '@/contexts/global-store-provider';
 import {
   ACCESS_TOKEN_STORAGE_KEY,
   REFRESH_TOKEN_STORAGE_KEY,
@@ -18,6 +19,9 @@ import {
 function WalletConnected() {
   const { publicKey, disconnect, wallet } = useWallet();
   const [open, setOpen] = useState<boolean>(false);
+  const changeSolanaConnection = useGlobalStore(
+    (state) => state.changeSolanaConnection,
+  );
 
   const handleOpen = useCallback((value: boolean) => {
     setOpen(value);
@@ -55,6 +59,7 @@ function WalletConnected() {
         <DropdownMenuItem
           className="flex justify-center cursor-pointer"
           onClick={() => {
+            changeSolanaConnection(false);
             disconnect();
             deleteCookie(ACCESS_TOKEN_STORAGE_KEY);
             deleteCookie(REFRESH_TOKEN_STORAGE_KEY);

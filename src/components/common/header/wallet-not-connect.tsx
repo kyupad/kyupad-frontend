@@ -115,7 +115,7 @@ function WalletNotConnect({
                           wl.adapter.connected ? (
                             <span className="text-green-500">Connected</span>
                           ) : (
-                            <span className="text-orange-500">Installed</span>
+                            <span className="text-orange-500">Detected</span>
                           )
                         ) : (
                           <span className="text-red-500">Not Installed</span>

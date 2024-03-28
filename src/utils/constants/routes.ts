@@ -8,6 +8,7 @@ const WEB_ROUTES = {
   NOTFOUND: '/404',
   FAQ: '/faq',
   WHITELIST: '/whitelist',
+  MY_SPACE: '/my-space',
 };
 
 export { API_ROUTES, WEB_ROUTES };

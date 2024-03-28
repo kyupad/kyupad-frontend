@@ -33,9 +33,9 @@ function Whitelist() {
           <div className="flex flex-col gap-4 w-full">
             <div className="text-2xl font-bold text-kyu-color-11">End time</div>
             <CalendarCoundown time={new Date('2024-03-30').getTime()} />
-            <div>
+            <div className="flex gap-4">
               <span className="text-xl">Claim schedule: </span>
-              <span className="text-xl font-bold">31st May, 2024</span>
+              <span className="text-xl font-bold"> 31st May, 2024</span>
             </div>
           </div>
 
@@ -73,7 +73,7 @@ function Whitelist() {
       <Image
         src={latDecorator}
         alt="decorator"
-        className="mx-auto 2xl:-mt-16"
+        className="mx-auto 2xl:-mt-16 w-full"
         draggable={false}
       />
     </>

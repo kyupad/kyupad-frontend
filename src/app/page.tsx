@@ -32,7 +32,7 @@ const Home = () => {
           zIndex: -1,
         }}
         draggable="false"
-        className="top-[88vw] sm:top-[78vw] lg:top-[74vw] xl:top-[700px] absolute left-1/2 -translate-x-1/2"
+        className="top-[88vw] sm:top-[78vw] lg:top-[74vw] xl:top-[700px] absolute left-1/2 -translate-x-1/2 w-full"
       />
 
       <Image
@@ -125,7 +125,7 @@ const Home = () => {
       <Image
         src={latDecorator}
         alt="decorator"
-        className="mx-auto 2xl:-mt-16"
+        className="mx-auto 2xl:-mt-16 w-full"
         draggable={false}
       />
     </>
