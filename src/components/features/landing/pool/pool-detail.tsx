@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import Image from 'next/image';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
-import CountdownTime from '@/components/common/coutdown';
+import CountdownTime from '@/components/common/coutdown/simple';
 import { cn } from '@/utils/helpers';
 import { currencyFormatter } from '@/utils/helpers/currency';
 
