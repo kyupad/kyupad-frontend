@@ -7,6 +7,7 @@ const WEB_ROUTES = {
   HOME: '/',
   NOTFOUND: '/404',
   FAQ: '/faq',
+  WHITELIST: '/whitelist',
 };
 
 export { API_ROUTES, WEB_ROUTES };
