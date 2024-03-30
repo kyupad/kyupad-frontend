@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const variants = {
@@ -9,7 +8,7 @@ const variants = {
     y: 0,
     transition: {
       duration: 0.75,
-      delay: 0.5,
+      delay: 0.3, // 0.5
     },
   },
   out: {
@@ -22,13 +21,18 @@ const variants = {
   },
 };
 
-const AnimateLayout = ({ children }: { children: React.ReactNode }) => {
-  const { asPath } = useRouter();
+const InOutAnimation = ({
+  children,
+  key,
+}: {
+  children: React.ReactNode;
+  key: any;
+}) => {
   return (
-    <div style={{ overflow: 'hidden' }}>
-      <AnimatePresence initial={false} mode="wait">
+    <div>
+      <AnimatePresence initial={true} mode="wait">
         <motion.div
-          key={asPath}
+          key={key}
           variants={variants}
           animate="in"
           initial="out"
@@ -41,4 +45,4 @@ const AnimateLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default memo(AnimateLayout);
+export default memo(InOutAnimation);

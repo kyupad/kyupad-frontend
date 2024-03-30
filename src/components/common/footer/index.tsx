@@ -21,11 +21,11 @@ function Footer() {
               FAQ
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
             </Link>
-            <Link href={WEB_ROUTES.FAQ} className="group relative">
+            <Link href={WEB_ROUTES.PERFORMANCE} className="group relative">
               Performance
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
             </Link>
-            <Link href={WEB_ROUTES.FAQ} className="group relative">
+            <Link href={WEB_ROUTES.TERMS} className="group relative">
               Terms & Conditions
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
             </Link>
@@ -36,10 +36,18 @@ function Footer() {
               Join our community
             </div>
             <div className="flex gap-3">
-              <a href={WEB_ROUTES.HOME}>
+              <a
+                href="https://t.co/9NEs1U1r46"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 <Image src={telegram} alt="Telegram" />
               </a>
-              <a href={WEB_ROUTES.HOME}>
+              <a
+                href="https://twitter.com/Kyupad_"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 <Image src={x} alt="X" />
               </a>
             </div>

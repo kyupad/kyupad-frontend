@@ -48,7 +48,7 @@ function MobileMenu({
                 Whitelist NFT
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link>
-              <Link href={WEB_ROUTES.HOME} className="relative group">
+              <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
                 My Space
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link>

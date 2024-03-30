@@ -21,21 +21,21 @@ function Whitelist() {
     <>
       <div
         className={cn(
-          'px-4 lg:px-[60px] py-5 mx-auto flex max-w-[1198px] gap-10 mt-[60px] flex-wrap justify-center items-center',
+          'px-4 lg:px-[60px] py-5 mx-auto flex max-w-[1198px] gap-10 mt-[60px] flex-wrap justify-center items-center lg:items-start',
           fontHeading.variable,
         )}
       >
-        <div className="flex flex-col gap-7 order-2 items-center lg:items-start lg:order-1">
+        <div className="flex flex-col gap-7 order-2 items-center sm:items-start lg:order-1">
           <h1 className="text-4xl sm:text-5xl xl:text-7xl font-heading text-kyu-color-13 leading-tight">
             Free Mint <br /> Whitelist Pass NFT
           </h1>
 
           <div className="flex flex-col gap-4 w-full">
             <div className="text-2xl font-bold text-kyu-color-11">End time</div>
-            <CalendarCoundown time={new Date('2024-03-30').getTime()} />
-            <div>
+            <CalendarCoundown time={new Date('2024-08-30').getTime()} />
+            <div className="flex gap-4">
               <span className="text-xl">Claim schedule: </span>
-              <span className="text-xl font-bold">31st May, 2024</span>
+              <span className="text-xl font-bold"> 31st May, 2024</span>
             </div>
           </div>
 
@@ -73,7 +73,7 @@ function Whitelist() {
       <Image
         src={latDecorator}
         alt="decorator"
-        className="mx-auto 2xl:-mt-16"
+        className="mx-auto 2xl:-mt-16 w-full"
         draggable={false}
       />
     </>
