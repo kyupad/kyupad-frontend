@@ -9,6 +9,7 @@ import WalletConnectProvider from '@/contexts/wallet-connect-provider';
 import { WEB_ROUTES } from '@/utils/constants';
 
 import Skeleton from '../loading/skeleton';
+import DesktopMenu from './desktop-menu';
 import MobileMenu from './mobile-menu';
 import kyupadLogo from '/public/images/header/kyupad-logo.svg';
 
@@ -19,7 +20,7 @@ const WalletConnect = dynamic(() => import('./wallet-connect'), {
 
 const Header = () => {
   return (
-    <header className="flex w-full max-w-8xl mx-auto justify-between px-4 lg:px-[24px] py-5 flex-wrap gap-8">
+    <header className="flex w-full max-w-8xl mx-auto justify-between px-4 lg:px-[60px] py-5 flex-wrap gap-8">
       <div className="max-w-[144px] min-w-[144px]">
         <Link href={WEB_ROUTES.HOME}>
           <Image src={kyupadLogo} alt="Kyupad Logo" draggable={false} />
@@ -33,20 +34,7 @@ const Header = () => {
         />
       </div>
       <div className="hidden gap-8 items-center flex-wrap lg:flex">
-        <nav className="flex gap-8 text-xl">
-          <Link href={WEB_ROUTES.HOME} className="relative group">
-            Whitelist NFT
-            <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-          </Link>
-          <Link href={WEB_ROUTES.HOME} className="relative group">
-            My Space
-            <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-          </Link>
-          <Link href={WEB_ROUTES.HOME} className="relative group">
-            Catnip Points
-            <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-          </Link>
-        </nav>
+        <DesktopMenu />
         <GlobalStoreProvider>
           <WalletConnectProvider>
             <WalletConnect

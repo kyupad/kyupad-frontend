@@ -76,6 +76,12 @@ const theme = {
       'kyu-color-10': '#31313a',
       'kyu-color-11': '#25252c',
       'kyu-color-12': '#f7f7f8',
+      'kyu-color-13': '#f8a627',
+      'kyu-color-14': '#85879b',
+      'kyu-color-15': '#4A4A5A',
+      'kyu-color-16': '#EEEDF1',
+      'kyu-color-17': '#18CF6A',
+      'kyu-color-18': '#EC5347',
     },
     borderRadius: {
       lg: 'var(--radius)',
@@ -102,7 +108,7 @@ const theme = {
       'accordion-up': 'accordion-up 0.2s ease-out',
     },
     maxWidth: {
-      '8xl': '1400px',
+      '8xl': '1440px',
     },
   },
 };

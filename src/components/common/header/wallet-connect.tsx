@@ -38,6 +38,9 @@ function WalletConnect({
     setLoading(value);
   }, []);
 
+  const { is_solana_connected: isSolanaConnected, changeSolanaConnection } =
+    useGlobalStore((state) => state);
+
   const signInWithSolana = useCallback(
     async (adapter: Adapter) => {
       if (!('signIn' in adapter)) return true;
@@ -93,12 +96,15 @@ function WalletConnect({
           REFRESH_TOKEN_COOKIE_CONFIG,
         ),
       ]);
-    },
-    [doGetSignInData, doVerifySignInWithSolana, setCookie],
-  );
 
-  const isSolanaConnected = useGlobalStore(
-    (state) => state.is_solana_connected,
+      changeSolanaConnection(true);
+    },
+    [
+      changeSolanaConnection,
+      doGetSignInData,
+      doVerifySignInWithSolana,
+      setCookie,
+    ],
   );
 
   return (

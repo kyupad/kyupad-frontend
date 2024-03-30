@@ -41,6 +41,12 @@
     --kyu-color-10: #31313a;
     --kyu-color-11: #25252c;
     --kyu-color-12: #f7f7f8;
+    --kyu-color-13: #f8a627;
+    --kyu-color-14: #85879b;
+    --kyu-color-15: #4a4a5a;
+    --kyu-color-16: #eeedf1;
+    --kyu-color-17: #18cf6a;
+    --kyu-color-18: #ec5347;
   }
 
   .dark {
@@ -74,6 +80,28 @@
   body {
     background: var(--kyu-color-12);
     color: var(--kyu-color-10);
+  }
+}
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: var(--kyu-color-12);
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: var(--kyu-color-4);
+    border-radius: 100vh;
+    border: 2px solid var(--kyu-color-10);
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--kyu-color-5);
   }
 }
 

@@ -1,7 +1,5 @@
-import Footer from '@/components/common/footer';
 import Header from '@/components/common/header';
 import Ribbon from '@/components/features/ribbon';
-import WebVitals from '@/components/features/web-vitals';
 import { META_DATA_DEFAULT } from '@/utils/constants/seo';
 import { cn } from '@/utils/helpers';
 
@@ -9,6 +7,10 @@ import '@styles/globals.css';
 
 import dynamic from 'next/dynamic';
 import { Nunito } from 'next/font/google';
+
+const Footer = dynamic(() => import('@/components/common/footer'));
+
+const WebVitals = dynamic(() => import('@/components/features/web-vitals'));
 
 const NextTopLoader = dynamic(() => require('nextjs-toploader')) as any;
 const SonnerToaster = dynamic(() => import('@/components/common/toast/sonner'));
@@ -26,7 +28,10 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body
-        className={cn('min-h-screen font-sans antialiased', fontSans.variable)}
+        className={cn(
+          'min-h-screen font-sans antialiased scrollbar',
+          fontSans.variable,
+        )}
       >
         <WebVitals />
         <NextTopLoader color="#f2820e" />

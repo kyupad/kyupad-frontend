@@ -1,8 +1,8 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import PrimaryButton from '@/components/common/button/primary';
-import Pool from '@/components/features/landing/pool';
 import { cn } from '@/utils/helpers';
 
 import catBanner from '/public/images/home/cat-banner.png';
@@ -12,6 +12,8 @@ import latDecorator from '/public/images/home/last-decorator.svg';
 import catLeft from '/public/images/home/meo-left.png';
 import catRight from '/public/images/home/meo-right.png';
 import rocket from '/public/images/home/rocket.png';
+
+const Pool = dynamic(() => import('@/components/features/landing/pool'));
 
 const fontHeading = Knewave({
   subsets: ['latin'],
@@ -30,7 +32,7 @@ const Home = () => {
           zIndex: -1,
         }}
         draggable="false"
-        className="top-[88vw] sm:top-[78vw] lg:top-[74vw] xl:top-[700px] absolute left-1/2 -translate-x-1/2"
+        className="top-[88vw] sm:top-[78vw] lg:top-[74vw] xl:top-[700px] absolute left-1/2 -translate-x-1/2 w-full"
       />
 
       <Image
@@ -45,7 +47,7 @@ const Home = () => {
 
       <div
         className={cn(
-          'max-w-8xl mx-auto flex flex-col items-center pt-7 px-4 gap-[30px] sm:gap-[100px]',
+          'max-w-8xl mx-auto flex flex-col items-center pt-7 px-4 lg:px-[60px] gap-[30px] sm:gap-[100px]',
           fontHeading.variable,
         )}
       >
@@ -66,12 +68,12 @@ const Home = () => {
             Purrrr......
           </h3>
 
-          <div className="lg:px-[24px] py-5">
+          <div className="py-5">
             <Pool title="Fur-ture Launch" active />
           </div>
         </div>
 
-        <div className="lg:px-[24px] relative">
+        <div className="relative">
           <Image
             src={catLeft}
             alt="cat left"
@@ -84,7 +86,7 @@ const Home = () => {
           <Pool title="Upcoming Launches" data={[1, 2, 3]} upcoming />
         </div>
 
-        <div className="lg:px-[24px] relative">
+        <div className="relative">
           <Image
             src={catRight}
             alt="cat right"
@@ -123,7 +125,7 @@ const Home = () => {
       <Image
         src={latDecorator}
         alt="decorator"
-        className="mx-auto 2xl:-mt-16"
+        className="mx-auto 2xl:-mt-16 w-full"
         draggable={false}
       />
     </>

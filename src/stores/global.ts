@@ -5,6 +5,7 @@ interface IGlobalStore {
   is_agree_terms: boolean;
   is_solana_connected: boolean;
   agreeTerms: () => void;
+  changeSolanaConnection: (value: boolean) => void;
 }
 
 type StoreWithPersist = Mutate<
@@ -42,6 +43,7 @@ const initialState: IGlobalStore = {
   is_agree_terms: false,
   is_solana_connected: false,
   agreeTerms: () => {},
+  changeSolanaConnection: () => {},
 };
 
 const createGlobalStore = createStore<IGlobalStore>()(
