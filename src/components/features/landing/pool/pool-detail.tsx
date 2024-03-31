@@ -1,8 +1,10 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
 import CountdownTime from '@/components/common/coutdown/simple';
+import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { currencyFormatter } from '@/utils/helpers/currency';
 
@@ -166,11 +168,21 @@ const PoolDetail = ({
 
         <div>
           {!ended_at && (
-            <PrimaryButton block className={cn(active ? 'font-heading' : '')}>
-              Join now
-            </PrimaryButton>
+            <Link
+              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', 'bunny-protocol')}`}
+            >
+              <PrimaryButton block className={cn(active ? 'font-heading' : '')}>
+                Join now
+              </PrimaryButton>
+            </Link>
           )}
-          {ended_at && <SecondaryButton>Details</SecondaryButton>}
+          {ended_at && (
+            <Link
+              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', 'bunny-protocol')}`}
+            >
+              <SecondaryButton block>Details</SecondaryButton>
+            </Link>
+          )}
         </div>
       </div>
 

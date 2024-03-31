@@ -12,7 +12,7 @@ function Footer() {
     <footer className="bg-kyu-color-4 flex items-center justify-center min-h-[244px]">
       <div className="max-w-8xl w-full flex flex-col items-center gap-3">
         <div className="flex justify-between items-center w-full px-[60px] py-5 gap-8 xl:gap-[60px] flex-col lg:flex-row">
-          <div className="max-w-[150px] xl:min-w-[240px]">
+          <div className="max-w-[150px] min-w-[150px] xl:min-w-[240px]">
             <Image src={logoFooter} alt="Logo Footer" draggable={false} />
           </div>
 

@@ -1,10 +1,19 @@
 'use client';
 
 import React, { memo, useEffect, useState } from 'react';
+import { cn } from '@/utils/helpers';
 
 import CountdownItem from './item';
 
-const SimpleCountdown = ({ time }: { time: number }) => {
+const SimpleCountdown = ({
+  time,
+  className,
+  action,
+}: {
+  time: number;
+  className?: string;
+  action?: Function;
+}) => {
   const [days, setDays] = useState<number>(0);
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
@@ -34,6 +43,7 @@ const SimpleCountdown = ({ time }: { time: number }) => {
       animationFrameId = requestAnimationFrame(updateTime);
 
       if (difference <= 0) {
+        action && action();
         cancelAnimationFrame(animationFrameId);
         setDays(0);
         setHours(0);
@@ -45,10 +55,15 @@ const SimpleCountdown = ({ time }: { time: number }) => {
     updateTime();
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [time]);
+  }, [action, time]);
 
   return (
-    <div className="flex font-bold text-sm sm:text-xl text-[#18CF6A] whitespace-nowrap gap-1">
+    <div
+      className={cn(
+        'flex font-bold text-sm sm:text-xl text-[#18CF6A] whitespace-nowrap gap-1',
+        className,
+      )}
+    >
       <CountdownItem num={days} text="d" /> :
       <CountdownItem num={hours} text="h" /> :
       <CountdownItem num={minutes} text="m" /> :

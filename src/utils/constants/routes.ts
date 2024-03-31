@@ -12,6 +12,8 @@ const WEB_ROUTES = {
   CATNIP_POINTS: '/catnip-points',
   PERFORMANCE: '/performance',
   TERMS: '/terms',
+  PROJECTS: '/projects',
+  PROJECT_DETAIL: '/projects/[id]',
 };
 
 export { API_ROUTES, WEB_ROUTES };

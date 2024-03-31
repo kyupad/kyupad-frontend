@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 function CountdownItem({ num, text }: { num: number; text: string }) {
   return (
     <div>
-      <div className="w-full max-w-11 text-center relative overflow-hidden">
+      <div className="w-full text-center relative overflow-hidden">
         <div className="flex">
           <AnimatePresence mode="popLayout">
             <motion.span

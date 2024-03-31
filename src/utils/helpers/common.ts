@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import clsx, { ClassValue } from 'clsx';
+import dayjs from 'dayjs';
 import { SweetAlertOptions } from 'sweetalert2';
 import { twMerge } from 'tailwind-merge';
 
@@ -78,28 +79,12 @@ const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
 
-function listenCookieChange(
-  callback: ({
-    oldValue,
-    newValue,
-  }: {
-    oldValue: string;
-    newValue: string;
-  }) => void,
-  interval = 1000,
-) {
-  let lastCookie = document.cookie;
-  setInterval(() => {
-    const cookie = document.cookie;
-    if (cookie !== lastCookie) {
-      try {
-        callback({ oldValue: lastCookie, newValue: cookie });
-      } finally {
-        lastCookie = cookie;
-      }
-    }
-  }, interval);
-}
+const convertUTCtime = (time: string) => {
+  const dt = dayjs(time);
+  const formattedDateTime = dt.format('MMM DD, YYYY HH:mm [UTC]');
+
+  return formattedDateTime;
+};
 
 export {
   removeUndefinedAndNull,
@@ -108,5 +93,5 @@ export {
   logger,
   getInfoDevice,
   cn,
-  listenCookieChange,
+  convertUTCtime,
 };

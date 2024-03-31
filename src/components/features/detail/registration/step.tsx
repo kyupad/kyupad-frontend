@@ -1,0 +1,139 @@
+'use client';
+
+import React, { memo, useCallback, useState } from 'react';
+import Image from 'next/image';
+import PrimaryButton from '@/components/common/button/primary';
+import SecondaryButton from '@/components/common/button/secondary';
+import SimpleCountdown from '@/components/common/coutdown/simple';
+import { UTC_FORMAT_STRING } from '@/utils/constants';
+import { cn } from '@/utils/helpers';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+import currentStep from '/public/images/detail/current-step.svg';
+import stepDone from '/public/images/detail/step-done.svg';
+import step from '/public/images/detail/step.svg';
+
+dayjs.extend(utc);
+
+const getActiveStep = (data: any[]) => {
+  const now = dayjs.utc();
+  const step = data.find((item) => {
+    return (
+      dayjs.utc(item.time).isSame(now) || dayjs.utc(item.time).isAfter(now)
+    );
+  });
+
+  return step ? step.step : data.length;
+};
+
+function RegistrationStep({ data }: { data: any[] }) {
+  const [activeStep, setActiveStep] = useState<number>(getActiveStep(data));
+
+  const handleChangeActiveStep = useCallback((value: number) => {
+    setActiveStep(value);
+  }, []);
+
+  let progress = 'w-0';
+  switch (activeStep) {
+    case 1:
+      progress = 'w-0';
+      break;
+    case 2:
+      progress = 'w-1/3';
+      break;
+    case 3:
+      progress = 'w-2/3';
+      break;
+    case 4:
+      progress = 'w-full';
+      break;
+    default:
+      progress = 'w-0';
+      break;
+  }
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="border-2 border-kyu-color-10 p-5 lg:p-10 rounded-[16px] bg-kyu-color-16 text-kyu-color-11">
+        <div className="flex sm:flex-col gap-8">
+          <div className="flex justify-between flex-col sm:flex-row order-1">
+            {data?.map((item) => (
+              <h2 key={item.step} className="text-xl sm:text-2xl font-bold">
+                Step {item.step}
+              </h2>
+            ))}
+          </div>
+          <div className="order-2">
+            <div className="w-0.5 h-full sm:w-full sm:h-0.5 bg-kyu-color-7 relative">
+              <div
+                className={cn(
+                  'absolute h-0.5 top-1/2 -translate-y-1/2 bg-kyu-color-5 transition-all duration-500 ease-in-out',
+                  progress,
+                )}
+              />
+              <div className="flex flex-col items-center sm:flex-row justify-between absolute top-1/2 -translate-y-1/2 w-full h-full">
+                {data?.map((item) => (
+                  <div key={item.step} className="bg-kyu-color-16 min-w-[32px]">
+                    {item.step === activeStep && (
+                      <Image src={currentStep} alt="step" draggable={false} />
+                    )}
+                    {item.step > activeStep && (
+                      <Image src={step} alt="step" draggable={false} />
+                    )}
+                    {item.step < activeStep && (
+                      <Image src={stepDone} alt="step" draggable={false} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between gap-4 order-3 flex-col sm:flex-row">
+            {data?.map((item, index, arr) => (
+              <div
+                key={item.step}
+                className={cn(
+                  'flex flex-col gap-2',
+                  index === arr.length - 1 ? 'sm:items-end sm:text-right' : '',
+                  index !== 0 && index !== arr.length - 1
+                    ? 'sm:items-center sm:text-center'
+                    : '',
+                )}
+              >
+                <div className="text-2xl font-bold">{item.title}</div>
+                <time className="font-medium">
+                  {dayjs.utc(item.time).format(UTC_FORMAT_STRING)}
+                </time>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center flex-wrap gap-4">
+        <div className="flex gap-4 md:gap-8 items-center flex-wrap">
+          <div className="text-2xl font-bold">Registration Ends in</div>
+          {activeStep === 1 ? (
+            <SimpleCountdown
+              action={() => handleChangeActiveStep(activeStep + 1)}
+              className="!text-xl md:!text-2xl"
+              time={dayjs.utc(data[0].time).valueOf()}
+            />
+          ) : (
+            <span className="font-bold text-2xl text-kyu-color-18">Ended</span>
+          )}
+        </div>
+        {activeStep === 1 && (
+          <PrimaryButton className="min-w-[200px]">Register Now</PrimaryButton>
+        )}
+
+        {activeStep > 1 && (
+          <SecondaryButton disabled>Registration Ended</SecondaryButton>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default memo(RegistrationStep);
