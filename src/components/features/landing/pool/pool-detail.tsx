@@ -8,8 +8,8 @@ import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { currencyFormatter } from '@/utils/helpers/currency';
 
+import kyu from '/public/images/home/kyu.jpeg';
 import meow from '/public/images/home/meow.jpeg';
-import robot from '/public/images/home/robot.webp';
 
 interface IPoolDetailProps {
   active?: boolean;
@@ -58,7 +58,7 @@ const PoolDetail = ({
           >
             <Image
               alt="logo"
-              src={robot}
+              src={kyu}
               draggable="false"
               fill
               style={{ objectFit: 'cover' }}

@@ -5,7 +5,7 @@
 We take the security of our project seriously. If you discover a security issue, please follow these steps to report it:
 
 1. **DO NOT** open a public issue. Security vulnerabilities must be reported privately.
-2. Email us at [hi@duongnamtruong.com](mailto:hi@duongnamtruong.com) with a detailed description of the issue. Provide steps to reproduce if possible. Please do not include sensitive information in your email.
+2. Email us at [noahduong@kyupad.xyz](mailto:noahduong@kyupad.xyz) with a detailed description of the issue. Provide steps to reproduce if possible. Please do not include sensitive information in your email.
 3. Allow some time for us to review and respond to your report.
 
 ## Supported Versions
@@ -31,6 +31,6 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 ## Contact
 
-If you have any questions regarding this security policy, please contact us at [hi@duongnamtruong.com](mailto:hi@duongnamtruong.com).
+If you have any questions regarding this security policy, please contact us at [noahduong@kyupad.xyz](mailto:noahduong@kyupad.xyz).
 
 Thank you for helping to keep our project secure.

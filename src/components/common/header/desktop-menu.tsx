@@ -10,12 +10,12 @@ function DesktopMenu() {
   const pathName = usePathname();
   return (
     <nav className="flex gap-8 text-xl">
-      <Link href={WEB_ROUTES.WHITELIST} className="relative group">
+      <Link href={WEB_ROUTES.WHITELIST_PASS} className="relative group">
         Whitelist NFT
         <span
           className={cn(
             'absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full',
-            pathName === WEB_ROUTES.WHITELIST ? 'w-full' : '',
+            pathName === WEB_ROUTES.WHITELIST_PASS ? 'w-full' : '',
           )}
         ></span>
       </Link>

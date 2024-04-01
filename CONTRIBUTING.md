@@ -6,7 +6,7 @@ Before you start contributing, please take a moment to read the following guidel
 
 ## Code of Conduct
 
-This project and everyone participating in it are governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to hi@duongnamtruong.com.
+This project and everyone participating in it are governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to noahduong@kyupad.xyz.
 
 ## How Can I Contribute?
 
@@ -42,6 +42,6 @@ By contributing to this project, you agree that your contributions will be licen
 
 ## Contact
 
-If you have questions or need further assistance, feel free to contact us at hi@duongnamtruong.com.
+If you have questions or need further assistance, feel free to contact us at noahduong@kyupad.xyz.
 
 Thank you for contributing to NextJS Boilerplate!

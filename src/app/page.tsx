@@ -118,7 +118,7 @@ const Home = () => {
             <div className="text-2xl font-bold sm:text-4xl text-center">
               Apply to launch your spaceship at Kyupad
             </div>
-            <PrimaryButton>Apply now</PrimaryButton>
+            <PrimaryButton className="min-w-[200px]">Apply now</PrimaryButton>
           </div>
         </div>
       </div>

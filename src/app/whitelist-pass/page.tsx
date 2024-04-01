@@ -1,4 +1,5 @@
 import React from 'react';
+import { Metadata } from 'next';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import PrimaryButton from '@/components/common/button/primary';
@@ -15,6 +16,10 @@ const fontHeading = Knewave({
   display: 'swap',
   weight: ['400'],
 });
+
+export const metadata: Metadata = {
+  title: 'Whitelist NFT',
+};
 
 function Whitelist() {
   return (

@@ -7,7 +7,7 @@ const WEB_ROUTES = {
   HOME: '/',
   NOTFOUND: '/404',
   FAQ: '/faq',
-  WHITELIST: '/whitelist',
+  WHITELIST_PASS: '/whitelist-pass',
   MY_SPACE: '/my-space',
   CATNIP_POINTS: '/catnip-points',
   PERFORMANCE: '/performance',

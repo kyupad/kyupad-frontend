@@ -1,7 +1,6 @@
 import React, { memo, useCallback, useState } from 'react';
 import Image from 'next/image';
 import { useGlobalStore } from '@/contexts/global-store-provider';
-import { ReloadIcon } from '@radix-ui/react-icons';
 import { WalletReadyState } from '@solana/wallet-adapter-base';
 import { useWallet } from '@solana/wallet-adapter-react';
 
@@ -43,10 +42,10 @@ function WalletNotConnect({
       <PrimaryButton
         className="min-h-[52px] w-[220px] flex items-center justify-center text-xl"
         onClick={() => handleOpen(!open)}
-        disabled={loading}
+        loading={loading}
+        loadingText="Connecting"
       >
-        {loading && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}{' '}
-        {loading ? 'Connecting' : 'Connect Wallet'}
+        Connect Wallet
       </PrimaryButton>
       <DialogContent className="sm:max-w-[680px] bg-kyu-color-12 p-10 rounded-[16px] border-2 border-kyu-color-11">
         <DialogHeader>
