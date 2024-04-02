@@ -1,6 +1,6 @@
-<h1 align="center" id="title">NextJS Boilerplate</h1>
+<h1 align="center" id="title">Kyupad Frontend</h1>
 
-<p align="center"><img src="https://socialify.git.ci/truongdn-it/nextjs-boilerplate/image?description=1&amp;descriptionEditable=A%20super%20powerful%20NextJS%20boilerplate%20developed%20following%20the%20Feature%20driven%20pattern&amp;font=Inter&amp;forks=1&amp;issues=1&amp;language=1&amp;name=1&amp;owner=1&amp;pattern=Circuit%20Board&amp;pulls=1&amp;stargazers=1&amp;theme=Auto" alt="project-image"></p>
+<p align="center"><img src="https://socialify.git.ci/kyupad/kyupad-frontend/image?description=1&amp;descriptionEditable=A%20super%20powerful%20NextJS%20boilerplate%20developed%20following%20the%20Feature%20driven%20pattern&amp;font=Inter&amp;forks=1&amp;issues=1&amp;language=1&amp;name=1&amp;owner=1&amp;pattern=Circuit%20Board&amp;pulls=1&amp;stargazers=1&amp;theme=Auto" alt="project-image"></p>
 
 <p id="description">A super powerful NextJS boilerplate developed following the Feature driven pattern.</p>
 
@@ -15,7 +15,7 @@
 
 <h2>🚀 Demo</h2>
 
-[https://nextjs-core-project.vercel.app/](https://nextjs-core-project.vercel.app/)
+[https://kyupad.xyz/](https://kyupad.xyz/)
 
 <h2>Project Screenshots:</h2>
 
@@ -122,25 +122,31 @@ Note: _Underscore to be not allow!!!_
 
 <p>1. Clone the project</p>
 
-```
-git clone https://github.com/truongdn-it/nextjs-boilerplate
+```bash
+git clone https://github.com/kyupad/kyupad-frontend.git
 ```
 
 <p>2. Go to the project directory</p>
 
-```
-cd nextjs-boilerplate
+```bash
+cd kyupad-frontend
 ```
 
 <p>3. Install dependencies</p>
 
-```
+```bash
 npm install
 ```
 
-<p>4. Start the server</p>
+<p>4. Add environment</p>
 
+```bash
+cp .env.example .env
 ```
+
+<p>5. Start the server</p>
+
+```bash
 npm run dev
 ```
 
