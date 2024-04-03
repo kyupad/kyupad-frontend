@@ -1,8 +1,8 @@
-import React from 'react';
-import dynamic from 'next/dynamic';
+import React, { Suspense } from 'react';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import PrimaryButton from '@/components/common/button/primary';
+import Pool from '@/components/features/landing/pool';
 import { cn } from '@/utils/helpers';
 
 import catBanner from '/public/images/home/cat-banner.png';
@@ -13,8 +13,6 @@ import catLeft from '/public/images/home/meo-left.png';
 import catRight from '/public/images/home/meo-right.png';
 import rocket from '/public/images/home/rocket.png';
 
-const Pool = dynamic(() => import('@/components/features/landing/pool'));
-
 const fontHeading = Knewave({
   subsets: ['latin'],
   variable: '--font-heading',
@@ -22,7 +20,7 @@ const fontHeading = Knewave({
   weight: ['400'],
 });
 
-const Home = () => {
+const Home = async () => {
   return (
     <>
       <Image
@@ -69,11 +67,18 @@ const Home = () => {
           </h3>
 
           <div className="py-5">
-            <Pool title="Fur-ture Launch" active />
+            <Suspense fallback={null}>
+              <Pool
+                title="Fur-ture Launch"
+                active
+                mode="active"
+                direction="row"
+              />
+            </Suspense>
           </div>
         </div>
 
-        <div className="relative">
+        <div className="relative w-full">
           <Image
             src={catLeft}
             alt="cat left"
@@ -83,7 +88,9 @@ const Home = () => {
             draggable="false"
             className="top-[-40px] left-[40px] max-w-[100px] sm:max-w-[180px] sm:top-[-120px] sm:left-[80px] md:left-[30px] lg:max-w-[237px] lg:top-[-130px] lg:left-[-50px] xl:left-[120px] 2xl:left-[-80px] 2xl:top-[-140px] absolute -translate-x-1/2"
           />
-          <Pool title="Upcoming Launches" data={[1, 2, 3]} upcoming />
+          <Suspense fallback={null}>
+            <Pool title="Upcoming Launches" mode="upcoming" upcoming />
+          </Suspense>
         </div>
 
         <div className="relative">
@@ -96,15 +103,9 @@ const Home = () => {
             draggable="false"
             className="right-[-475px] top-[-100px] max-w-[403px] absolute"
           />
-          <Pool
-            paging
-            title="Success-fur Launches"
-            data={[
-              { ended_at: 'mock' },
-              { ended_at: 'mock' },
-              { ended_at: 'mock' },
-            ]}
-          />
+          <Suspense fallback={null}>
+            <Pool paging title="Success-fur Launches" mode="success" />
+          </Suspense>
         </div>
 
         <div className="flex flex-col gap-8 items-center">
@@ -134,3 +135,6 @@ const Home = () => {
 
 // eslint-disable-next-line import/no-unused-modules
 export default Home;
+
+// eslint-disable-next-line import/no-unused-modules
+export const dynamic = 'force-dynamic';

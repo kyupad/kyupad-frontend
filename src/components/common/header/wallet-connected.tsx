@@ -32,24 +32,26 @@ function WalletConnected() {
       <DropdownMenuTrigger asChild>
         <div>
           <PrimaryButton
-            className="relative min-h-[52px] w-[220px] flex items-center justify-center gap-3 text-xl"
+            className="relative min-h-[52px] min-w-[220px] text-xl"
             onClick={() => handleOpen(!open)}
             data-state={open ? 'open' : 'close'}
           >
-            {wallet?.adapter?.icon && (
-              <div className="min-w-[28px]">
-                <Image
-                  src={wallet.adapter.icon}
-                  alt="icon"
-                  width={28}
-                  height={28}
-                />
+            <div className="flex items-center justify-center gap-3">
+              {wallet?.adapter?.icon && (
+                <div className="min-w-[28px]">
+                  <Image
+                    src={wallet.adapter.icon}
+                    alt="icon"
+                    width={28}
+                    height={28}
+                  />
+                </div>
+              )}
+              <div>
+                {publicKey?.toBase58()?.slice(0, 5) +
+                  '...' +
+                  publicKey?.toBase58()?.slice(-5)}
               </div>
-            )}
-            <div>
-              {publicKey?.toBase58()?.slice(0, 5) +
-                '...' +
-                publicKey?.toBase58()?.slice(-5)}
             </div>
           </PrimaryButton>
         </div>

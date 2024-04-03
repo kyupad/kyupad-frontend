@@ -1,6 +1,7 @@
 const API_ROUTES = {
   GET_SIGNIN_DATA: '/v1/auth/signin-data',
   VERIFY_SIWS: '/v1/auth/verify-siws',
+  GET_PROJECTS: '/v1/projects',
 };
 
 const WEB_ROUTES = {

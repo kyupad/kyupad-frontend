@@ -29,7 +29,7 @@ function WalletNotConnect({
   signin: Function;
 }) {
   const [open, setOpen] = useState<boolean>(false);
-  const { wallets, select } = useWallet();
+  const { wallets, select, disconnect } = useWallet();
 
   const handleOpen = useCallback((value: boolean) => {
     setOpen(value);
@@ -41,7 +41,10 @@ function WalletNotConnect({
     <Dialog open={open} onOpenChange={setOpen}>
       <PrimaryButton
         className="min-h-[52px] w-[220px] flex items-center justify-center text-xl"
-        onClick={() => handleOpen(!open)}
+        onClick={() => {
+          disconnect();
+          handleOpen(!open);
+        }}
         loading={loading}
         loadingText="Connecting"
       >

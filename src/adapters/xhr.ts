@@ -14,7 +14,7 @@ const request = async (
   url: string,
   data?: any,
   options?: RequestInit,
-): Promise<Response | null | { message: string }> => {
+): Promise<any> => {
   const controller = new AbortController();
 
   if (options?.signal) {

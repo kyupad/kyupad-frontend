@@ -1,27 +1,65 @@
-import React, { memo } from 'react';
+'use client';
+
+import React, { memo, useCallback, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
 import CountdownTime from '@/components/common/coutdown/simple';
-import { WEB_ROUTES } from '@/utils/constants';
+import { ENDED_AT_FORMAT_STRING, WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { currencyFormatter } from '@/utils/helpers/currency';
+import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import utc from 'dayjs/plugin/utc';
 
-import kyu from '/public/images/home/kyu.jpeg';
-import meow from '/public/images/home/meow.jpeg';
+dayjs.extend(utc);
+dayjs.extend(advancedFormat);
 
 interface IPoolDetailProps {
   active?: boolean;
   direction?: 'row' | 'column';
   ended_at?: string;
+  name: string;
+  symbol: string;
+  tags?: string[];
+  shortDescription: string;
+  totalRaise: number;
+  ticketSize: number;
+  salePool: string;
+  logo: string;
+  thumbnail: string;
+  snapshotAt: string;
+  slug: string;
 }
 
 const PoolDetail = ({
   active,
   direction = 'row',
   ended_at,
+  name,
+  symbol,
+  tags,
+  shortDescription,
+  totalRaise,
+  ticketSize,
+  salePool,
+  logo,
+  thumbnail,
+  slug,
+  snapshotAt,
 }: IPoolDetailProps) => {
+  const now = dayjs.utc();
+  const [endedAt, setEndedAt] = useState<string>(
+    dayjs.utc(snapshotAt).isSame(now) || dayjs.utc(snapshotAt).isBefore(now)
+      ? dayjs.utc(snapshotAt).format(ENDED_AT_FORMAT_STRING)
+      : '',
+  );
+
+  const handleChangeEndedAt = useCallback(() => {
+    setEndedAt(dayjs.utc(snapshotAt).format(ENDED_AT_FORMAT_STRING));
+  }, [snapshotAt]);
+
   return (
     <div
       className={cn(
@@ -38,14 +76,15 @@ const PoolDetail = ({
         {/* countdown time end */}
         <div className="flex justify-between gap-3 items-center flex-wrap">
           <span className="text-xs sm:text-base text-button-primary-border font-medium whitespace-nowrap">
-            {ended_at ? 'Ended on' : `Registration Ends in`}
+            {endedAt ? 'Ended on' : `Registration Ends in`}
           </span>
-          {ended_at ? (
-            <span className="font-bold text-xl text-[#F2820E]">
-              March 13th, 2023
-            </span>
+          {endedAt ? (
+            <span className="font-bold text-xl text-[#F2820E]">{endedAt}</span>
           ) : (
-            <CountdownTime time={new Date('2024-05-22').getTime()} />
+            <CountdownTime
+              time={dayjs.utc(snapshotAt).valueOf()}
+              action={handleChangeEndedAt}
+            />
           )}
         </div>
 
@@ -58,7 +97,7 @@ const PoolDetail = ({
           >
             <Image
               alt="logo"
-              src={kyu}
+              src={logo}
               draggable="false"
               fill
               style={{ objectFit: 'cover' }}
@@ -72,7 +111,7 @@ const PoolDetail = ({
                 direction === 'column' ? '!text-2xl' : '',
               )}
             >
-              Bunny Protocol
+              {name || 'Project A'}
             </h4>
             <div
               className={cn(
@@ -80,11 +119,11 @@ const PoolDetail = ({
                 direction === 'column' ? '!text-xl' : '',
               )}
             >
-              $BPT
+              ${symbol || 'XXX'}
             </div>
 
             <div className="flex gap-[10px] flex-wrap">
-              {['Perp DEX', 'DeFi'].map((item) => {
+              {tags?.map((item) => {
                 return (
                   <span
                     key={item}
@@ -107,8 +146,7 @@ const PoolDetail = ({
             direction === 'column' ? '!text-base' : '',
           )}
         >
-          Dive into intense multiplayer battles in the most competitive space
-          shooter ever!{' '}
+          {shortDescription || 'Short description of the project'}
         </div>
 
         <div className="flex flex-col gap-3">
@@ -117,7 +155,7 @@ const PoolDetail = ({
               Total raise
             </span>
             <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-              {currencyFormatter.format(300000)}
+              {currencyFormatter.format(totalRaise)}
             </span>
           </div>
 
@@ -150,7 +188,7 @@ const PoolDetail = ({
                   Ticket Size
                 </span>
                 <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-                  {currencyFormatter.format(+300000)}
+                  {currencyFormatter.format(ticketSize)}
                 </span>
               </div>
 
@@ -159,7 +197,7 @@ const PoolDetail = ({
                   Sale Pool
                 </span>
                 <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-                  Lottery
+                  {salePool}
                 </span>
               </div>
             </>
@@ -168,18 +206,14 @@ const PoolDetail = ({
 
         <div>
           {!ended_at && (
-            <Link
-              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', 'bunny-protocol')}`}
-            >
+            <Link href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', slug)}`}>
               <PrimaryButton block className={cn(active ? 'font-heading' : '')}>
                 Join now
               </PrimaryButton>
             </Link>
           )}
           {ended_at && (
-            <Link
-              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', 'bunny-protocol')}`}
-            >
+            <Link href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', slug)}`}>
               <SecondaryButton block>Details</SecondaryButton>
             </Link>
           )}
@@ -196,7 +230,7 @@ const PoolDetail = ({
           )}
         >
           <Image
-            src={meow}
+            src={thumbnail}
             fill
             alt="cover"
             draggable={false}

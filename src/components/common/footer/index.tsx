@@ -3,8 +3,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { WEB_ROUTES } from '@/utils/constants';
 
+import discord from '/public/images/footer/discord.svg';
 import logoFooter from '/public/images/footer/logo-footer.svg';
-import telegram from '/public/images/footer/telegram.svg';
+// import telegram from '/public/images/footer/telegram.svg';
 import x from '/public/images/footer/x.svg';
 
 function Footer() {
@@ -37,11 +38,11 @@ function Footer() {
             </div>
             <div className="flex gap-3">
               <a
-                href="https://t.co/9NEs1U1r46"
+                href="https://t.co/KjXOnvARym"
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                <Image src={telegram} alt="Telegram" />
+                <Image src={discord} alt="Discord" />
               </a>
               <a
                 href="https://twitter.com/Kyupad_"
