@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useId } from 'react';
 import { cn } from '@/utils/helpers';
 
 import InOutAnimation from '../animation/in-out';
@@ -15,6 +15,7 @@ interface ITabs {
 
 function Tabs({ items }: ITabs) {
   const [activeTab, setActiveTab] = React.useState(0);
+  const id = useId();
 
   const handleTabClick = useCallback((index: number) => {
     setActiveTab(index);
@@ -41,7 +42,7 @@ function Tabs({ items }: ITabs) {
 
       <div className="py-[60px] bg-kyu-color-12">
         <div className="w-full max-w-8xl mx-auto px-4 lg:px-[60px]">
-          <InOutAnimation key={activeTab}>
+          <InOutAnimation id={activeTab + id + Math.random()}>
             {items[activeTab].children}
           </InOutAnimation>
         </div>

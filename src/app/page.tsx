@@ -93,7 +93,7 @@ const Home = async () => {
           </Suspense>
         </div>
 
-        <div className="relative">
+        <div className="relative w-full">
           <Image
             src={catRight}
             alt="cat right"

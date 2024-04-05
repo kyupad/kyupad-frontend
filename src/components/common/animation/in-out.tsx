@@ -8,7 +8,7 @@ const variants = {
     y: 0,
     transition: {
       duration: 0.75,
-      delay: 0.3, // 0.5
+      delay: 0, // 0.5
     },
   },
   out: {
@@ -23,16 +23,16 @@ const variants = {
 
 const InOutAnimation = ({
   children,
-  key,
+  id,
 }: {
   children: React.ReactNode;
-  key: any;
+  id: any;
 }) => {
   return (
     <div>
       <AnimatePresence initial={true} mode="wait">
         <motion.div
-          key={key}
+          key={id}
           variants={variants}
           animate="in"
           initial="out"

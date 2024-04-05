@@ -6,41 +6,45 @@ import RegistrationStep from './step';
 import Timeline from './timeline';
 import TokenSale from './token-sale';
 
-const data = [
-  {
-    step: 1,
-    title: 'Registration',
-    time: '2024-03-31T14:45:10.984Z',
-  },
-  {
-    step: 2,
-    title: 'Snapshot',
-    time: '2024-04-20T14:12:10.984Z',
-  },
-  {
-    step: 3,
-    title: 'Investment',
-    time: '2024-05-20T14:12:10.984Z',
-  },
-  {
-    step: 4,
-    title: 'Claim',
-    time: '2024-06-20T14:12:10.984Z',
-  },
-];
+interface IRegistrationProps {
+  data: any;
+  isApplied: boolean;
+}
 
-const Registation = () => {
+const Registation = ({ isApplied, data }: IRegistrationProps) => {
+  const dataStep = [
+    {
+      step: 1,
+      title: 'Registration',
+      time: data?.registration_at,
+    },
+    {
+      step: 2,
+      title: 'Snapshot',
+      time: data?.snapshot_at,
+    },
+    {
+      step: 3,
+      title: 'Investment',
+      time: data?.investment_at,
+    },
+    {
+      step: 4,
+      title: 'Claim',
+      time: data?.claim_at,
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="max-w-8xl mx-auto px-4 lg:px-[60px] flex flex-col gap-5 pb-4">
-        <p className="text-xl text-justify">
-          Dive into intense multiplayer battles in the most competitive space
-          shooter ever! Developed by industry veterans from Cyberpunk 2077, the
-          Witcher, and Ubisoft- Powered by GameSwift and a Microsoft grant, with
-          400k* pre-registered players!
-        </p>
+      <div className="w-full max-w-8xl mx-auto px-4 lg:px-[60px] flex flex-col gap-5 pb-4">
+        <p className="text-xl text-justify">{data?.short_description || ''}</p>
 
-        <RegistrationStep data={data} />
+        <RegistrationStep
+          data={dataStep}
+          projectId={data?._id}
+          isApplied={isApplied}
+        />
 
         <div className="p-4 lg:p-10 border-2 border-kyu-color-11 rounded-[16px] bg-kyu-color-2 mt-5 flex flex-col gap-6">
           <div className="flex justify-between gap-4 sm:gap-[50px] xl:gap-[216px] flex-col sm:flex-row">

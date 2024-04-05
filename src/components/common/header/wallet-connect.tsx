@@ -22,12 +22,14 @@ interface IWalletConnectProps {
   doGetSignInData: Function;
   doVerifySignInWithSolana: Function;
   setCookie: Function;
+  revalidateProjectDetail: Function;
 }
 
 function WalletConnect({
   doGetSignInData,
   doVerifySignInWithSolana,
   setCookie,
+  revalidateProjectDetail,
 }: IWalletConnectProps) {
   const { connecting, disconnecting } = useWallet();
   const accessToken = getCookie(ACCESS_TOKEN_STORAGE_KEY);
@@ -110,7 +112,7 @@ function WalletConnect({
   return (
     <>
       {accessToken && isSolanaConnected ? (
-        <WalletConnected />
+        <WalletConnected revalidateProjectDetail={revalidateProjectDetail} />
       ) : (
         <WalletNotConnect
           loading={loading || connecting || disconnecting}

@@ -2,13 +2,17 @@
 
 import React, { memo, useCallback, useState } from 'react';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import { doApplyProject } from '@/adapters/projects';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
+import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
 import { UTC_FORMAT_STRING } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { toast } from 'sonner';
 
 import currentStep from '/public/images/detail/current-step.svg';
 import stepDone from '/public/images/detail/step-done.svg';
@@ -27,8 +31,24 @@ const getActiveStep = (data: any[]) => {
   return step ? step.step : data.length;
 };
 
-function RegistrationStep({ data }: { data: any[] }) {
+function RegistrationStep({
+  data,
+  projectId,
+  isApplied,
+}: {
+  data: any[];
+  projectId: string;
+  isApplied: boolean;
+}) {
   const [activeStep, setActiveStep] = useState<number>(getActiveStep(data));
+  const { slug } = useParams();
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
+
+  const handleChangeLoading = useCallback((value: boolean) => {
+    setLoading(value);
+  }, []);
 
   const handleChangeActiveStep = useCallback((value: number) => {
     setActiveStep(value);
@@ -52,6 +72,7 @@ function RegistrationStep({ data }: { data: any[] }) {
       progress = 'w-0';
       break;
   }
+
   return (
     <div className="flex flex-col gap-5">
       <div className="border-2 border-kyu-color-10 p-5 lg:p-10 rounded-[16px] bg-kyu-color-16 text-kyu-color-11">
@@ -118,17 +139,63 @@ function RegistrationStep({ data }: { data: any[] }) {
             <SimpleCountdown
               action={() => handleChangeActiveStep(activeStep + 1)}
               className="!text-xl md:!text-2xl"
-              time={dayjs.utc(data[0].time).valueOf()}
+              time={dayjs.utc(data?.[1]?.time).valueOf()}
             />
           ) : (
             <span className="font-bold text-2xl text-kyu-color-18">Ended</span>
           )}
         </div>
-        {activeStep === 1 && (
-          <PrimaryButton className="min-w-[200px]">Register Now</PrimaryButton>
+        {activeStep < 3 && isApplied && (
+          <div className="flex gap-4 flex-wrap">
+            <SecondaryButton disabled>Registered</SecondaryButton>
+            <PrimaryButton
+              onClick={() => {
+                if (activeStep === 1) {
+                  changeViewMode('registration');
+                } else if (activeStep === 2) {
+                  changeViewMode('snapshot');
+                }
+              }}
+            >
+              View Registration
+            </PrimaryButton>
+          </div>
         )}
 
-        {activeStep > 1 && (
+        {activeStep === 1 && !isApplied && (
+          <PrimaryButton
+            loading={loading}
+            loadingText="Registering..."
+            className="min-w-[200px]"
+            onClick={async () => {
+              handleChangeLoading(true);
+
+              try {
+                const result = await doApplyProject(slug as string, {
+                  project_id: projectId,
+                });
+
+                if (!result?.data) {
+                  toast.error(result?.message, {
+                    position: 'top-right',
+                    closeButton: true,
+                  });
+                  return;
+                }
+
+                changeViewMode('registration');
+              } catch {
+                //
+              } finally {
+                handleChangeLoading(false);
+              }
+            }}
+          >
+            Register Now
+          </PrimaryButton>
+        )}
+
+        {activeStep > 1 && !isApplied && (
           <SecondaryButton disabled>Registration Ended</SecondaryButton>
         )}
       </div>

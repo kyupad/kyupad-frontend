@@ -205,22 +205,26 @@ const PoolDetail = ({
         </div>
 
         <div>
-          {!ended_at && (
-            <Link href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', slug)}`}>
+          {!endedAt && (
+            <Link
+              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', slug || '')}`}
+            >
               <PrimaryButton block className={cn(active ? 'font-heading' : '')}>
                 Join now
               </PrimaryButton>
             </Link>
           )}
-          {ended_at && (
-            <Link href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', slug)}`}>
+          {endedAt && (
+            <Link
+              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', slug || '')}`}
+            >
               <SecondaryButton block>Details</SecondaryButton>
             </Link>
           )}
         </div>
       </div>
 
-      {!ended_at && (
+      {!endedAt && (
         <div
           className={cn(
             'lg:w-7/12 relative rounded-tl-[8px] border-b-4 rounded-tr-[8px] lg:rounded-[8px] overflow-hidden border-[#25252C] order-1 lg:order-2 pb-[56.25%] lg:pb-0 lg:border-2',

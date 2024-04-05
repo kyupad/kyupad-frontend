@@ -40,6 +40,7 @@ const request = async (
     next: {
       tags: [url],
     },
+    credentials: 'include',
   };
 
   switch (method) {

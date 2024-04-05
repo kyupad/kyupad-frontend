@@ -4,6 +4,7 @@ import { useGlobalStore } from '@/contexts/global-store-provider';
 import {
   ACCESS_TOKEN_STORAGE_KEY,
   REFRESH_TOKEN_STORAGE_KEY,
+  WEB_ROUTES,
 } from '@/utils/constants';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { deleteCookie } from 'cookies-next';
@@ -16,7 +17,11 @@ import {
   DropdownMenuTrigger,
 } from '../dropdown';
 
-function WalletConnected() {
+function WalletConnected({
+  revalidateProjectDetail,
+}: {
+  revalidateProjectDetail: Function;
+}) {
   const { publicKey, disconnect, wallet } = useWallet();
   const [open, setOpen] = useState<boolean>(false);
   const changeSolanaConnection = useGlobalStore(
@@ -61,6 +66,7 @@ function WalletConnected() {
         <DropdownMenuItem
           className="flex justify-center cursor-pointer"
           onClick={() => {
+            revalidateProjectDetail(WEB_ROUTES.PROJECT_DETAIL);
             changeSolanaConnection(false);
             disconnect();
             deleteCookie(ACCESS_TOKEN_STORAGE_KEY);

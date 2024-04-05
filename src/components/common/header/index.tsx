@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { doGetSignInData, doVerifySignInWithSolana } from '@/actions/auth';
 import { setCookie } from '@/actions/jwt';
+import { revalidateProjectDetail } from '@/actions/project';
 import GlobalStoreProvider from '@/contexts/global-store-provider';
 import WalletConnectProvider from '@/contexts/wallet-connect-provider';
 import { WEB_ROUTES } from '@/utils/constants';
@@ -41,6 +42,7 @@ const Header = () => {
               doGetSignInData={doGetSignInData}
               doVerifySignInWithSolana={doVerifySignInWithSolana}
               setCookie={setCookie}
+              revalidateProjectDetail={revalidateProjectDetail}
             />
           </WalletConnectProvider>
         </GlobalStoreProvider>
