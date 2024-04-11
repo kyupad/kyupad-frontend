@@ -36,7 +36,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
             <div className="flex gap-5 items-center">
               <div>
                 <Image
-                  className="max-w-[100px] sm:max-w-[150px] xl:max-w-[200px] rounded-full max-h-[200px]"
+                  className="max-w-[100px] sm:max-w-[150px] xl:max-w-[200px] rounded-full max-h-[100px] sm:max-h-[150px] xl:max-h-[200px]"
                   src={detail?.logo}
                   width={200}
                   height={200}
