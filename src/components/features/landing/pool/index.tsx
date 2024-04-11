@@ -67,21 +67,11 @@ const Pool = async ({
           )
           .map((item: any) => (
             <PoolDetail
-              key={item._id}
+              key={item.id}
               active={active}
               direction={direction}
-              ended_at={item?.ended_at}
-              name={item?.name}
-              symbol={item?.symbol}
-              tags={item?.tags}
-              shortDescription={item?.short_description}
-              totalRaise={item?.total_raise}
-              ticketSize={item?.ticket_size}
-              salePool={item?.sale_pool}
-              logo={item?.logo}
-              thumbnail={item?.thumbnail}
-              slug={item?.slug}
-              snapshotAt={item?.snapshot_at}
+              data={item}
+              isSuccess={mode === 'success'}
             />
           ))}
         {upcoming && data && data?.length > 0 && <UpcomingPool />}

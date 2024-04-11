@@ -19,46 +19,42 @@ dayjs.extend(advancedFormat);
 interface IPoolDetailProps {
   active?: boolean;
   direction?: 'row' | 'column';
-  ended_at?: string;
-  name: string;
-  symbol: string;
-  tags?: string[];
-  shortDescription: string;
-  totalRaise: number;
-  ticketSize: number;
-  salePool: string;
-  logo: string;
-  thumbnail: string;
-  snapshotAt: string;
-  slug: string;
+  data: any;
+  isSuccess?: boolean;
 }
 
 const PoolDetail = ({
   active,
   direction = 'row',
-  ended_at,
-  name,
-  symbol,
-  tags,
-  shortDescription,
-  totalRaise,
-  ticketSize,
-  salePool,
-  logo,
-  thumbnail,
-  slug,
-  snapshotAt,
+  data,
+  isSuccess,
 }: IPoolDetailProps) => {
   const now = dayjs.utc();
-  const [endedAt, setEndedAt] = useState<string>(
-    dayjs.utc(snapshotAt).isSame(now) || dayjs.utc(snapshotAt).isBefore(now)
-      ? dayjs.utc(snapshotAt).format(ENDED_AT_FORMAT_STRING)
+  const [registrationEndAt, setRegistrationEndAt] = useState<string>(
+    dayjs.utc(data?.timeline?.registration_end_at).isSame(now) ||
+      dayjs.utc(data?.timeline?.registration_end_at).isBefore(now)
+      ? dayjs
+          .utc(data?.timeline?.registration_end_at)
+          .format(ENDED_AT_FORMAT_STRING)
       : '',
   );
 
-  const handleChangeEndedAt = useCallback(() => {
-    setEndedAt(dayjs.utc(snapshotAt).format(ENDED_AT_FORMAT_STRING));
-  }, [snapshotAt]);
+  const [investmentEndAt] = useState<string>(
+    dayjs.utc(data?.timeline?.investment_end_at).isSame(now) ||
+      dayjs.utc(data?.timeline?.investment_end_at).isBefore(now)
+      ? dayjs
+          .utc(data?.timeline?.investment_end_at)
+          .format(ENDED_AT_FORMAT_STRING)
+      : '',
+  );
+
+  const handleChangeRegistrationEndAt = useCallback(() => {
+    setRegistrationEndAt(
+      dayjs
+        .utc(data?.timeline?.registration_end_at)
+        .format(ENDED_AT_FORMAT_STRING),
+    );
+  }, [data?.timeline?.registration_end_at]);
 
   return (
     <div
@@ -76,15 +72,25 @@ const PoolDetail = ({
         {/* countdown time end */}
         <div className="flex justify-between gap-3 items-center flex-wrap">
           <span className="text-xs sm:text-base text-button-primary-border font-medium whitespace-nowrap">
-            {endedAt ? 'Ended on' : `Registration Ends in`}
+            {investmentEndAt ? 'Ended on' : `Registration Ends in`}
           </span>
-          {endedAt ? (
-            <span className="font-bold text-xl text-[#F2820E]">{endedAt}</span>
+          {investmentEndAt ? (
+            <span className="font-bold text-xl text-[#F2820E]">
+              {investmentEndAt}
+            </span>
           ) : (
-            <CountdownTime
-              time={dayjs.utc(snapshotAt).valueOf()}
-              action={handleChangeEndedAt}
-            />
+            <>
+              {!registrationEndAt ? (
+                <CountdownTime
+                  time={dayjs
+                    .utc(data?.timeline?.registration_end_at)
+                    .valueOf()}
+                  action={handleChangeRegistrationEndAt}
+                />
+              ) : (
+                <span className="font-bold text-xl text-[#F2820E]">Ended</span>
+              )}
+            </>
           )}
         </div>
 
@@ -97,7 +103,7 @@ const PoolDetail = ({
           >
             <Image
               alt="logo"
-              src={logo}
+              src={data?.logo}
               draggable="false"
               fill
               style={{ objectFit: 'cover' }}
@@ -111,7 +117,7 @@ const PoolDetail = ({
                 direction === 'column' ? '!text-2xl' : '',
               )}
             >
-              {name || 'Project A'}
+              {data?.name || 'Project A'}
             </h4>
             <div
               className={cn(
@@ -119,11 +125,11 @@ const PoolDetail = ({
                 direction === 'column' ? '!text-xl' : '',
               )}
             >
-              ${symbol || 'XXX'}
+              ${data?.token_info?.symbol || 'XXX'}
             </div>
 
             <div className="flex gap-[10px] flex-wrap">
-              {tags?.map((item) => {
+              {data?.tags?.map((item: string) => {
                 return (
                   <span
                     key={item}
@@ -146,7 +152,7 @@ const PoolDetail = ({
             direction === 'column' ? '!text-base' : '',
           )}
         >
-          {shortDescription || 'Short description of the project'}
+          {data?.short_description || 'Short description of the project'}
         </div>
 
         <div className="flex flex-col gap-3">
@@ -155,11 +161,11 @@ const PoolDetail = ({
               Total raise
             </span>
             <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-              {currencyFormatter.format(totalRaise)}
+              {currencyFormatter.format(data?.info?.total_raise)}
             </span>
           </div>
 
-          {ended_at && (
+          {investmentEndAt && (
             <>
               <div className="flex justify-between">
                 <span className="text-button-primary-border font-medium">
@@ -181,14 +187,14 @@ const PoolDetail = ({
             </>
           )}
 
-          {!ended_at && (
+          {!investmentEndAt && (
             <>
               <div className="flex justify-between">
                 <span className="text-button-primary-border font-medium">
                   Ticket Size
                 </span>
                 <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-                  {currencyFormatter.format(ticketSize)}
+                  {currencyFormatter.format(data?.info?.ticket_size)}
                 </span>
               </div>
 
@@ -197,7 +203,7 @@ const PoolDetail = ({
                   Sale Pool
                 </span>
                 <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-                  {salePool}
+                  {data?.info?.sale_pool}
                 </span>
               </div>
             </>
@@ -205,18 +211,18 @@ const PoolDetail = ({
         </div>
 
         <div>
-          {!endedAt && (
+          {!investmentEndAt && (
             <Link
-              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', slug || '')}`}
+              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', data?.slug || '')}`}
             >
               <PrimaryButton block className={cn(active ? 'font-heading' : '')}>
                 Join now
               </PrimaryButton>
             </Link>
           )}
-          {endedAt && (
+          {investmentEndAt && (
             <Link
-              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', slug || '')}`}
+              href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', data?.slug || '')}`}
             >
               <SecondaryButton block>Details</SecondaryButton>
             </Link>
@@ -224,7 +230,7 @@ const PoolDetail = ({
         </div>
       </div>
 
-      {!endedAt && (
+      {isSuccess && !investmentEndAt && (
         <div
           className={cn(
             'lg:w-7/12 relative rounded-tl-[8px] border-b-4 rounded-tr-[8px] lg:rounded-[8px] overflow-hidden border-[#25252C] order-1 lg:order-2 pb-[56.25%] lg:pb-0 lg:border-2',
@@ -234,7 +240,26 @@ const PoolDetail = ({
           )}
         >
           <Image
-            src={thumbnail}
+            src={data?.thumbnail}
+            fill
+            alt="cover"
+            draggable={false}
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            sizes="100vw"
+          />
+        </div>
+      )}
+      {!isSuccess && (
+        <div
+          className={cn(
+            'lg:w-7/12 relative rounded-tl-[8px] border-b-4 rounded-tr-[8px] lg:rounded-[8px] overflow-hidden border-[#25252C] order-1 lg:order-2 pb-[56.25%] lg:pb-0 lg:border-2',
+            direction === 'column'
+              ? '!order-1 !w-full !pb-[56.25%] !rounded-bl-none !rounded-br-none !border-b-4 !border-r-0 !border-l-0 !border-t-0'
+              : '',
+          )}
+        >
+          <Image
+            src={data?.thumbnail}
             fill
             alt="cover"
             draggable={false}

@@ -18,14 +18,14 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
   const { slug } = params;
 
   const data = await doGetProjectDetail(slug);
-  const detail = data?.data?.detail;
+
+  const detail = data?.data?.project;
   const is_applied = data?.data?.is_applied;
   const now = dayjs.utc();
-
   return (
     <div className="pt-[60px]">
-      {(dayjs.utc(detail?.snapshot_at).isBefore(now) ||
-        dayjs.utc(detail?.snapshot_at).isSame(now)) && (
+      {(dayjs.utc(detail?.timeline?.snapshot_start_at).isAfter(now) ||
+        dayjs.utc(detail?.timeline?.snapshot_start_at).isSame(now)) && (
         <>
           <div className="max-w-8xl mx-auto px-4 lg:px-[60px] pt-5 flex items-center">
             <ProjectDetailStoreProvider>
@@ -36,7 +36,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
             <div className="flex gap-5 items-center">
               <div>
                 <Image
-                  className="max-w-[100px] sm:max-w-[150px] xl:max-w-[200px] rounded-full"
+                  className="max-w-[100px] sm:max-w-[150px] xl:max-w-[200px] rounded-full max-h-[200px]"
                   src={detail?.logo}
                   width={200}
                   height={200}
@@ -49,7 +49,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
                   {detail?.name || 'Project A'}
                 </h1>
                 <p className="text-xl sm:text-3xl xl:text-4xl font-bold xl:leading-[48px] line-clamp-1">
-                  ${detail?.symbol || 'XXX'}
+                  ${detail?.token_info?.symbol || 'XXX'}
                 </p>
               </div>
             </div>

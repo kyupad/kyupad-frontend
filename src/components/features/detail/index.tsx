@@ -19,7 +19,9 @@ function DetailController({ data, isApplied }: IDetailControllerProps) {
     <div>
       {!viewMode && <Registration data={data} isApplied={isApplied} />}
       {viewMode === 'registration' && (
-        <ViewRegistration registrationEndAt={data?.snapshot_at} />
+        <ViewRegistration
+          registrationEndAt={data?.timeline?.registration_end_at}
+        />
       )}
 
       {viewMode === 'snapshot' && <ViewSnapshot data={data} />}

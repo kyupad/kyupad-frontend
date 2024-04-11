@@ -2,7 +2,6 @@
 
 import React, { memo, useCallback, useState } from 'react';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
 import { doApplyProject } from '@/adapters/projects';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
@@ -41,7 +40,6 @@ function RegistrationStep({
   isApplied: boolean;
 }) {
   const [activeStep, setActiveStep] = useState<number>(getActiveStep(data));
-  const { slug } = useParams();
   const [loading, setLoading] = useState<boolean>(false);
 
   const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
@@ -169,9 +167,8 @@ function RegistrationStep({
             className="min-w-[200px]"
             onClick={async () => {
               handleChangeLoading(true);
-
               try {
-                const result = await doApplyProject(slug as string, {
+                const result = await doApplyProject({
                   project_id: projectId,
                 });
 

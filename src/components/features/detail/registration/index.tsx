@@ -16,22 +16,22 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
     {
       step: 1,
       title: 'Registration',
-      time: data?.registration_at,
+      time: data?.timeline?.registration_start_at,
     },
     {
       step: 2,
       title: 'Snapshot',
-      time: data?.snapshot_at,
+      time: data?.timeline?.snapshot_start_at,
     },
     {
       step: 3,
       title: 'Investment',
-      time: data?.investment_at,
+      time: data?.timeline?.investment_start_at,
     },
     {
       step: 4,
       title: 'Claim',
-      time: data?.claim_at,
+      time: data?.timeline?.claim_start_at,
     },
   ];
 
@@ -42,7 +42,7 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
 
         <RegistrationStep
           data={dataStep}
-          projectId={data?._id}
+          projectId={data?.id}
           isApplied={isApplied}
         />
 
