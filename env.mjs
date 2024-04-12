@@ -21,6 +21,7 @@ const env = createEnv({
     NEXT_PUBLIC_NETWORK: z.union([z.literal('mainnet'), z.literal('testnet')]),
     NEXT_PUBLIC_ALLOWED_ORIGINS: z.string().min(1),
     NEXT_PUBLIC_ALLOWED_RESOURCES: z.string().nullish(),
+    NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN: z.string().min(1),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -29,6 +30,8 @@ const env = createEnv({
     NEXT_PUBLIC_NETWORK: process.env.NEXT_PUBLIC_NETWORK,
     NEXT_PUBLIC_ALLOWED_ORIGINS: process.env.NEXT_PUBLIC_ALLOWED_ORIGINS,
     NEXT_PUBLIC_ALLOWED_RESOURCES: process.env.NEXT_PUBLIC_ALLOWED_RESOURCES,
+    NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN:
+      process.env.NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN,
   },
 });
 
