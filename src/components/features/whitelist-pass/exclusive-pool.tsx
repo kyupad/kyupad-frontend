@@ -18,8 +18,8 @@ import {
   TokenStandard,
 } from '@metaplex-foundation/mpl-bubblegum';
 import { publicKey as publicKeyFn } from '@metaplex-foundation/umi';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey, Transaction } from '@solana/web3.js';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import dayjs from 'dayjs';
 import { env } from 'env.mjs';
 import dropdown from 'public/images/whitelist/drop-down.svg';
@@ -33,15 +33,17 @@ const tokenMetaDataProgramId = new PublicKey(
 
 function ExclusivePool() {
   const [open, setOpen] = useState<boolean>(false);
-  const { publicKey, signTransaction } = useWallet();
+  const { publicKey } = useWallet();
+
   const [activePool, setActivePool] = useState<any[]>([]);
   const [currentPool, setCurrentPool] = useState<any>({});
   const [currentPoolId, setCurrentPoolId] = useState<string>(
     currentPool?.pool_id || '',
   );
   const [collectionMint, setCollectionMint] = useState<PublicKey>();
+  const { connection } = useConnection();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const connection = new Connection(env.NEXT_PUBLIC_RPC_URL, 'confirmed');
   const program = new Program<KyupadSmartContract>(IDL, programId, {
     connection,
   });
@@ -52,6 +54,10 @@ function ExclusivePool() {
 
   const handleChangePool = useCallback((poolId: string) => {
     setCurrentPoolId(poolId);
+  }, []);
+
+  const handleSetIsLoading = useCallback((value: boolean) => {
+    setIsLoading(value);
   }, []);
 
   useEffect(() => {
@@ -90,6 +96,8 @@ function ExclusivePool() {
       console.error('Collection mint not found');
       return;
     }
+
+    handleSetIsLoading(true);
 
     const merkleProof = currentPool?.merkle_proof;
 
@@ -217,39 +225,46 @@ function ExclusivePool() {
       }
     });
 
-    const mintCnftInstruction = await program.methods
-      .mintCnft(
-        Buffer.from(merkleProofDecoded, 'hex') as any,
-        currentPoolId as string,
-        Buffer.from(data) as Buffer,
-      )
-      .accounts({
-        minter: publicKey,
-        pools: poolsPDA,
-        poolMinted: poolMinted,
-        merkleTree: treeAddress,
-        treeAuthority,
-        compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-        logWrapper: SPL_NOOP_PROGRAM_ID,
-        collectionAuthority: collectionAuthority,
-        collectionAuthorityRecordPda: MPL_BUBBLEGUM_PROGRAM_ID,
-        collectionMint: collectionMint,
-        collectionMetadata: collectionMetadata,
-        editionAccount: collectionMasterEditionAccount,
-        bubblegumSigner: bgumSigner,
-        tokenMetadataProgram: tokenMetaDataProgramId,
-      })
-      .remainingAccounts(remainingAccounts)
-      .instruction();
+    try {
+      const mintCnftInstruction = await program.methods
+        .mintCnft(
+          Buffer.from(merkleProofDecoded, 'hex') as any,
+          currentPoolId as string,
+          Buffer.from(data) as Buffer,
+        )
+        .accounts({
+          minter: publicKey,
+          pools: poolsPDA,
+          poolMinted: poolMinted,
+          merkleTree: treeAddress,
+          treeAuthority,
+          compressionProgram: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
+          logWrapper: SPL_NOOP_PROGRAM_ID,
+          collectionAuthority: collectionAuthority,
+          collectionAuthorityRecordPda: MPL_BUBBLEGUM_PROGRAM_ID,
+          collectionMint: collectionMint,
+          collectionMetadata: collectionMetadata,
+          editionAccount: collectionMasterEditionAccount,
+          bubblegumSigner: bgumSigner,
+          tokenMetadataProgram: tokenMetaDataProgramId,
+        })
+        .remainingAccounts(remainingAccounts)
+        .instruction();
 
-    const tx = new Transaction().add(mintCnftInstruction);
-    tx.feePayer = publicKey;
-    tx.recentBlockhash = (
-      await connection.getLatestBlockhash('finalized')
-    ).blockhash;
+      const tx = new Transaction().add(mintCnftInstruction);
+      tx.feePayer = publicKey;
+      tx.recentBlockhash = (
+        await connection.getLatestBlockhash('finalized')
+      ).blockhash;
 
-    const sig = signTransaction && (await signTransaction(tx));
-    console.info(sig, 'sig');
+      if (typeof window !== 'undefined') {
+        await window?.solana.signAndSendTransaction(tx);
+      }
+    } catch (error) {
+      console.error(error, 'error');
+    } finally {
+      handleSetIsLoading(false);
+    }
   };
 
   return (
@@ -354,6 +369,7 @@ function ExclusivePool() {
           </div>
 
           <PrimaryButton
+            loading={isLoading}
             disabled={!currentPool?.is_active}
             onClick={handleMint}
           >
