@@ -18,10 +18,18 @@ const env = createEnv({
       z.literal('production'),
       z.string().nullish(),
     ]),
-    NEXT_PUBLIC_NETWORK: z.union([z.literal('mainnet'), z.literal('testnet')]),
+    NEXT_PUBLIC_NETWORK: z.union([
+      z.literal('mainnet'),
+      z.literal('testnet'),
+      z.literal('devnet'),
+    ]),
     NEXT_PUBLIC_ALLOWED_ORIGINS: z.string().min(1),
     NEXT_PUBLIC_ALLOWED_RESOURCES: z.string().nullish(),
     NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN: z.string().min(1),
+    NEXT_PUBLIC_NFT_PROGRAM_ID: z.string().min(1),
+    NEXT_PUBLIC_RPC_URL: z.string().min(1).includes('http'),
+    NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID: z.string().min(1),
+    NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN: z.string().min(1),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -32,6 +40,12 @@ const env = createEnv({
     NEXT_PUBLIC_ALLOWED_RESOURCES: process.env.NEXT_PUBLIC_ALLOWED_RESOURCES,
     NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN:
       process.env.NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN,
+    NEXT_PUBLIC_NFT_PROGRAM_ID: process.env.NEXT_PUBLIC_NFT_PROGRAM_ID,
+    NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
+    NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID:
+      process.env.NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID,
+    NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN:
+      process.env.NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN,
   },
 });
 

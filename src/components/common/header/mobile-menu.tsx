@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { revalidateProjectDetail } from '@/actions/project';
 import GlobalStoreProvider from '@/contexts/global-store-provider';
-import WalletConnectProvider from '@/contexts/wallet-connect-provider';
 import { WEB_ROUTES } from '@/utils/constants';
 import PrimaryButton from '@components/common/button/primary';
 
@@ -59,14 +58,12 @@ function MobileMenu({
               </Link>
             </nav>
             <GlobalStoreProvider>
-              <WalletConnectProvider>
-                <WalletConnect
-                  doGetSignInData={doGetSignInData}
-                  doVerifySignInWithSolana={doVerifySignInWithSolana}
-                  setCookie={setCookie}
-                  revalidateProjectDetail={revalidateProjectDetail}
-                />
-              </WalletConnectProvider>
+              <WalletConnect
+                doGetSignInData={doGetSignInData}
+                doVerifySignInWithSolana={doVerifySignInWithSolana}
+                setCookie={setCookie}
+                revalidateProjectDetail={revalidateProjectDetail}
+              />
             </GlobalStoreProvider>
           </div>
           <SheetFooter />

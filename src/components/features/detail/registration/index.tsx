@@ -16,22 +16,26 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
     {
       step: 1,
       title: 'Registration',
-      time: data?.timeline?.registration_start_at,
+      start: data?.timeline?.registration_start_at,
+      end: data?.timeline?.registration_end_at,
     },
     {
       step: 2,
       title: 'Snapshot',
-      time: data?.timeline?.snapshot_start_at,
+      start: data?.timeline?.snapshot_start_at,
+      end: data?.timeline?.snapshot_end_at,
     },
     {
       step: 3,
       title: 'Investment',
-      time: data?.timeline?.investment_start_at,
+      start: data?.timeline?.investment_start_at,
+      end: data?.timeline?.investment_end_at,
     },
     {
       step: 4,
       title: 'Claim',
-      time: data?.timeline?.claim_start_at,
+      start: data?.timeline?.claim_start_at,
+      end: data?.timeline?.claim_end_at,
     },
   ];
 

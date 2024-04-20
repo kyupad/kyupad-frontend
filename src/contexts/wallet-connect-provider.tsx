@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import {
   ConnectionProvider,
   WalletProvider,
@@ -16,17 +15,9 @@ import {
   TorusWalletAdapter,
   TrustWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
-import { clusterApiUrl } from '@solana/web3.js';
 import { env } from 'env.mjs';
 
 function WalletConnectProvider({ children }: { children: React.ReactNode }) {
-  const network =
-    env.NEXT_PUBLIC_NETWORK === 'testnet'
-      ? WalletAdapterNetwork.Testnet
-      : WalletAdapterNetwork.Mainnet;
-
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
@@ -39,11 +30,11 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
       new SpotWalletAdapter(),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [network],
+    [],
   );
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
+    <ConnectionProvider endpoint={env.NEXT_PUBLIC_RPC_URL}>
       <WalletProvider wallets={wallets} autoConnect>
         {children}
       </WalletProvider>

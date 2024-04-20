@@ -65,12 +65,13 @@ function WalletConnected({
       <DropdownMenuContent className="w-[220px] font-bold">
         <DropdownMenuItem
           className="flex justify-center cursor-pointer"
-          onClick={() => {
+          onClick={async () => {
             revalidateProjectDetail(WEB_ROUTES.PROJECT_DETAIL);
             changeSolanaConnection(false);
-            disconnect();
+            await disconnect();
             deleteCookie(ACCESS_TOKEN_STORAGE_KEY);
             deleteCookie(REFRESH_TOKEN_STORAGE_KEY);
+            localStorage.removeItem('walletName');
           }}
         >
           <span className="text-xl">Disconnect</span>

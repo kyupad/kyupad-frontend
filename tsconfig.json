@@ -10,7 +10,8 @@
       "@utils/*": ["src/utils/*"],
       "@scripts/*": ["scripts/*"],
       "@stores/*": ["stores/*"],
-      "@actions/*": ["src/actions/*"]
+      "@actions/*": ["src/actions/*"],
+      "@anchors/*": ["src/anchors/*"]
     },
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],

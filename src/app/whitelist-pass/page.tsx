@@ -2,9 +2,10 @@ import React from 'react';
 import { Metadata } from 'next';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
-import PrimaryButton from '@/components/common/button/primary';
-import CalendarCoundown from '@/components/common/coutdown/calendar';
 import { Progress } from '@/components/common/progress/progress';
+import ExclusivePool from '@/components/features/whitelist-pass/exclusive-pool';
+import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
+import WhitelistPassStep from '@/components/features/whitelist-pass/step';
 import { cn } from '@/utils/helpers';
 
 import latDecorator from '/public/images/home/last-decorator.svg';
@@ -22,63 +23,91 @@ export const metadata: Metadata = {
 };
 
 function Whitelist() {
+  const roundStep = [
+    {
+      step: 1,
+      start: '2024-08-30T00:00:00Z',
+      end: '2024-08-30T00:00:00Z',
+      title: 'Round 1',
+    },
+    {
+      step: 2,
+      start: '2024-08-30T00:00:00Z',
+      end: '2024-08-30T00:00:00Z',
+      title: 'Round 2',
+    },
+    {
+      step: 3,
+      start: '2024-08-30T00:00:00Z',
+      end: '2024-08-30T00:00:00Z',
+      title: 'End',
+    },
+  ];
   return (
     <>
       <div
         className={cn(
-          'px-4 lg:px-[60px] py-5 mx-auto flex max-w-[1198px] gap-10 mt-[60px] flex-wrap justify-center items-center lg:items-start',
+          'px-4 lg:px-[60px] py-5 mx-auto flex flex-col items-center gap-[100px]',
           fontHeading.variable,
         )}
       >
-        <div className="flex flex-col gap-7 order-2 items-center sm:items-start lg:order-1">
-          <h1 className="text-4xl sm:text-5xl xl:text-7xl font-heading text-kyu-color-13 leading-tight">
-            Free Mint <br /> Whitelist Pass NFT
-          </h1>
+        <div
+          className={cn(
+            'flex max-w-[1198px] gap-10 mt-[60px] flex-wrap justify-center items-center xl:justify-between w-full',
+          )}
+        >
+          <div className="flex flex-col gap-12 order-2 items-center sm:items-start lg:order-1">
+            <h1 className="leading-tight text-kyu-color-11 flex flex-col gap-3">
+              <span className="text-4xl sm:text-5xl xl:text-7xl font-heading">
+                Free Mint
+              </span>
+              <span className="text-3xl sm:text-4xl xl:text-5xl font-bold">
+                Whitelist Pass NFT
+              </span>
+            </h1>
 
-          <div className="flex flex-col gap-4 w-full">
-            <div className="text-2xl font-bold text-kyu-color-11">End time</div>
-            <CalendarCoundown time={new Date('2024-08-30').getTime()} />
-            <div className="flex gap-4">
-              <span className="text-xl">Claim schedule: </span>
-              <span className="text-xl font-bold"> 31st May, 2024</span>
+            <div className="min-w-[300px] sm:min-w-[480px]">
+              <WhitelistPassStep data={roundStep} />
+            </div>
+
+            <div className="">
+              <span className="font-medium text-kyu-color-14">
+                Total Whitelist Pass NFT minted:{' '}
+              </span>
+              <span className="font-bold">0</span>
             </div>
           </div>
+          <div className="flex flex-col gap-14 order-1 lg:order-2">
+            <div className="max-w-[426px]">
+              <Image src={whitelist} alt="whitelist" draggable={false} />
+            </div>
 
-          <div className="max-w-[280px] flex flex-col gap-4 w-full">
-            <PrimaryButton className="w-full">Free Mint</PrimaryButton>
-            <div className="flex justify-between">
-              <div>
-                <span className="text-kyu-color-14 font-medium">Claimed</span>{' '}
-                <span className="font-bold text-kyu-color-11">0</span>
-              </div>
-              <div>
-                <span className="text-kyu-color-14 font-medium">Available</span>{' '}
-                <span className="font-bold text-kyu-color-11">1</span>
-              </div>
+            <div className="relative">
+              <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
+                0
+              </span>
+              <Progress value={0} />
+              <span className="absolute right-0 -top-8">
+                <span className="text-kyu-color-14 font-medium">Total</span>{' '}
+                <span className="font-bold text-kyu-color-11">20,000</span>
+              </span>
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-14 order-1 lg:order-2">
-          <div className="max-w-[426px]">
-            <Image src={whitelist} alt="whitelist" draggable={false} />
-          </div>
 
-          <div className="relative">
-            <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-              1250
-            </span>
-            <Progress value={60} />
-            <span className="absolute right-0 -top-8">
-              <span className="text-kyu-color-14 font-medium">Total</span>{' '}
-              <span className="font-bold text-kyu-color-11">20,000</span>
-            </span>
-          </div>
+        <div className="w-full max-w-[1198px]">
+          <ExclusivePool />
+        </div>
+
+        <div className="w-full max-w-[1198px]">
+          <FcfsPool />
         </div>
       </div>
+
       <Image
         src={latDecorator}
         alt="decorator"
-        className="mx-auto 2xl:-mt-16 w-full"
+        className="mx-auto w-full"
         draggable={false}
       />
     </>

@@ -11,6 +11,7 @@ import { UTC_FORMAT_STRING } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import incomingStep from 'public/images/detail/incoming-step.svg';
 import { toast } from 'sonner';
 
 import currentStep from '/public/images/detail/current-step.svg';
@@ -23,11 +24,28 @@ const getActiveStep = (data: any[]) => {
   const now = dayjs.utc();
   const step = data.find((item) => {
     return (
-      dayjs.utc(item.time).isSame(now) || dayjs.utc(item.time).isAfter(now)
+      ((dayjs.utc(item.start).isBefore(now) ||
+        dayjs.utc(item.start).isSame(now)) &&
+        dayjs.utc(item.end).isAfter(now)) ||
+      dayjs.utc(item.end).isSame(now)
     );
   });
 
-  return step ? step.step : data.length;
+  if (step) {
+    return step.step;
+  }
+
+  if (!step) {
+    if (dayjs.utc(data[data.length - 1].end).isBefore(now)) {
+      return data.length;
+    }
+
+    const nextStep = data.find((item) => {
+      return dayjs.utc(item.start).isAfter(now);
+    });
+
+    return nextStep?.step || 1;
+  }
 };
 
 function RegistrationStep({
@@ -94,7 +112,26 @@ function RegistrationStep({
                 {data?.map((item) => (
                   <div key={item.step} className="bg-kyu-color-16 min-w-[32px]">
                     {item.step === activeStep && (
-                      <Image src={currentStep} alt="step" draggable={false} />
+                      <>
+                        {dayjs
+                          .utc(data[activeStep - 1].start)
+                          .isBefore(dayjs.utc()) ||
+                        dayjs
+                          .utc(data[activeStep - 1].start)
+                          .isSame(dayjs.utc()) ? (
+                          <Image
+                            src={currentStep}
+                            alt="step"
+                            draggable={false}
+                          />
+                        ) : (
+                          <Image
+                            src={incomingStep}
+                            alt="step"
+                            draggable={false}
+                          />
+                        )}
+                      </>
                     )}
                     {item.step > activeStep && (
                       <Image src={step} alt="step" draggable={false} />
@@ -122,7 +159,7 @@ function RegistrationStep({
               >
                 <div className="text-2xl font-bold">{item.title}</div>
                 <time className="font-medium">
-                  {dayjs.utc(item.time).format(UTC_FORMAT_STRING)}
+                  {dayjs.utc(item.start).format(UTC_FORMAT_STRING)}
                 </time>
               </div>
             ))}
@@ -137,7 +174,7 @@ function RegistrationStep({
             <SimpleCountdown
               action={() => handleChangeActiveStep(activeStep + 1)}
               className="!text-xl md:!text-2xl"
-              time={dayjs.utc(data?.[1]?.time).valueOf()}
+              time={dayjs.utc(data?.[1]?.end).valueOf()}
             />
           ) : (
             <span className="font-bold text-2xl text-kyu-color-18">Ended</span>
