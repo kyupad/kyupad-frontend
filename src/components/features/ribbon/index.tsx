@@ -12,9 +12,9 @@ function Ribbon() {
         setEnv('LOCAL');
         break;
       default:
-        if (hostname !== 'kyupad.xyz') {
-          const arr = hostname.split('.');
-          setEnv(arr[0].toUpperCase);
+        if (hostname && hostname !== 'kyupad.xyz') {
+          const arr = hostname?.split('.');
+          if (arr && arr.length > 0) setEnv(arr[0]?.toUpperCase());
         }
         break;
     }
