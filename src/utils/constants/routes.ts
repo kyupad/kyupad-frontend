@@ -5,6 +5,7 @@ const API_ROUTES = {
   GET_PROJECT_DETAIL: '/v1/projects/[slug]',
   APPLY_PROJECT: '/v1/projects/apply',
   GET_MINTING_POOL: '/v1/nft/minting-pool',
+  GENERATE_CFNT_METADATA: '/v1/nft/metadata',
 };
 
 const WEB_ROUTES = {

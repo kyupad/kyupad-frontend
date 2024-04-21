@@ -16,4 +16,16 @@ const doGetMintingPool = async ({
   return data;
 };
 
-export { doGetMintingPool };
+const doGenerateMetadata = async (body: {
+  id: string;
+  name: string;
+  symbol: string;
+  description?: string;
+  seller_fee_basis_points: number;
+  creators?: string[];
+}) => {
+  const data = await request('POST', API_ROUTES.GENERATE_CFNT_METADATA, body);
+  return data;
+};
+
+export { doGetMintingPool, doGenerateMetadata };

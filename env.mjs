@@ -13,11 +13,6 @@ const env = createEnv({
       z.string().nullish(),
     ]),
     NEXT_PUBLIC_BASE_URL: z.string().min(1).includes('http'),
-    NEXT_PUBLIC_NODE_ENV: z.union([
-      z.literal('development'),
-      z.literal('production'),
-      z.string().nullish(),
-    ]),
     NEXT_PUBLIC_NETWORK: z.union([
       z.literal('mainnet'),
       z.literal('testnet'),
@@ -30,6 +25,7 @@ const env = createEnv({
     NEXT_PUBLIC_RPC_URL: z.string().min(1).includes('http'),
     NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID: z.string().min(1),
     NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN: z.string().min(1),
+    NEXT_PUBLIC_MPL_BUBBLEGUM_PROGRAM_ID: z.string().min(1),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -46,6 +42,8 @@ const env = createEnv({
       process.env.NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID,
     NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN:
       process.env.NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN,
+    NEXT_PUBLIC_MPL_BUBBLEGUM_PROGRAM_ID:
+      process.env.NEXT_PUBLIC_MPL_BUBBLEGUM_PROGRAM_ID,
   },
 });
 

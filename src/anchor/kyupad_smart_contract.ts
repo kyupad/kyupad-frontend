@@ -3,6 +3,33 @@ export type KyupadSmartContract = {
   name: 'kyupad_smart_contract';
   instructions: [
     {
+      name: 'initAdmin';
+      accounts: [
+        {
+          name: 'signer';
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: 'adminPda';
+          isMut: true;
+          isSigner: false;
+          docs: ['CHECK'];
+        },
+        {
+          name: 'systemProgram';
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [
+        {
+          name: 'address';
+          type: 'publicKey';
+        },
+      ];
+    },
+    {
       name: 'mintCnft';
       accounts: [
         {
@@ -113,6 +140,11 @@ export type KyupadSmartContract = {
           isSigner: true;
         },
         {
+          name: 'adminPda';
+          isMut: false;
+          isSigner: false;
+        },
+        {
           name: 'collectionMint';
           isMut: false;
           isSigner: false;
@@ -137,6 +169,11 @@ export type KyupadSmartContract = {
           name: 'creator';
           isMut: true;
           isSigner: true;
+        },
+        {
+          name: 'adminPda';
+          isMut: false;
+          isSigner: false;
         },
         {
           name: 'metadata';
@@ -198,6 +235,11 @@ export type KyupadSmartContract = {
           name: 'creator';
           isMut: true;
           isSigner: true;
+        },
+        {
+          name: 'adminPda';
+          isMut: false;
+          isSigner: false;
         },
         {
           name: 'merkleTree';
@@ -265,6 +307,11 @@ export type KyupadSmartContract = {
           isSigner: true;
         },
         {
+          name: 'adminPda';
+          isMut: false;
+          isSigner: false;
+        },
+        {
           name: 'collectionMint';
           isMut: false;
           isSigner: false;
@@ -330,6 +377,18 @@ export type KyupadSmartContract = {
           {
             name: 'remainingAssets';
             type: 'u16';
+          },
+        ];
+      };
+    },
+    {
+      name: 'admin';
+      type: {
+        kind: 'struct';
+        fields: [
+          {
+            name: 'isAdmin';
+            type: 'bool';
           },
         ];
       };
@@ -498,6 +557,33 @@ export const IDL: KyupadSmartContract = {
   name: 'kyupad_smart_contract',
   instructions: [
     {
+      name: 'initAdmin',
+      accounts: [
+        {
+          name: 'signer',
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: 'adminPda',
+          isMut: true,
+          isSigner: false,
+          docs: ['CHECK'],
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: 'address',
+          type: 'publicKey',
+        },
+      ],
+    },
+    {
       name: 'mintCnft',
       accounts: [
         {
@@ -608,6 +694,11 @@ export const IDL: KyupadSmartContract = {
           isSigner: true,
         },
         {
+          name: 'adminPda',
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: 'collectionMint',
           isMut: false,
           isSigner: false,
@@ -632,6 +723,11 @@ export const IDL: KyupadSmartContract = {
           name: 'creator',
           isMut: true,
           isSigner: true,
+        },
+        {
+          name: 'adminPda',
+          isMut: false,
+          isSigner: false,
         },
         {
           name: 'metadata',
@@ -693,6 +789,11 @@ export const IDL: KyupadSmartContract = {
           name: 'creator',
           isMut: true,
           isSigner: true,
+        },
+        {
+          name: 'adminPda',
+          isMut: false,
+          isSigner: false,
         },
         {
           name: 'merkleTree',
@@ -760,6 +861,11 @@ export const IDL: KyupadSmartContract = {
           isSigner: true,
         },
         {
+          name: 'adminPda',
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: 'collectionMint',
           isMut: false,
           isSigner: false,
@@ -825,6 +931,18 @@ export const IDL: KyupadSmartContract = {
           {
             name: 'remainingAssets',
             type: 'u16',
+          },
+        ],
+      },
+    },
+    {
+      name: 'admin',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'isAdmin',
+            type: 'bool',
           },
         ],
       },

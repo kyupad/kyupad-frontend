@@ -4,7 +4,7 @@ import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import { Progress } from '@/components/common/progress/progress';
 import ExclusivePool from '@/components/features/whitelist-pass/exclusive-pool';
-import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
+// import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
 import WhitelistPassStep from '@/components/features/whitelist-pass/step';
 import { cn } from '@/utils/helpers';
 
@@ -99,9 +99,9 @@ function Whitelist() {
           <ExclusivePool />
         </div>
 
-        <div className="w-full max-w-[1198px]">
+        {/* <div className="w-full max-w-[1198px]">
           <FcfsPool />
-        </div>
+        </div> */}
       </div>
 
       <Image
