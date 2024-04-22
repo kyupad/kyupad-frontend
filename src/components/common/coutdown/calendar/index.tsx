@@ -1,10 +1,17 @@
 'use client';
 
 import React, { memo, useEffect, useState } from 'react';
+import { cn } from '@/utils/helpers';
 
 import CountdownItem from './item';
 
-const CalendarCountdown = ({ time }: { time: number }) => {
+const CalendarCountdown = ({
+  time,
+  fullWidth,
+}: {
+  time: number;
+  fullWidth?: boolean;
+}) => {
   const [days, setDays] = useState<number>(0);
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
@@ -48,7 +55,12 @@ const CalendarCountdown = ({ time }: { time: number }) => {
   }, [time]);
 
   return (
-    <div className="flex font-bold text-[32px] text-kyu-color-11 whitespace-nowrap border-2 border-kyu-color-11 p-5 max-w-[412px] rounded-[8px] bg-kyu-color-16 justify-between w-full">
+    <div
+      className={cn(
+        'flex font-bold text-[32px] text-kyu-color-11 whitespace-nowrap border-2 border-kyu-color-11 p-5 rounded-[8px] bg-kyu-color-16 justify-between w-full',
+        fullWidth ? '' : 'max-w-[412px]',
+      )}
+    >
       <CountdownItem num={days} text="Days" /> :
       <CountdownItem num={hours} text="Hours" /> :
       <CountdownItem num={minutes} text="Minutes" /> :

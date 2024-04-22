@@ -67,7 +67,7 @@ function Whitelist() {
             </h1>
 
             <div className="min-w-[300px] sm:min-w-[480px]">
-              <WhitelistPassStep data={roundStep} />
+              <WhitelistPassStep data={roundStep} direction="vertical" />
             </div>
 
             <div className="">

@@ -41,7 +41,13 @@ const getActiveStep = (data: any[]) => {
   }
 };
 
-function WhitelistPassStep({ data }: { data: any[] }) {
+function WhitelistPassStep({
+  data,
+  direction = 'horizontal',
+}: {
+  data: any[];
+  direction?: 'horizontal' | 'vertical';
+}) {
   const [activeStep] = useState<number>(getActiveStep(data));
 
   let progress = 'w-0';
@@ -66,23 +72,47 @@ function WhitelistPassStep({ data }: { data: any[] }) {
   return (
     <div className="flex flex-col gap-5">
       <div className="text-kyu-color-11">
-        <div className="flex flex-col gap-8">
-          <div className="flex justify-between flex-row order-1">
+        <div
+          className={cn(
+            'flex gap-8',
+            direction === 'vertical' ? 'flex-row' : 'flex-col',
+          )}
+        >
+          <div
+            className={cn(
+              'flex justify-between',
+              direction === 'vertical'
+                ? 'flex-col order-2'
+                : 'flex-row order-1',
+            )}
+          >
             {data?.map((item) => (
               <h2 key={item.step} className="text-xl sm:text-2xl font-bold">
                 {item?.title || ''}
               </h2>
             ))}
           </div>
-          <div className="order-2">
-            <div className="w-full h-0.5 bg-kyu-color-7 relative">
+          <div
+            className={cn('', direction === 'vertical' ? 'order-1' : 'order-2')}
+          >
+            <div
+              className={cn(
+                'bg-kyu-color-7 relative',
+                direction === 'vertical' ? 'h-full w-0.5' : 'w-full h-0.5',
+              )}
+            >
               <div
                 className={cn(
                   'absolute h-0.5 top-1/2 -translate-y-1/2 bg-kyu-color-5 transition-all duration-500 ease-in-out',
                   progress,
                 )}
               />
-              <div className="flex items-center flex-row justify-between absolute top-1/2 -translate-y-1/2 w-full h-full">
+              <div
+                className={cn(
+                  'flex items-center justify-between absolute top-1/2 -translate-y-1/2 w-full h-full',
+                  direction === 'vertical' ? 'flex-col' : 'flex-row',
+                )}
+              >
                 {data?.map((item) => (
                   <div key={item.step} className="bg-kyu-color-12 min-w-[32px]">
                     {item.step === activeStep && (

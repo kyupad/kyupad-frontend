@@ -36,13 +36,15 @@ const tokenMetaDataProgramId = new PublicKey(
 
 function ExclusivePool() {
   const [open, setOpen] = useState<boolean>(false);
-  const { publicKey } = useWallet();
+  const { publicKey, wallet } = useWallet();
 
   const [activePool, setActivePool] = useState<any[]>([]);
   const [currentPool, setCurrentPool] = useState<any>({});
   const [currentPoolId, setCurrentPoolId] = useState<string>();
   const [collectionMint, setCollectionMint] = useState<PublicKey>();
-  const [merkleTree, SetMerkleTree] = useState<PublicKey>();
+  const [merkleTree, SetMerkleTree] = useState<PublicKey>(
+    new PublicKey('CSEC2YAhq6Fapke6uRDKePskRcafEbWvLnod6me6jBvU'),
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { connection } = useConnection();
@@ -71,7 +73,12 @@ function ExclusivePool() {
       });
 
       if (data?.data?.community_round?.active_pools) {
-        setActivePool(data?.data?.community_round?.active_pools);
+        setActivePool([
+          ...(data?.data?.community_round?.active_pools || []),
+          {
+            pool_name: 'More Communities announced soon.',
+          },
+        ]);
       }
 
       if (data?.data?.community_round?.current_pool) {
@@ -138,14 +145,14 @@ function ExclusivePool() {
         true,
       );
 
-      const merkleProofDecodedParsed = JSON.parse(
-        decrypt(merkleProofDecoded, env.NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN, true),
-      ).map((info: any) => {
-        return {
-          ...info,
-          data: Buffer.from(info.data, 'hex'),
-        };
-      });
+      const merkleProofDecodedParsed = JSON.parse(merkleProofDecoded).map(
+        (info: any) => {
+          return {
+            ...info,
+            data: Buffer.from(info.data, 'hex'),
+          };
+        },
+      );
 
       const merkleProofDecodedParsedArray = merkleProofDecodedParsed.map(
         (item: any) => Array.from(item.data),
@@ -308,11 +315,23 @@ function ExclusivePool() {
         await connection.getLatestBlockhash('finalized')
       ).blockhash;
 
-      if (typeof window !== 'undefined') {
-        await window?.solana.signAndSendTransaction(tx, {
-          skipPreflight: process.env.NODE_ENV === 'development',
-        });
-      }
+      const sig = await (wallet?.adapter as any)?.signTransaction(tx);
+      const signature = await connection.sendRawTransaction(sig.serialize(), {
+        skipPreflight: process.env.NODE_ENV === 'development',
+      });
+
+      const latestBlockHash = await connection.getLatestBlockhash();
+
+      await connection.confirmTransaction({
+        signature,
+        blockhash: latestBlockHash.blockhash,
+        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+      });
+
+      toast.success('Minted successfully. Please check the wallet!', {
+        position: 'top-right',
+        closeButton: true,
+      });
     } catch (error) {
       console.error(error, 'error');
     } finally {
@@ -330,7 +349,7 @@ function ExclusivePool() {
           onClick={() => handleSetOpen(open)}
           className="rounded-[8px] py-3 px-10 border-2 text-2xl font-bold bg-kyu-color-2 border-kyu-color-11 flex items-center gap-5"
         >
-          <span>How to be eligible round 1</span>
+          <span>How to be eligible</span>
           <Image
             src={dropdown}
             alt="dropdown"
@@ -350,86 +369,101 @@ function ExclusivePool() {
             'py-5 px-10 border-2 rounded-[8px] bg-kyu-color-16 border-kyu-color-10 text-xl text-justify',
           )}
         >
-          <p>
-            To be eligible for the NFT Minting, your wallet must contain at
-            least one NFT from any of our partner collections. Your minting
-            capacity is based on the number of different collections you have
-            NFTs from.
-          </p>
-          <p>For instance:</p>
           <ul className="list-disc pl-7">
             <li>
-              If you have 2 Mad Lads and 1 SMB NFT, you can mint from both the
-              Mad Lads and SMB pools, allowing you to mint two NFTs in total.
+              To be eligible for the NFT Minting, you need to be a part of one
+              of our partnered communities.A list of whitelisted addresses
+              eligible for minting will be released prior to the mint date.
             </li>
             <li>
-              If you own 3 Mad Lads NFTs, you&apos;re qualified to mint one NFT
-              from the Mad Lads pool only.
+              Each wallet is permitted to mint a maximum of two NFTs, regardless
+              of eligibility for additional minting rounds or membership in more
+              than two partnered communities.
+            </li>
+            <li>
+              Details on upcoming partnered communities will be announced
+              through our official channels soon.
             </li>
           </ul>
         </div>
       </div>
 
       <div className="flex gap-3">
-        {activePool?.map((pool) => (
-          <button
-            onClick={() => {
-              handleChangePoolId(pool?.pool_id);
-              // changeOptimisticCurrentPool(pool?.pool_id);
-            }}
-            className={cn(
-              'py-3 px-4 rounded-[8px] text-xl font-bold',
-              currentPool?.pool_id === pool?.pool_id
-                ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
-                : 'text-[#8E8FA2]',
-            )}
-            key={pool?.pool_id}
-          >
-            {pool?.pool_name}
-          </button>
-        ))}
+        {activePool?.map((pool, index) => {
+          if (!pool?.pool_id) {
+            return (
+              <span
+                className="py-3 px-4 rounded-[8px] text-xl font-bold"
+                key={index}
+              >
+                {pool?.pool_name}
+              </span>
+            );
+          }
+
+          return (
+            <button
+              onClick={() => {
+                handleChangePoolId(pool?.pool_id);
+                // changeOptimisticCurrentPool(pool?.pool_id);
+              }}
+              className={cn(
+                'py-3 px-4 rounded-[8px] text-xl font-bold',
+                currentPool?.pool_id === pool?.pool_id
+                  ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
+                  : 'text-[#8E8FA2]',
+              )}
+              key={pool?.pool_id}
+            >
+              {pool?.pool_name}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="flex p-10 bg-kyu-color-16 rounded-[16px] justify-center gap-10 items-center flex-wrap">
-        <div className="w-[263px] h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
-          <Image
-            src={currentPool?.pool_image || ''}
-            alt={currentPool?.pool_image || ''}
-            fill
-            style={{ objectFit: 'cover' }}
-            draggable={false}
-          />
-        </div>
-        <div className="w-full max-w-[425px] flex flex-col gap-5">
-          <span className="text-xl font-bold">Round 1 time left:</span>
-          <div className="-mt-4">
-            <CalendarCountdown
-              time={dayjs.utc(currentPool?.end_time).valueOf()}
+      {currentPoolId && (
+        <div className="flex p-10 bg-kyu-color-16 rounded-[16px] justify-center gap-10 items-center">
+          <div className="w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
+            <Image
+              src={currentPool?.pool_image || ''}
+              alt={currentPool?.pool_image || ''}
+              fill
+              style={{ objectFit: 'cover' }}
+              draggable={false}
             />
           </div>
+          <div className="w-1/2 flex flex-col gap-5">
+            <span className="text-xl font-bold">Round 1 time left:</span>
+            <div className="-mt-4">
+              <CalendarCountdown
+                time={dayjs.utc(currentPool?.end_time).valueOf()}
+                fullWidth
+              />
+            </div>
 
-          <div className="relative mt-6">
-            <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-              {currentPool?.minted_total || 0}
-            </span>
-            <Progress value={0} />
-            <span className="absolute right-0 -top-8">
-              <span className="text-kyu-color-14 font-medium">Total</span>{' '}
-              <span className="font-bold text-kyu-color-11">
-                {currentPool?.pool_supply || 0}
+            <div className="relative mt-6">
+              <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
+                {currentPool?.minted_total || 0}
               </span>
-            </span>
-          </div>
+              <Progress value={0} />
+              <span className="absolute right-0 -top-8">
+                <span className="text-kyu-color-14 font-medium">Total</span>{' '}
+                <span className="font-bold text-kyu-color-11">
+                  {currentPool?.pool_supply || 0}
+                </span>
+              </span>
+            </div>
 
-          <PrimaryButton
-            loading={isLoading}
-            disabled={!currentPool?.is_active}
-            onClick={handleMint}
-          >
-            {currentPool?.is_active ? 'Free Mint' : 'Not eligible'}
-          </PrimaryButton>
+            <PrimaryButton
+              loading={isLoading}
+              disabled={!currentPool?.is_active}
+              onClick={handleMint}
+            >
+              {currentPool?.is_active ? 'Free Mint' : 'Not eligible'}
+            </PrimaryButton>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
