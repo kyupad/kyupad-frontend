@@ -2,6 +2,7 @@
 
 import React, { memo, useState } from 'react';
 import Image from 'next/image';
+import { UTC_FORMAT_STRING } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -29,7 +30,7 @@ const getActiveStep = (data: any[]) => {
   }
 
   if (!step) {
-    if (dayjs.utc(data[data.length - 1].end).isBefore(now)) {
+    if (dayjs.utc(data[data.length - 1]?.end).isBefore(now)) {
       return data.length;
     }
 
@@ -86,10 +87,20 @@ function WhitelistPassStep({
                 : 'flex-row order-1',
             )}
           >
-            {data?.map((item) => (
-              <h2 key={item.step} className="text-xl sm:text-2xl font-bold">
-                {item?.title || ''}
-              </h2>
+            {data?.map((item, index) => (
+              <div
+                key={item.step}
+                className={cn('', index === data?.length - 1 ? '' : 'pb-5')}
+              >
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  {item?.title || ''}
+                </h2>
+
+                <span>
+                  {dayjs.utc(item?.start).format(UTC_FORMAT_STRING)} -{' '}
+                  {dayjs.utc(item?.end).format(UTC_FORMAT_STRING)}
+                </span>
+              </div>
             ))}
           </div>
           <div
@@ -98,7 +109,7 @@ function WhitelistPassStep({
             <div
               className={cn(
                 'bg-kyu-color-7 relative',
-                direction === 'vertical' ? 'h-full w-0.5' : 'w-full h-0.5',
+                direction === 'vertical' ? `h-full w-0.5` : 'w-full h-0.5',
               )}
             >
               <div

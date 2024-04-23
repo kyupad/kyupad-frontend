@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
+import { doGetSeasonActive } from '@/actions/whitelist-pass';
 import { Progress } from '@/components/common/progress/progress';
 import ExclusivePool from '@/components/features/whitelist-pass/exclusive-pool';
 // import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
@@ -22,27 +23,17 @@ export const metadata: Metadata = {
   title: 'Whitelist NFT',
 };
 
-function Whitelist() {
-  const roundStep = [
-    {
-      step: 1,
-      start: '2024-08-30T00:00:00Z',
-      end: '2024-08-30T00:00:00Z',
-      title: 'Round 1',
-    },
-    {
-      step: 2,
-      start: '2024-08-30T00:00:00Z',
-      end: '2024-08-30T00:00:00Z',
-      title: 'Round 2',
-    },
-    {
-      step: 3,
-      start: '2024-08-30T00:00:00Z',
-      end: '2024-08-30T00:00:00Z',
-      title: 'End',
-    },
-  ];
+async function Whitelist() {
+  const data = await doGetSeasonActive();
+  const mintingRoundRoadMap = data?.data?.minting_round_road_map || [];
+
+  const roundStep = mintingRoundRoadMap?.map((r: any) => ({
+    step: 1,
+    start: r?.start_time,
+    end: r?.end_time,
+    title: r?.community_name || '',
+  }));
+
   return (
     <>
       <div
@@ -67,14 +58,9 @@ function Whitelist() {
             </h1>
 
             <div className="min-w-[300px] sm:min-w-[480px]">
-              <WhitelistPassStep data={roundStep} direction="vertical" />
-            </div>
-
-            <div className="">
-              <span className="font-medium text-kyu-color-14">
-                Total Whitelist Pass NFT minted:{' '}
-              </span>
-              <span className="font-bold">0</span>
+              <div className="h-[284px] overflow-y-auto px-4 scrollbar">
+                <WhitelistPassStep data={roundStep} direction="vertical" />
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-14 order-1 lg:order-2">
@@ -84,12 +70,23 @@ function Whitelist() {
 
             <div className="relative">
               <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-                0
+                {data?.data?.season?.minted_total || 0}
               </span>
               <Progress value={0} />
               <span className="absolute right-0 -top-8">
                 <span className="text-kyu-color-14 font-medium">Total</span>{' '}
-                <span className="font-bold text-kyu-color-11">20,000</span>
+                <span className="font-bold text-kyu-color-11">
+                  {data?.data?.season?.total || 0}
+                </span>
+              </span>
+            </div>
+
+            <div className="-mt-10">
+              <span className="font-medium text-kyu-color-14">
+                Total Whitelist Pass NFT minted:{' '}
+              </span>
+              <span className="font-bold">
+                {data?.data?.season?.my_minted_total || 0}
               </span>
             </div>
           </div>
@@ -116,3 +113,5 @@ function Whitelist() {
 
 // eslint-disable-next-line import/no-unused-modules
 export default Whitelist;
+
+export const dynamic = 'force-dynamic';

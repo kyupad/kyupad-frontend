@@ -21,6 +21,16 @@ export type KyupadSmartContract = {
           isMut: false;
           isSigner: false;
         },
+        {
+          name: 'bpfLoaderUpgradeable';
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'kyupadProgramData';
+          isMut: false;
+          isSigner: false;
+        },
       ];
       args: [
         {
@@ -40,6 +50,16 @@ export type KyupadSmartContract = {
         {
           name: 'pools';
           isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'mintCounterCollection';
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: 'destination';
+          isMut: true;
           isSigner: false;
         },
         {
@@ -160,7 +180,53 @@ export type KyupadSmartContract = {
           isSigner: false;
         },
       ];
-      args: [];
+      args: [
+        {
+          name: 'initCollectionConfigArgs';
+          type: {
+            defined: 'InitCollectionConfigArgs';
+          };
+        },
+      ];
+    },
+    {
+      name: 'updatePoolConfig';
+      accounts: [
+        {
+          name: 'signer';
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: 'adminPda';
+          isMut: false;
+          isSigner: false;
+          docs: ['CHECK'];
+        },
+        {
+          name: 'collectionMint';
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'pools';
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: 'systemProgram';
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [
+        {
+          name: 'args';
+          type: {
+            defined: 'UpdatePoolConfigArgs';
+          };
+        },
+      ];
     },
     {
       name: 'createCollection';
@@ -322,6 +388,11 @@ export type KyupadSmartContract = {
           isSigner: false;
         },
         {
+          name: 'destination';
+          isMut: false;
+          isSigner: false;
+        },
+        {
           name: 'poolMinted';
           isMut: true;
           isSigner: false;
@@ -353,18 +424,16 @@ export type KyupadSmartContract = {
             type: 'publicKey';
           },
           {
-            name: 'author';
-            type: {
-              vec: 'publicKey';
-            };
-          },
-          {
             name: 'poolsConfig';
             type: {
               vec: {
                 defined: 'PoolConfig';
               };
             };
+          },
+          {
+            name: 'maxMintOfWallet';
+            type: 'u8';
           },
         ];
       };
@@ -406,8 +475,32 @@ export type KyupadSmartContract = {
         ];
       };
     },
+    {
+      name: 'mintCounterCollection';
+      type: {
+        kind: 'struct';
+        fields: [
+          {
+            name: 'count';
+            type: 'u8';
+          },
+        ];
+      };
+    },
   ];
   types: [
+    {
+      name: 'InitCollectionConfigArgs';
+      type: {
+        kind: 'struct';
+        fields: [
+          {
+            name: 'maxMintOfWallet';
+            type: 'u8';
+          },
+        ];
+      };
+    },
     {
       name: 'PoolConfigArgs';
       type: {
@@ -447,6 +540,28 @@ export type KyupadSmartContract = {
               option: {
                 vec: 'string';
               };
+            };
+          },
+        ];
+      };
+    },
+    {
+      name: 'UpdatePoolConfigArgs';
+      type: {
+        kind: 'struct';
+        fields: [
+          {
+            name: 'poolId';
+            type: 'string';
+          },
+          {
+            name: 'merkleRoot';
+            type: 'bytes';
+          },
+          {
+            name: 'totalPoolSupply';
+            type: {
+              option: 'u16';
             };
           },
         ];
@@ -515,7 +630,7 @@ export type KyupadSmartContract = {
     {
       code: 6002;
       name: 'InvalidMekleRoot';
-      msg: 'The merkle root input not in the groups config';
+      msg: 'The merkle root is invalid';
     },
     {
       code: 6003;
@@ -549,6 +664,31 @@ export type KyupadSmartContract = {
       name: 'CannotAddPoolConfig';
       msg: 'This pool config is already in pools';
     },
+    {
+      code: 6010;
+      name: 'DestinationIsInvalid';
+      msg: "This destination address doesn't not match with pools config";
+    },
+    {
+      code: 6011;
+      name: 'InvalidSigner';
+      msg: 'This signer is now allow to init another signer';
+    },
+    {
+      code: 6012;
+      name: 'ErrorUnknown';
+      msg: 'Error unknown';
+    },
+    {
+      code: 6013;
+      name: 'PoolIdInvalid';
+      msg: "Your pool id doesn't in pools config";
+    },
+    {
+      code: 6014;
+      name: 'InvalidMerkeRoot';
+      msg: 'Invalid merkle root';
+    },
   ];
 };
 
@@ -575,6 +715,16 @@ export const IDL: KyupadSmartContract = {
           isMut: false,
           isSigner: false,
         },
+        {
+          name: 'bpfLoaderUpgradeable',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'kyupadProgramData',
+          isMut: false,
+          isSigner: false,
+        },
       ],
       args: [
         {
@@ -594,6 +744,16 @@ export const IDL: KyupadSmartContract = {
         {
           name: 'pools',
           isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'mintCounterCollection',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'destination',
+          isMut: true,
           isSigner: false,
         },
         {
@@ -714,7 +874,53 @@ export const IDL: KyupadSmartContract = {
           isSigner: false,
         },
       ],
-      args: [],
+      args: [
+        {
+          name: 'initCollectionConfigArgs',
+          type: {
+            defined: 'InitCollectionConfigArgs',
+          },
+        },
+      ],
+    },
+    {
+      name: 'updatePoolConfig',
+      accounts: [
+        {
+          name: 'signer',
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: 'adminPda',
+          isMut: false,
+          isSigner: false,
+          docs: ['CHECK'],
+        },
+        {
+          name: 'collectionMint',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'pools',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: 'args',
+          type: {
+            defined: 'UpdatePoolConfigArgs',
+          },
+        },
+      ],
     },
     {
       name: 'createCollection',
@@ -876,6 +1082,11 @@ export const IDL: KyupadSmartContract = {
           isSigner: false,
         },
         {
+          name: 'destination',
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: 'poolMinted',
           isMut: true,
           isSigner: false,
@@ -907,18 +1118,16 @@ export const IDL: KyupadSmartContract = {
             type: 'publicKey',
           },
           {
-            name: 'author',
-            type: {
-              vec: 'publicKey',
-            },
-          },
-          {
             name: 'poolsConfig',
             type: {
               vec: {
                 defined: 'PoolConfig',
               },
             },
+          },
+          {
+            name: 'maxMintOfWallet',
+            type: 'u8',
           },
         ],
       },
@@ -960,8 +1169,32 @@ export const IDL: KyupadSmartContract = {
         ],
       },
     },
+    {
+      name: 'mintCounterCollection',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'count',
+            type: 'u8',
+          },
+        ],
+      },
+    },
   ],
   types: [
+    {
+      name: 'InitCollectionConfigArgs',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'maxMintOfWallet',
+            type: 'u8',
+          },
+        ],
+      },
+    },
     {
       name: 'PoolConfigArgs',
       type: {
@@ -1001,6 +1234,28 @@ export const IDL: KyupadSmartContract = {
               option: {
                 vec: 'string',
               },
+            },
+          },
+        ],
+      },
+    },
+    {
+      name: 'UpdatePoolConfigArgs',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'poolId',
+            type: 'string',
+          },
+          {
+            name: 'merkleRoot',
+            type: 'bytes',
+          },
+          {
+            name: 'totalPoolSupply',
+            type: {
+              option: 'u16',
             },
           },
         ],
@@ -1069,7 +1324,7 @@ export const IDL: KyupadSmartContract = {
     {
       code: 6002,
       name: 'InvalidMekleRoot',
-      msg: 'The merkle root input not in the groups config',
+      msg: 'The merkle root is invalid',
     },
     {
       code: 6003,
@@ -1102,6 +1357,31 @@ export const IDL: KyupadSmartContract = {
       code: 6009,
       name: 'CannotAddPoolConfig',
       msg: 'This pool config is already in pools',
+    },
+    {
+      code: 6010,
+      name: 'DestinationIsInvalid',
+      msg: "This destination address doesn't not match with pools config",
+    },
+    {
+      code: 6011,
+      name: 'InvalidSigner',
+      msg: 'This signer is now allow to init another signer',
+    },
+    {
+      code: 6012,
+      name: 'ErrorUnknown',
+      msg: 'Error unknown',
+    },
+    {
+      code: 6013,
+      name: 'PoolIdInvalid',
+      msg: "Your pool id doesn't in pools config",
+    },
+    {
+      code: 6014,
+      name: 'InvalidMerkeRoot',
+      msg: 'Invalid merkle root',
     },
   ],
 };

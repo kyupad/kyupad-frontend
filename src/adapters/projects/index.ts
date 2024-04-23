@@ -3,16 +3,30 @@ import { API_ROUTES } from '@/utils/constants';
 import { request } from '../xhr';
 
 const doGetUpcomingProjects = async () => {
-  const data = await request('GET', API_ROUTES.GET_PROJECTS, {
-    type: 'upcoming',
-  });
+  const data = await request(
+    'GET',
+    API_ROUTES.GET_PROJECTS,
+    {
+      type: 'upcoming',
+    },
+    {
+      cache: 'no-store',
+    },
+  );
   return data;
 };
 
 const doGetSuccessProjects = async () => {
-  const data = await request('GET', API_ROUTES.GET_PROJECTS, {
-    type: 'success',
-  });
+  const data = await request(
+    'GET',
+    API_ROUTES.GET_PROJECTS,
+    {
+      type: 'success',
+    },
+    {
+      cache: 'no-store',
+    },
+  );
 
   return data;
 };

@@ -42,9 +42,7 @@ function ExclusivePool() {
   const [currentPool, setCurrentPool] = useState<any>({});
   const [currentPoolId, setCurrentPoolId] = useState<string>();
   const [collectionMint, setCollectionMint] = useState<PublicKey>();
-  const [merkleTree, SetMerkleTree] = useState<PublicKey>(
-    new PublicKey('CSEC2YAhq6Fapke6uRDKePskRcafEbWvLnod6me6jBvU'),
-  );
+  const [merkleTree, SetMerkleTree] = useState<PublicKey>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { connection } = useConnection();
@@ -214,7 +212,9 @@ function ExclusivePool() {
         id: currentPoolId,
       });
 
-      nftArgs.uri = cnftMetadata.data.url;
+      nftArgs.uri = cnftMetadata.data?.url;
+      nftArgs.name = cnftMetadata.data?.name;
+      nftArgs.symbol = cnftMetadata.data?.symbol;
 
       const serializer = getMetadataArgsSerializer();
       const data = serializer.serialize(nftArgs);
@@ -250,6 +250,16 @@ function ExclusivePool() {
         ],
         program.programId,
       );
+
+      const [mintCounterCollection] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from('mint_counter_collection'),
+          publicKey.toBuffer(),
+          collectionMint.toBuffer(),
+        ],
+        program.programId,
+      );
+
       const pools_config_data: any[] = (
         await program.account.pools.fetch(poolsPDA)
       ).poolsConfig;
@@ -305,6 +315,8 @@ function ExclusivePool() {
           editionAccount: collectionMasterEditionAccount,
           bubblegumSigner: bgumSigner,
           tokenMetadataProgram: tokenMetaDataProgramId,
+          destination: currentPool?.destination_wallet,
+          mintCounterCollection: mintCounterCollection,
         })
         .remainingAccounts(remainingAccounts)
         .instruction();
@@ -316,22 +328,37 @@ function ExclusivePool() {
       ).blockhash;
 
       const sig = await (wallet?.adapter as any)?.signTransaction(tx);
-      const signature = await connection.sendRawTransaction(sig.serialize(), {
+      const signatured = await connection.sendRawTransaction(sig.serialize(), {
         skipPreflight: process.env.NODE_ENV === 'development',
       });
 
-      const latestBlockHash = await connection.getLatestBlockhash();
+      const latestBlockHash = await connection.getLatestBlockhash('finalized');
 
       await connection.confirmTransaction({
-        signature,
+        signature: signatured,
         blockhash: latestBlockHash.blockhash,
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
       });
 
-      toast.success('Minted successfully. Please check the wallet!', {
-        position: 'top-right',
-        closeButton: true,
-      });
+      toast.success(
+        <div>
+          Minted successfully. Please check the wallet!
+          <br />
+          <a
+            href={`https://explorer.solana.com/address/${signatured}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="underline"
+          >
+            View transaction
+          </a>
+        </div>,
+
+        {
+          position: 'top-right',
+          closeButton: true,
+        },
+      );
     } catch (error) {
       console.error(error, 'error');
     } finally {
@@ -343,7 +370,7 @@ function ExclusivePool() {
     <div className="w-full flex flex-col gap-6">
       <div className="flex items-center gap-5 justify-between w-full flex-wrap">
         <h2 className="font-heading text-3xl sm:text-4xl xl:text-5xl">
-          Round 1: Exclusive Pools
+          Community Exclusive Pools
         </h2>
         <button
           onClick={() => handleSetOpen(open)}
@@ -433,7 +460,9 @@ function ExclusivePool() {
             />
           </div>
           <div className="w-1/2 flex flex-col gap-5">
-            <span className="text-xl font-bold">Round 1 time left:</span>
+            <span className="text-xl font-bold">
+              {currentPool?.pool_name || ''} time left:
+            </span>
             <div className="-mt-4">
               <CalendarCountdown
                 time={dayjs.utc(currentPool?.end_time).valueOf()}
