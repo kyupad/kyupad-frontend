@@ -72,7 +72,16 @@ async function Whitelist() {
               <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
                 {data?.data?.season?.minted_total || 0}
               </span>
-              <Progress value={0} />
+              <Progress
+                value={
+                  data?.data?.season?.minted_total > 0 &&
+                  data?.data?.season?.total
+                    ? (data?.data?.season?.minted_total /
+                        data?.data?.season?.total) *
+                      100
+                    : 0
+                }
+              />
               <span className="absolute right-0 -top-8">
                 <span className="text-kyu-color-14 font-medium">Total</span>{' '}
                 <span className="font-bold text-kyu-color-11">
@@ -82,12 +91,20 @@ async function Whitelist() {
             </div>
 
             <div className="-mt-10">
-              <span className="font-medium text-kyu-color-14">
-                Total Whitelist Pass NFT minted:{' '}
-              </span>
-              <span className="font-bold">
-                {data?.data?.season?.my_minted_total || 0}
-              </span>
+              <>
+                <span className="font-medium text-kyu-color-14">
+                  {!data?.data?.season?.my_minted_total &&
+                  data?.data?.season?.my_minted_total !== 0
+                    ? null
+                    : ' Total Whitelist Pass NFT minted: '}
+                </span>
+                <span className="font-bold">
+                  {!data?.data?.season?.my_minted_total &&
+                  data?.data?.season?.my_minted_total !== 0
+                    ? null
+                    : data?.data?.season?.my_minted_total}
+                </span>
+              </>
             </div>
           </div>
         </div>

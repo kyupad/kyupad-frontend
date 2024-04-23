@@ -5,11 +5,13 @@ import Image from 'next/image';
 import {
   doGenerateMetadata,
   doGetMintingPool,
+  doSyncNftbySignature,
 } from '@/adapters/whitelist-pass';
 import { IDL, KyupadSmartContract } from '@/anchor/kyupad_smart_contract';
 import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
 import { Progress } from '@/components/common/progress/progress';
+import { useSessionStore } from '@/contexts/session-store-provider';
 import { cn } from '@/utils/helpers';
 import { Program } from '@coral-xyz/anchor';
 import {
@@ -44,6 +46,7 @@ function ExclusivePool() {
   const [collectionMint, setCollectionMint] = useState<PublicKey>();
   const [merkleTree, SetMerkleTree] = useState<PublicKey>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { poolsCounter, updatePoolCounter } = useSessionStore((state) => state);
 
   const { connection } = useConnection();
 
@@ -340,12 +343,20 @@ function ExclusivePool() {
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
       });
 
+      updatePoolCounter(currentPoolId, (poolsCounter[currentPoolId] || 0) + 1);
+
+      await doSyncNftbySignature({
+        id: cnftMetadata?.id,
+        pool_id: currentPoolId,
+        signature: signatured,
+      });
+
       toast.success(
         <div>
           Minted successfully. Please check the wallet!
           <br />
           <a
-            href={`https://explorer.solana.com/address/${signatured}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
+            href={`https://explorer.solana.com/tx/${signatured}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
             target="_blank"
             rel="noreferrer noopener"
             className="underline"
@@ -399,7 +410,7 @@ function ExclusivePool() {
           <ul className="list-disc pl-7">
             <li>
               To be eligible for the NFT Minting, you need to be a part of one
-              of our partnered communities.A list of whitelisted addresses
+              of our partnered communities. A list of whitelisted addresses
               eligible for minting will be released prior to the mint date.
             </li>
             <li>
@@ -472,9 +483,21 @@ function ExclusivePool() {
 
             <div className="relative mt-6">
               <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-                {currentPool?.minted_total || 0}
+                {(currentPool?.minted_total || 0) +
+                  (poolsCounter[currentPoolId] || 0)}
               </span>
-              <Progress value={0} />
+              <Progress
+                value={
+                  (currentPool?.minted_total || 0) +
+                    (poolsCounter[currentPoolId] || 0) >
+                    0 && currentPool?.pool_supply > 0
+                    ? (((currentPool?.minted_total || 0) +
+                        (poolsCounter[currentPoolId] || 0)) /
+                        currentPool?.pool_supply) *
+                      100
+                    : 0
+                }
+              />
               <span className="absolute right-0 -top-8">
                 <span className="text-kyu-color-14 font-medium">Total</span>{' '}
                 <span className="font-bold text-kyu-color-11">
@@ -482,13 +505,16 @@ function ExclusivePool() {
                 </span>
               </span>
             </div>
-
             <PrimaryButton
               loading={isLoading}
-              disabled={!currentPool?.is_active}
+              disabled={!currentPool?.is_active || poolsCounter[currentPoolId]}
               onClick={handleMint}
             >
-              {currentPool?.is_active ? 'Free Mint' : 'Not eligible'}
+              {!poolsCounter[currentPoolId] && (
+                <>{currentPool?.is_active ? 'Free Mint' : 'Not eligible'}</>
+              )}
+
+              {poolsCounter[currentPoolId] && <>Minted</>}
             </PrimaryButton>
           </div>
         </div>

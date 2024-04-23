@@ -7,6 +7,7 @@ const API_ROUTES = {
   GET_MINTING_POOL: '/v1/nft/minting-pool',
   GENERATE_CFNT_METADATA: '/v1/nft/metadata',
   GET_SEASON_ACTIVE: '/v1/seasons/active',
+  SYNC_NFT_BY_SIGNATURE: '/v1/nft/sync-nft-by-signature',
 };
 
 const WEB_ROUTES = {

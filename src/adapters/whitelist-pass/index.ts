@@ -28,4 +28,13 @@ const doGenerateMetadata = async (body: {
   return data;
 };
 
-export { doGetMintingPool, doGenerateMetadata };
+const doSyncNftbySignature = async (body: {
+  id: string;
+  pool_id: string;
+  signature: string;
+}) => {
+  const data = await request('POST', API_ROUTES.SYNC_NFT_BY_SIGNATURE, body);
+  return data;
+};
+
+export { doGetMintingPool, doGenerateMetadata, doSyncNftbySignature };
