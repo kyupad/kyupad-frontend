@@ -345,33 +345,14 @@ function ExclusivePool() {
         .remainingAccounts(remainingAccounts)
         .instruction();
 
-      const lookupTableAccount = (
-        await connection.getAddressLookupTable(
-          new PublicKey('EkJLaUYbFRdy98wrLqmuWfUEWhyybVEK4JD59TwPE5EU'),
-        )
-      ).value;
+      const tx = new Transaction().add(mintCnftInstruction);
+      tx.feePayer = publicKey;
+      tx.recentBlockhash = (
+        await connection.getLatestBlockhash('finalized')
+      ).blockhash;
 
-      // create v0 compatible message
-      const messageV0 = new TransactionMessage({
-        payerKey: publicKey,
-        recentBlockhash: (await connection.getLatestBlockhash('finalized'))
-          .blockhash,
-        instructions: [mintCnftInstruction],
-      }).compileToV0Message([lookupTableAccount!]);
-
-      const transaction = new VersionedTransaction(messageV0);
-
-      // const tx = new Transaction().add(mintCnftInstruction);
-      // tx.feePayer = publicKey;
-      // tx.recentBlockhash = (
-      //   await connection.getLatestBlockhash('finalized')
-      // ).blockhash;
-
-      if (!signTransaction) {
-        return;
-      }
-      const sig = await signTransaction(transaction);
-      const signatured = await connection.sendTransaction(sig, {
+      const sig = await (wallet?.adapter as any)?.signTransaction(tx);
+      const signatured = await connection.sendRawTransaction(sig.serialize(), {
         skipPreflight: process.env.NODE_ENV === 'development',
       });
 
@@ -386,7 +367,7 @@ function ExclusivePool() {
       updatePoolCounter(currentPoolId, (poolsCounter[currentPoolId] || 0) + 1);
 
       await doSyncNftbySignature({
-        id: cnftMetadata?.data?.id,
+        id: cnftMetadata?.id,
         pool_id: currentPoolId,
         signature: signatured,
       });
@@ -416,7 +397,6 @@ function ExclusivePool() {
       handleSetIsLoading(false);
     }
   };
-
   const now = dayjs.utc();
 
   return (
