@@ -1,17 +1,19 @@
 'use client';
 
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Skeleton from '@/components/common/loading/skeleton';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import Big from 'big.js';
+import check from 'public/images/my-space/check.svg';
 import copy from 'public/images/my-space/copy.svg';
 
 function MySpaceBalance() {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
   const [balance, setBalance] = useState<number>();
+  const [copied, setCopied] = useState<boolean>(false);
 
   useEffect(() => {
     const getBalance = async () => {
@@ -23,6 +25,20 @@ function MySpaceBalance() {
 
     getBalance();
   }, [connection, publicKey]);
+
+  const handleSetCopied = useCallback((value: boolean) => {
+    setCopied(value);
+  }, []);
+
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
+
   return (
     <div className="flex flex-col gap-4 px-[20px] py-4 sm:px-[60px] sm:py-[40px]">
       <h1 className="text-2xl sm:text-[32px] font-bold text-kyu-color-11 leading-[44px]">
@@ -47,8 +63,18 @@ function MySpaceBalance() {
                 publicKey?.toBase58()?.slice(-5)}
             </span>
           </span>
-          <button className="min-w-[32px]">
-            <Image src={copy} alt="Copy" />
+          <button
+            onClick={() => {
+              handleSetCopied(true);
+              navigator.clipboard.writeText(publicKey?.toBase58());
+            }}
+            className="min-w-[32px]"
+          >
+            {copied ? (
+              <Image src={check} alt="Copy" />
+            ) : (
+              <Image src={copy} alt="Copy" />
+            )}
           </button>
         </div>
       )}

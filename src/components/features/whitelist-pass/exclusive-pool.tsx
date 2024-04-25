@@ -377,21 +377,21 @@ function ExclusivePool() {
       const latestBlockHash = await connection.getLatestBlockhash();
 
       await connection.confirmTransaction({
-        signature,
+        signature: signatured,
         blockhash: latestBlockHash.blockhash,
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
       });
-
-      updatePoolCounter(
-        currentPoolId || currentPool?.pool_id,
-        (poolsCounter[currentPoolId || currentPool?.pool_id] || 0) + 1,
-      );
 
       await doSyncNftbySignature({
         id: cnftMetadata?.data?.id,
         pool_id: currentPoolId || currentPool?.pool_id,
         signature: signatured,
       });
+
+      updatePoolCounter(
+        currentPoolId || currentPool?.pool_id,
+        (poolsCounter[currentPoolId || currentPool?.pool_id] || 0) + 1,
+      );
 
       toast.success(
         <div>
