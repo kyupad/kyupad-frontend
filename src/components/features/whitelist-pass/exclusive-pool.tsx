@@ -47,7 +47,7 @@ const tokenMetaDataProgramId = new PublicKey(
 
 function ExclusivePool() {
   const [open, setOpen] = useState<boolean>(false);
-  const { publicKey, signTransaction } = useWallet();
+  const { publicKey, wallet } = useWallet();
 
   const [activePool, setActivePool] = useState<any[]>([]);
   const [currentPool, setCurrentPool] = useState<any>({});
@@ -57,6 +57,7 @@ function ExclusivePool() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingPool, setLoadingPool] = useState<boolean>(false);
   const { poolsCounter, updatePoolCounter } = useSessionStore((state) => state);
+  const [lookupTableAddress, setLookupTableAddress] = useState<PublicKey>();
 
   const { connection } = useConnection();
 
@@ -108,6 +109,10 @@ function ExclusivePool() {
         SetMerkleTree(new PublicKey(data?.data?.merkle_tree));
       }
 
+      if (data?.data?.lookup_table_address) {
+        setLookupTableAddress(new PublicKey(data?.data?.lookup_table_address));
+      }
+
       setLoadingPool(false);
     };
 
@@ -137,7 +142,7 @@ function ExclusivePool() {
       return;
     }
 
-    if (!currentPoolId) {
+    if (!currentPoolId && !currentPool?.pool_id) {
       console.error('Current pool id not found');
       return;
     }
@@ -147,13 +152,8 @@ function ExclusivePool() {
       return;
     }
 
-    if (!currentPool?.pool_name) {
-      console.error('Pool name not found');
-      return;
-    }
-
-    if (!currentPool?.pool_symbol) {
-      console.error('Pool symbol not found');
+    if (!lookupTableAddress) {
+      console.error('Lookup table address not found');
       return;
     }
 
@@ -233,7 +233,7 @@ function ExclusivePool() {
         name: nftArgs.name,
         symbol: nftArgs.symbol as string,
         seller_fee_basis_points: nftArgs.sellerFeeBasisPoints,
-        id: currentPoolId,
+        id: currentPoolId || currentPool?.pool_id,
       });
 
       nftArgs.uri = cnftMetadata.data?.url;
@@ -260,7 +260,7 @@ function ExclusivePool() {
         [
           Buffer.from('pool_minted'),
           poolsPDA.toBuffer(),
-          Buffer.from(currentPoolId),
+          Buffer.from(currentPoolId || currentPool?.pool_id),
         ],
         program.programId,
       );
@@ -268,7 +268,7 @@ function ExclusivePool() {
       const [mintCounter] = PublicKey.findProgramAddressSync(
         [
           Buffer.from('mint_counter'),
-          Buffer.from(currentPoolId),
+          Buffer.from(currentPoolId || currentPool?.pool_id),
           publicKey.toBuffer(),
           poolsPDA.toBuffer(),
         ],
@@ -283,6 +283,10 @@ function ExclusivePool() {
         ],
         program.programId,
       );
+
+      const lookupTableAccount = (
+        await connection.getAddressLookupTable(lookupTableAddress)
+      ).value;
 
       const pools_config_data: any[] = (
         await program.account.pools.fetch(poolsPDA)
@@ -321,7 +325,7 @@ function ExclusivePool() {
       const mintCnftInstruction = await program.methods
         .mintCnft(
           merkleProofDecodedParsedArray,
-          currentPoolId,
+          currentPoolId || currentPool?.pool_id,
           Buffer.from(data) as Buffer,
         )
         .accounts({
@@ -345,13 +349,6 @@ function ExclusivePool() {
         .remainingAccounts(remainingAccounts)
         .instruction();
 
-      const lookupTableAccount = (
-        await connection.getAddressLookupTable(
-          new PublicKey('EkJLaUYbFRdy98wrLqmuWfUEWhyybVEK4JD59TwPE5EU'),
-        )
-      ).value;
-
-      // create v0 compatible message
       const messageV0 = new TransactionMessage({
         payerKey: publicKey,
         recentBlockhash: (await connection.getLatestBlockhash('finalized'))
@@ -359,35 +356,40 @@ function ExclusivePool() {
         instructions: [mintCnftInstruction],
       }).compileToV0Message([lookupTableAccount!]);
 
-      const transaction = new VersionedTransaction(messageV0);
+      const transactionV0 = new VersionedTransaction(messageV0);
 
-      // const tx = new Transaction().add(mintCnftInstruction);
-      // tx.feePayer = publicKey;
-      // tx.recentBlockhash = (
-      //   await connection.getLatestBlockhash('finalized')
-      // ).blockhash;
+      const signature = await (wallet?.adapter as any)?.signTransaction(
+        transactionV0,
+      );
 
-      if (!signTransaction) {
+      const signatured = await connection?.sendRawTransaction(
+        signature.serialize(),
+        {
+          skipPreflight: process.env.NODE_ENV === 'development',
+        },
+      );
+
+      if (!signatured) {
+        console.error('Transaction failed');
         return;
       }
-      const sig = await signTransaction(transaction);
-      const signatured = await connection.sendTransaction(sig, {
-        skipPreflight: process.env.NODE_ENV === 'development',
-      });
 
-      const latestBlockHash = await connection.getLatestBlockhash('finalized');
+      const latestBlockHash = await connection.getLatestBlockhash();
 
       await connection.confirmTransaction({
-        signature: signatured,
+        signature,
         blockhash: latestBlockHash.blockhash,
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
       });
 
-      updatePoolCounter(currentPoolId, (poolsCounter[currentPoolId] || 0) + 1);
+      updatePoolCounter(
+        currentPoolId || currentPool?.pool_id,
+        (poolsCounter[currentPoolId || currentPool?.pool_id] || 0) + 1,
+      );
 
       await doSyncNftbySignature({
         id: cnftMetadata?.data?.id,
-        pool_id: currentPoolId,
+        pool_id: currentPoolId || currentPool?.pool_id,
         signature: signatured,
       });
 

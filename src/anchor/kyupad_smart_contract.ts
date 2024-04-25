@@ -210,7 +210,7 @@ export type KyupadSmartContract = {
         },
         {
           name: 'pools';
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
@@ -904,7 +904,7 @@ export const IDL: KyupadSmartContract = {
         },
         {
           name: 'pools',
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {

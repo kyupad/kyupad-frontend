@@ -51,8 +51,15 @@ function MobileMenu({
                 My Space
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link>
-              <Link href={WEB_ROUTES.HOME} className="relative group">
+              {/* <Link href={WEB_ROUTES.HOME} className="relative group">
                 Catnip Points
+                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
+              </Link> */}
+              <Link
+                href={WEB_ROUTES.HOW_TO_JOIN_OUR_IDOS}
+                className="relative group"
+              >
+                How to join our IDOs
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link>
             </nav>

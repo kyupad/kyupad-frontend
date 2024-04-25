@@ -21,6 +21,7 @@ const WEB_ROUTES = {
   TERMS: '/terms',
   PROJECTS: '/projects',
   PROJECT_DETAIL: '/projects/[id]',
+  HOW_TO_JOIN_OUR_IDOS: '/how-to-join-our-idos',
 };
 
 export { API_ROUTES, WEB_ROUTES };

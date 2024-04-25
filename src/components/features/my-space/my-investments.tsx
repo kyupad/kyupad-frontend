@@ -1,56 +1,66 @@
 import React, { memo } from 'react';
+import { Knewave } from 'next/font/google';
 import Image from 'next/image';
-import PrimaryButton from '@/components/common/button/primary';
-import bird from 'public/images/my-space/bird.png';
+// import PrimaryButton from '@/components/common/button/primary';
+import { cn } from '@/utils/helpers';
+// import bird from 'public/images/my-space/bird.png';
 import catRight from 'public/images/my-space/cat-right.png';
 
-const data = [
-  {
-    id: 1,
-    name: 'Bunny Protocol',
-    amount: 10000,
-    symbol: '$BPT',
-  },
+// const data = [
+//   {
+//     id: 1,
+//     name: 'Bunny Protocol',
+//     amount: 10000,
+//     symbol: '$BPT',
+//   },
 
-  {
-    id: 2,
-    name: 'Bunny Protocol',
-    amount: 10000,
-    symbol: '$BPT',
-  },
+//   {
+//     id: 2,
+//     name: 'Bunny Protocol',
+//     amount: 10000,
+//     symbol: '$BPT',
+//   },
 
-  {
-    id: 3,
-    name: 'Bunny Protocol',
-    amount: 10000,
-    symbol: '$BPT',
-  },
+//   {
+//     id: 3,
+//     name: 'Bunny Protocol',
+//     amount: 10000,
+//     symbol: '$BPT',
+//   },
 
-  {
-    id: 4,
-    name: 'Bunny Protocol',
-    amount: 10000,
-    symbol: '$BPT',
-  },
+//   {
+//     id: 4,
+//     name: 'Bunny Protocol',
+//     amount: 10000,
+//     symbol: '$BPT',
+//   },
 
-  {
-    id: 5,
-    name: 'Bunny Protocol',
-    amount: 10000,
-    symbol: '$BPT',
-  },
-];
+//   {
+//     id: 5,
+//     name: 'Bunny Protocol',
+//     amount: 10000,
+//     symbol: '$BPT',
+//   },
+// ];
+
+const fontHeading = Knewave({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+  weight: ['400'],
+});
 
 function MyInvestments() {
   return (
-    <div className="relative">
+    <div className={cn('relative', fontHeading.variable)}>
       <Image
         className="absolute top-28 left-[1280px] max-w-[428px]"
         src={catRight}
         alt="Cat Right"
         draggable={false}
       />
-      <div className="px-4 py-10 sm:p-10 border-2 border-kyu-color-10 rounded-[16px] max-w-[1080px] mx-auto flex gap-6 flex-col overflow-x-auto">
+      <p className="text-center font-heading text-4xl">Coming soon...</p>
+      {/* <div className="px-4 py-10 sm:p-10 border-2 border-kyu-color-10 rounded-[16px] max-w-[1080px] mx-auto flex gap-6 flex-col overflow-x-auto">
         {data.map((item) => (
           <div
             key={item.id}
@@ -73,7 +83,7 @@ function MyInvestments() {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

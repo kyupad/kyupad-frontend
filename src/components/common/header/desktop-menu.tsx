@@ -28,12 +28,21 @@ function DesktopMenu() {
           )}
         ></span>
       </Link>
-      <Link href={WEB_ROUTES.CATNIP_POINTS} className="relative group">
+      {/* <Link href={WEB_ROUTES.CATNIP_POINTS} className="relative group">
         Catnip Points
         <span
           className={cn(
             'absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full',
             pathName === WEB_ROUTES.CATNIP_POINTS ? 'w-full' : '',
+          )}
+        ></span>
+      </Link> */}
+      <Link href={WEB_ROUTES.HOW_TO_JOIN_OUR_IDOS} className="relative group">
+        How to join our IDOs
+        <span
+          className={cn(
+            'absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full',
+            pathName === WEB_ROUTES.HOW_TO_JOIN_OUR_IDOS ? 'w-full' : '',
           )}
         ></span>
       </Link>

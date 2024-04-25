@@ -1,0 +1,3 @@
+const SOL_PER_LAMPORT = 1000000000;
+
+export { SOL_PER_LAMPORT };
