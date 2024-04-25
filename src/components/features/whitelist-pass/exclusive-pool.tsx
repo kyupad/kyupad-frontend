@@ -576,13 +576,13 @@ function ExclusivePool() {
               <Progress
                 value={
                   (currentPool?.minted_total || 0) +
-                    (poolsCounter[currentPoolId || currentPool?.pool_id] || 0) >
-                    0 && currentPool?.pool_supply > 0
+                  (poolsCounter[currentPoolId || currentPool?.pool_id] || 0) >
+                  0 && currentPool?.pool_supply > 0
                     ? (((currentPool?.minted_total || 0) +
                         (poolsCounter[currentPoolId || currentPool?.pool_id] ||
                           0)) /
-                        currentPool?.pool_supply) *
-                      100
+                      currentPool?.pool_supply) *
+                    100
                     : 0
                 }
               />
