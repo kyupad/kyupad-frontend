@@ -104,10 +104,6 @@ function ExclusivePool() {
         setCollectionMint(new PublicKey(data?.data?.collection_address));
       }
 
-      if (data?.data?.community_round?.current_pool?.pool_id) {
-        setCurrentPoolId(data?.data?.community_round?.current_pool?.pool_id);
-      }
-
       if (data?.data?.merkle_tree) {
         SetMerkleTree(new PublicKey(data?.data?.merkle_tree));
       }
@@ -493,7 +489,7 @@ function ExclusivePool() {
                 }}
                 className={cn(
                   'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap',
-                  currentPoolId === pool?.pool_id
+                  (currentPoolId || currentPool?.pool_id) === pool?.pool_id
                     ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
                     : 'text-[#8E8FA2]',
                 )}
@@ -534,7 +530,9 @@ function ExclusivePool() {
           )}
         </div>
         <div className="w-full lg:w-1/2 flex flex-col gap-5">
-          {loadingPool ? (
+          {loadingPool ||
+          !currentPool?.pool_name ||
+          !currentPool?.start_time ? (
             <Skeleton className="h-5 w-1/2" />
           ) : (
             <span className="text-xl font-bold">
@@ -545,7 +543,9 @@ function ExclusivePool() {
             </span>
           )}
           <div className="-mt-4">
-            {loadingPool ? (
+            {loadingPool ||
+            !currentPool?.start_time ||
+            !currentPool?.end_time ? (
               <Skeleton className="h-[116px]" />
             ) : (
               <CalendarCountdown
@@ -562,24 +562,25 @@ function ExclusivePool() {
           </div>
 
           <div className="relative mt-6">
-            {loadingPool || !currentPoolId ? (
+            {loadingPool || (!currentPoolId && !currentPool?.pool_id) ? (
               <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
             ) : (
               <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
                 {(currentPool?.minted_total || 0) +
-                  (poolsCounter[currentPoolId] || 0)}
+                  (poolsCounter[currentPoolId || currentPool?.pool_id] || 0)}
               </span>
             )}
-            {loadingPool || !currentPoolId ? (
+            {loadingPool || (!currentPoolId && !currentPool?.pool_id) ? (
               <Skeleton className="h-2" />
             ) : (
               <Progress
                 value={
                   (currentPool?.minted_total || 0) +
-                    (poolsCounter[currentPoolId] || 0) >
+                    (poolsCounter[currentPoolId || currentPool?.pool_id] || 0) >
                     0 && currentPool?.pool_supply > 0
                     ? (((currentPool?.minted_total || 0) +
-                        (poolsCounter[currentPoolId] || 0)) /
+                        (poolsCounter[currentPoolId || currentPool?.pool_id] ||
+                          0)) /
                         currentPool?.pool_supply) *
                       100
                     : 0
@@ -598,14 +599,14 @@ function ExclusivePool() {
               </span>
             )}
           </div>
-          {loadingPool || !currentPoolId ? (
+          {loadingPool || (!currentPoolId && !currentPool?.pool_id) ? (
             <Skeleton className="h-[48px]" />
           ) : (
             <PrimaryButton
               loading={isLoading}
               disabled={
                 !currentPool?.is_active ||
-                poolsCounter[currentPoolId] ||
+                poolsCounter[currentPoolId || currentPool?.pool_id] ||
                 !(
                   dayjs.utc(currentPool?.start_time).isBefore(now) &&
                   dayjs.utc(currentPool?.end_time).isAfter(now)
@@ -613,7 +614,7 @@ function ExclusivePool() {
               }
               onClick={handleMint}
             >
-              {!poolsCounter[currentPoolId] && (
+              {!poolsCounter[currentPoolId || currentPool?.pool_id] && (
                 <>
                   {currentPool?.is_active &&
                   dayjs.utc(currentPool?.start_time).isBefore(now) &&
@@ -623,7 +624,9 @@ function ExclusivePool() {
                 </>
               )}
 
-              {poolsCounter[currentPoolId] && <>Minted</>}
+              {poolsCounter[currentPoolId || currentPool?.pool_id] && (
+                <>Minted</>
+              )}
             </PrimaryButton>
           )}
         </div>
