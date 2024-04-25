@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { doGetSignInData, doVerifySignInWithSolana } from '@/actions/auth';
 import { setCookie } from '@/actions/jwt';
 import { revalidateProjectDetail } from '@/actions/project';
-import GlobalStoreProvider from '@/contexts/global-store-provider';
 import { WEB_ROUTES } from '@/utils/constants';
 
 import Skeleton from '../loading/skeleton';
@@ -35,14 +34,12 @@ const Header = () => {
       </div>
       <div className="hidden gap-8 items-center flex-wrap lg:flex">
         <DesktopMenu />
-        <GlobalStoreProvider>
-          <WalletConnect
-            doGetSignInData={doGetSignInData}
-            doVerifySignInWithSolana={doVerifySignInWithSolana}
-            setCookie={setCookie}
-            revalidateProjectDetail={revalidateProjectDetail}
-          />
-        </GlobalStoreProvider>
+        <WalletConnect
+          doGetSignInData={doGetSignInData}
+          doVerifySignInWithSolana={doVerifySignInWithSolana}
+          setCookie={setCookie}
+          revalidateProjectDetail={revalidateProjectDetail}
+        />
       </div>
     </header>
   );

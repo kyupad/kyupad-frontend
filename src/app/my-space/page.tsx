@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import PrimaryButton from '@/components/common/button/primary';
-import { Input } from '@/components/common/input';
+// import PrimaryButton from '@/components/common/button/primary';
+// import { Input } from '@/components/common/input';
 import Tabs from '@/components/common/tabs';
 import MyInvestments from '@/components/features/my-space/my-investments';
 import MyParticipations from '@/components/features/my-space/my-participations';
@@ -38,13 +38,13 @@ const MySpace = () => {
               </div>
             </div>
             <div className="px-[20px] py-4 sm:px-[60px] sm:py-[40px] gap-3 w-full max-w-[536px] flex flex-col">
-              <Input label="Email:" value="noahduong@kyupad.xyz" />
+              {/* <Input label="Email:" value="noahduong@kyupad.xyz" />
               <Input
                 label="KYC Status:"
                 className="pl-[105px] text-green-500"
                 value="Completed"
               />
-              <PrimaryButton className="max-w-[200px]">Submit</PrimaryButton>
+              <PrimaryButton className="max-w-[200px]">Submit</PrimaryButton> */}
             </div>
           </div>
         </div>

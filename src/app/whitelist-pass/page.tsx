@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
-import { Progress } from '@/components/common/progress/progress';
+import Skeleton from '@/components/common/loading/skeleton';
 import ExclusivePool from '@/components/features/whitelist-pass/exclusive-pool';
-import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
-import WhitelistPassStep from '@/components/features/whitelist-pass/step';
+import MyTotalNftMinted from '@/components/features/whitelist-pass/my-total-nft-minted';
+import SeasonStats from '@/components/features/whitelist-pass/season-stats';
+// import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
+import WhitelistPassTimeline from '@/components/features/whitelist-pass/whitelist-pass-timeline';
 import { cn } from '@/utils/helpers';
 
 import latDecorator from '/public/images/home/last-decorator.svg';
@@ -22,27 +24,7 @@ export const metadata: Metadata = {
   title: 'Whitelist NFT',
 };
 
-function Whitelist() {
-  const roundStep = [
-    {
-      step: 1,
-      start: '2024-08-30T00:00:00Z',
-      end: '2024-08-30T00:00:00Z',
-      title: 'Round 1',
-    },
-    {
-      step: 2,
-      start: '2024-08-30T00:00:00Z',
-      end: '2024-08-30T00:00:00Z',
-      title: 'Round 2',
-    },
-    {
-      step: 3,
-      start: '2024-08-30T00:00:00Z',
-      end: '2024-08-30T00:00:00Z',
-      title: 'End',
-    },
-  ];
+async function Whitelist() {
   return (
     <>
       <div
@@ -67,14 +49,35 @@ function Whitelist() {
             </h1>
 
             <div className="min-w-[300px] sm:min-w-[480px]">
-              <WhitelistPassStep data={roundStep} />
-            </div>
+              <div className="h-[284px] overflow-y-auto px-4 scrollbar">
+                <Suspense
+                  fallback={
+                    <div className="flex flex-col gap-5">
+                      <div>
+                        <Skeleton className="h-[24px] w-1/3 mb-2" />
+                        <Skeleton className="h-[22px]" />
+                      </div>
 
-            <div className="">
-              <span className="font-medium text-kyu-color-14">
-                Total Whitelist Pass NFT minted:{' '}
-              </span>
-              <span className="font-bold">0</span>
+                      <div>
+                        <Skeleton className="h-[24px] w-1/3 mb-2" />
+                        <Skeleton className="h-[22px]" />
+                      </div>
+
+                      <div>
+                        <Skeleton className="h-[24px] w-1/3 mb-2" />
+                        <Skeleton className="h-[22px]" />
+                      </div>
+
+                      <div>
+                        <Skeleton className="h-[24px] w-1/3 mb-2" />
+                        <Skeleton className="h-[22px]" />
+                      </div>
+                    </div>
+                  }
+                >
+                  <WhitelistPassTimeline />
+                </Suspense>
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-14 order-1 lg:order-2">
@@ -82,16 +85,23 @@ function Whitelist() {
               <Image src={whitelist} alt="whitelist" draggable={false} />
             </div>
 
-            <div className="relative">
-              <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-                0
-              </span>
-              <Progress value={0} />
-              <span className="absolute right-0 -top-8">
-                <span className="text-kyu-color-14 font-medium">Total</span>{' '}
-                <span className="font-bold text-kyu-color-11">20,000</span>
-              </span>
-            </div>
+            <Suspense
+              fallback={
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-2 w-10" />
+                    <Skeleton className="h-2 w-20" />
+                  </div>
+                  <Skeleton className="h-2" />
+                </div>
+              }
+            >
+              <SeasonStats />
+            </Suspense>
+
+            <Suspense fallback={<Skeleton className="h-2 w-8/12 -mt-10" />}>
+              <MyTotalNftMinted />
+            </Suspense>
           </div>
         </div>
 
@@ -99,9 +109,9 @@ function Whitelist() {
           <ExclusivePool />
         </div>
 
-        <div className="w-full max-w-[1198px]">
+        {/* <div className="w-full max-w-[1198px]">
           <FcfsPool />
-        </div>
+        </div> */}
       </div>
 
       <Image
@@ -116,3 +126,5 @@ function Whitelist() {
 
 // eslint-disable-next-line import/no-unused-modules
 export default Whitelist;
+
+export const dynamic = 'force-dynamic';
