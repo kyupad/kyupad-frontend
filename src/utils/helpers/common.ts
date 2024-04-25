@@ -86,6 +86,29 @@ const convertUTCtime = (time: string) => {
   return formattedDateTime;
 };
 
+const debounceUseEffect = (callback: any, time: number) => {
+  let interval: any;
+  return () => {
+    clearTimeout(interval);
+    interval = setTimeout(() => {
+      interval = null;
+      callback();
+    }, time);
+  };
+};
+
+const debounce = (func: any, wait: number, immediate?: any) => {
+  let timeout: any;
+  return (...args: any) => {
+    clearTimeout(timeout);
+    if (immediate && !timeout) func(...args);
+    timeout = setTimeout(() => {
+      timeout = null;
+      if (!immediate) func(...args);
+    }, wait);
+  };
+};
+
 export {
   removeUndefinedAndNull,
   isEmpty,
@@ -94,4 +117,6 @@ export {
   getInfoDevice,
   cn,
   convertUTCtime,
+  debounce,
+  debounceUseEffect,
 };

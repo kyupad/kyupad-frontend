@@ -10,6 +10,7 @@ import {
 import { IDL, KyupadSmartContract } from '@/anchor/kyupad_smart_contract';
 import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
+import Skeleton from '@/components/common/loading/skeleton';
 import { Progress } from '@/components/common/progress/progress';
 import { useSessionStore } from '@/contexts/session-store-provider';
 import { cn } from '@/utils/helpers';
@@ -24,12 +25,20 @@ import {
 } from '@metaplex-foundation/mpl-bubblegum';
 import { publicKey as publicKeyFn } from '@metaplex-foundation/umi';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, Transaction } from '@solana/web3.js';
+import {
+  PublicKey,
+  TransactionMessage,
+  VersionedTransaction,
+} from '@solana/web3.js';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import dropdown from 'public/images/whitelist/drop-down.svg';
+import moreArrow from 'public/images/whitelist/more-arrow.svg';
 import { toast } from 'sonner';
 import { decrypt } from '@utils/helpers';
+
+dayjs.extend(utc);
 
 const programId = new PublicKey(env.NEXT_PUBLIC_NFT_PROGRAM_ID);
 const tokenMetaDataProgramId = new PublicKey(
@@ -38,7 +47,7 @@ const tokenMetaDataProgramId = new PublicKey(
 
 function ExclusivePool() {
   const [open, setOpen] = useState<boolean>(false);
-  const { publicKey, wallet } = useWallet();
+  const { publicKey, signTransaction } = useWallet();
 
   const [activePool, setActivePool] = useState<any[]>([]);
   const [currentPool, setCurrentPool] = useState<any>({});
@@ -46,6 +55,7 @@ function ExclusivePool() {
   const [collectionMint, setCollectionMint] = useState<PublicKey>();
   const [merkleTree, SetMerkleTree] = useState<PublicKey>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loadingPool, setLoadingPool] = useState<boolean>(false);
   const { poolsCounter, updatePoolCounter } = useSessionStore((state) => state);
 
   const { connection } = useConnection();
@@ -67,11 +77,15 @@ function ExclusivePool() {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchData = async () => {
-      const data = await doGetMintingPool({
-        wallet: publicKey?.toBase58() || '',
-        pool_id: currentPoolId,
-      });
+      const data = await doGetMintingPool(
+        {
+          wallet: publicKey?.toBase58() || '',
+          pool_id: currentPoolId,
+        },
+        controller.signal,
+      );
 
       if (data?.data?.community_round?.active_pools) {
         setActivePool([
@@ -97,9 +111,20 @@ function ExclusivePool() {
       if (data?.data?.merkle_tree) {
         SetMerkleTree(new PublicKey(data?.data?.merkle_tree));
       }
+
+      setLoadingPool(false);
     };
 
-    fetchData();
+    const debounceFunction = setTimeout(() => {
+      setLoadingPool(true);
+      fetchData();
+    }, 200);
+
+    return () => {
+      controller.abort();
+      clearTimeout(debounceFunction);
+      setLoadingPool(false);
+    };
   }, [currentPoolId, publicKey]);
 
   const handleMint = async () => {
@@ -324,14 +349,33 @@ function ExclusivePool() {
         .remainingAccounts(remainingAccounts)
         .instruction();
 
-      const tx = new Transaction().add(mintCnftInstruction);
-      tx.feePayer = publicKey;
-      tx.recentBlockhash = (
-        await connection.getLatestBlockhash('finalized')
-      ).blockhash;
+      const lookupTableAccount = (
+        await connection.getAddressLookupTable(
+          new PublicKey('EkJLaUYbFRdy98wrLqmuWfUEWhyybVEK4JD59TwPE5EU'),
+        )
+      ).value;
 
-      const sig = await (wallet?.adapter as any)?.signTransaction(tx);
-      const signatured = await connection.sendRawTransaction(sig.serialize(), {
+      // create v0 compatible message
+      const messageV0 = new TransactionMessage({
+        payerKey: publicKey,
+        recentBlockhash: (await connection.getLatestBlockhash('finalized'))
+          .blockhash,
+        instructions: [mintCnftInstruction],
+      }).compileToV0Message([lookupTableAccount!]);
+
+      const transaction = new VersionedTransaction(messageV0);
+
+      // const tx = new Transaction().add(mintCnftInstruction);
+      // tx.feePayer = publicKey;
+      // tx.recentBlockhash = (
+      //   await connection.getLatestBlockhash('finalized')
+      // ).blockhash;
+
+      if (!signTransaction) {
+        return;
+      }
+      const sig = await signTransaction(transaction);
+      const signatured = await connection.sendTransaction(sig, {
         skipPreflight: process.env.NODE_ENV === 'development',
       });
 
@@ -346,7 +390,7 @@ function ExclusivePool() {
       updatePoolCounter(currentPoolId, (poolsCounter[currentPoolId] || 0) + 1);
 
       await doSyncNftbySignature({
-        id: cnftMetadata?.id,
+        id: cnftMetadata?.data?.id,
         pool_id: currentPoolId,
         signature: signatured,
       });
@@ -376,6 +420,8 @@ function ExclusivePool() {
       handleSetIsLoading(false);
     }
   };
+
+  const now = dayjs.utc();
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -426,42 +472,58 @@ function ExclusivePool() {
         </div>
       </div>
 
-      <div className="flex gap-3">
-        {activePool?.map((pool, index) => {
-          if (!pool?.pool_id) {
+      <div className="relative">
+        <div className="flex gap-3 overflow-x-auto scrollbar pb-4">
+          {activePool?.map((pool, index) => {
+            if (!pool?.pool_id) {
+              return (
+                <span
+                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap"
+                  key={index}
+                >
+                  {pool?.pool_name}
+                </span>
+              );
+            }
+
             return (
-              <span
-                className="py-3 px-4 rounded-[8px] text-xl font-bold"
-                key={index}
+              <button
+                onClick={() => {
+                  handleChangePoolId(pool?.pool_id);
+                }}
+                className={cn(
+                  'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap',
+                  currentPoolId === pool?.pool_id
+                    ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
+                    : 'text-[#8E8FA2]',
+                )}
+                key={pool?.pool_id}
               >
                 {pool?.pool_name}
-              </span>
+              </button>
             );
-          }
+          })}
 
-          return (
-            <button
-              onClick={() => {
-                handleChangePoolId(pool?.pool_id);
-                // changeOptimisticCurrentPool(pool?.pool_id);
-              }}
-              className={cn(
-                'py-3 px-4 rounded-[8px] text-xl font-bold',
-                currentPool?.pool_id === pool?.pool_id
-                  ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
-                  : 'text-[#8E8FA2]',
-              )}
-              key={pool?.pool_id}
-            >
-              {pool?.pool_name}
-            </button>
-          );
-        })}
+          {!activePool ||
+            (activePool.length === 0 && (
+              <>
+                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+              </>
+            ))}
+        </div>
+        <Image src={moreArrow} alt="more" className="absolute right-0 top-0" />
       </div>
 
-      {currentPoolId && (
-        <div className="flex p-10 bg-kyu-color-16 rounded-[16px] justify-center gap-10 items-center">
-          <div className="w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
+      <div className="flex p-10 bg-kyu-color-16 rounded-[16px] justify-center gap-10 items-center flex-col lg:flex-row">
+        <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
+          {loadingPool || !currentPool?.pool_image ? (
+            <Skeleton className="h-full w-full" />
+          ) : (
             <Image
               src={currentPool?.pool_image || ''}
               alt={currentPool?.pool_image || ''}
@@ -469,23 +531,48 @@ function ExclusivePool() {
               style={{ objectFit: 'cover' }}
               draggable={false}
             />
-          </div>
-          <div className="w-1/2 flex flex-col gap-5">
+          )}
+        </div>
+        <div className="w-full lg:w-1/2 flex flex-col gap-5">
+          {loadingPool ? (
+            <Skeleton className="h-5 w-1/2" />
+          ) : (
             <span className="text-xl font-bold">
-              {currentPool?.pool_name || ''} time left:
+              {currentPool?.pool_name || ''}{' '}
+              {dayjs.utc(currentPool?.start_time).isBefore(now)
+                ? 'time left:'
+                : 'starts in:'}
             </span>
-            <div className="-mt-4">
+          )}
+          <div className="-mt-4">
+            {loadingPool ? (
+              <Skeleton className="h-[116px]" />
+            ) : (
               <CalendarCountdown
-                time={dayjs.utc(currentPool?.end_time).valueOf()}
+                time={dayjs
+                  .utc(
+                    dayjs.utc(currentPool?.start_time).isBefore(now)
+                      ? currentPool?.end_time?.valueOf()
+                      : currentPool?.start_time?.valueOf(),
+                  )
+                  .valueOf()}
                 fullWidth
               />
-            </div>
+            )}
+          </div>
 
-            <div className="relative mt-6">
+          <div className="relative mt-6">
+            {loadingPool || !currentPoolId ? (
+              <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
+            ) : (
               <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
                 {(currentPool?.minted_total || 0) +
                   (poolsCounter[currentPoolId] || 0)}
               </span>
+            )}
+            {loadingPool || !currentPoolId ? (
+              <Skeleton className="h-2" />
+            ) : (
               <Progress
                 value={
                   (currentPool?.minted_total || 0) +
@@ -498,27 +585,49 @@ function ExclusivePool() {
                     : 0
                 }
               />
+            )}
+            {loadingPool ||
+            (!currentPool?.pool_supply && currentPool?.pool_supply !== 0) ? (
+              <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
+            ) : (
               <span className="absolute right-0 -top-8">
                 <span className="text-kyu-color-14 font-medium">Total</span>{' '}
                 <span className="font-bold text-kyu-color-11">
                   {currentPool?.pool_supply || 0}
                 </span>
               </span>
-            </div>
+            )}
+          </div>
+          {loadingPool || !currentPoolId ? (
+            <Skeleton className="h-[48px]" />
+          ) : (
             <PrimaryButton
               loading={isLoading}
-              disabled={!currentPool?.is_active || poolsCounter[currentPoolId]}
+              disabled={
+                !currentPool?.is_active ||
+                poolsCounter[currentPoolId] ||
+                !(
+                  dayjs.utc(currentPool?.start_time).isBefore(now) &&
+                  dayjs.utc(currentPool?.end_time).isAfter(now)
+                )
+              }
               onClick={handleMint}
             >
               {!poolsCounter[currentPoolId] && (
-                <>{currentPool?.is_active ? 'Free Mint' : 'Not eligible'}</>
+                <>
+                  {currentPool?.is_active &&
+                  dayjs.utc(currentPool?.start_time).isBefore(now) &&
+                  dayjs.utc(currentPool?.end_time).isAfter(now)
+                    ? 'Free Mint'
+                    : 'Not eligible'}
+                </>
               )}
 
               {poolsCounter[currentPoolId] && <>Minted</>}
             </PrimaryButton>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

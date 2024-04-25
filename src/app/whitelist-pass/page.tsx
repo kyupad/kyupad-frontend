@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
-import { doGetSeasonActive } from '@/actions/whitelist-pass';
-import { Progress } from '@/components/common/progress/progress';
+import Skeleton from '@/components/common/loading/skeleton';
 import ExclusivePool from '@/components/features/whitelist-pass/exclusive-pool';
+import MyTotalNftMinted from '@/components/features/whitelist-pass/my-total-nft-minted';
+import SeasonStats from '@/components/features/whitelist-pass/season-stats';
 // import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
-import WhitelistPassStep from '@/components/features/whitelist-pass/step';
+import WhitelistPassTimeline from '@/components/features/whitelist-pass/whitelist-pass-timeline';
 import { cn } from '@/utils/helpers';
 
 import latDecorator from '/public/images/home/last-decorator.svg';
@@ -24,16 +25,6 @@ export const metadata: Metadata = {
 };
 
 async function Whitelist() {
-  const data = await doGetSeasonActive();
-  const mintingRoundRoadMap = data?.data?.minting_round_road_map || [];
-
-  const roundStep = mintingRoundRoadMap?.map((r: any) => ({
-    step: 1,
-    start: r?.start_time,
-    end: r?.end_time,
-    title: r?.community_name || '',
-  }));
-
   return (
     <>
       <div
@@ -59,7 +50,33 @@ async function Whitelist() {
 
             <div className="min-w-[300px] sm:min-w-[480px]">
               <div className="h-[284px] overflow-y-auto px-4 scrollbar">
-                <WhitelistPassStep data={roundStep} direction="vertical" />
+                <Suspense
+                  fallback={
+                    <div className="flex flex-col gap-5">
+                      <div>
+                        <Skeleton className="h-[24px] w-1/3 mb-2" />
+                        <Skeleton className="h-[22px]" />
+                      </div>
+
+                      <div>
+                        <Skeleton className="h-[24px] w-1/3 mb-2" />
+                        <Skeleton className="h-[22px]" />
+                      </div>
+
+                      <div>
+                        <Skeleton className="h-[24px] w-1/3 mb-2" />
+                        <Skeleton className="h-[22px]" />
+                      </div>
+
+                      <div>
+                        <Skeleton className="h-[24px] w-1/3 mb-2" />
+                        <Skeleton className="h-[22px]" />
+                      </div>
+                    </div>
+                  }
+                >
+                  <WhitelistPassTimeline />
+                </Suspense>
               </div>
             </div>
           </div>
@@ -68,44 +85,23 @@ async function Whitelist() {
               <Image src={whitelist} alt="whitelist" draggable={false} />
             </div>
 
-            <div className="relative">
-              <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-                {data?.data?.season?.minted_total || 0}
-              </span>
-              <Progress
-                value={
-                  data?.data?.season?.minted_total > 0 &&
-                  data?.data?.season?.total
-                    ? (data?.data?.season?.minted_total /
-                        data?.data?.season?.total) *
-                      100
-                    : 0
-                }
-              />
-              <span className="absolute right-0 -top-8">
-                <span className="text-kyu-color-14 font-medium">Total</span>{' '}
-                <span className="font-bold text-kyu-color-11">
-                  {data?.data?.season?.total || 0}
-                </span>
-              </span>
-            </div>
+            <Suspense
+              fallback={
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-2 w-10" />
+                    <Skeleton className="h-2 w-20" />
+                  </div>
+                  <Skeleton className="h-2" />
+                </div>
+              }
+            >
+              <SeasonStats />
+            </Suspense>
 
-            <div className="-mt-10">
-              <>
-                <span className="font-medium text-kyu-color-14">
-                  {!data?.data?.season?.my_minted_total &&
-                  data?.data?.season?.my_minted_total !== 0
-                    ? null
-                    : ' Total Whitelist Pass NFT minted: '}
-                </span>
-                <span className="font-bold">
-                  {!data?.data?.season?.my_minted_total &&
-                  data?.data?.season?.my_minted_total !== 0
-                    ? null
-                    : data?.data?.season?.my_minted_total}
-                </span>
-              </>
-            </div>
+            <Suspense fallback={<Skeleton className="h-2 w-8/12 -mt-10" />}>
+              <MyTotalNftMinted />
+            </Suspense>
           </div>
         </div>
 

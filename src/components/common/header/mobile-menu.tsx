@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { revalidateProjectDetail } from '@/actions/project';
-import GlobalStoreProvider from '@/contexts/global-store-provider';
 import { WEB_ROUTES } from '@/utils/constants';
 import PrimaryButton from '@components/common/button/primary';
 
@@ -57,14 +56,12 @@ function MobileMenu({
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link>
             </nav>
-            <GlobalStoreProvider>
-              <WalletConnect
-                doGetSignInData={doGetSignInData}
-                doVerifySignInWithSolana={doVerifySignInWithSolana}
-                setCookie={setCookie}
-                revalidateProjectDetail={revalidateProjectDetail}
-              />
-            </GlobalStoreProvider>
+            <WalletConnect
+              doGetSignInData={doGetSignInData}
+              doVerifySignInWithSolana={doVerifySignInWithSolana}
+              setCookie={setCookie}
+              revalidateProjectDetail={revalidateProjectDetail}
+            />
           </div>
           <SheetFooter />
         </SheetContent>

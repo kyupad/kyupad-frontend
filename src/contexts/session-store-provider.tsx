@@ -38,7 +38,7 @@ const useSessionStore = <T,>(selector: (store: ISessionStore) => T): T => {
   const sessionStoreContext = useContext(SessionStoreContext);
 
   if (!sessionStoreContext) {
-    throw new Error(`useSessionStore must be use within GlobalStoreProvider`);
+    throw new Error(`useSessionStore must be use within SessionStoreProvider`);
   }
 
   return useStore(sessionStoreContext, selector);

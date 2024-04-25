@@ -1,5 +1,6 @@
 import Header from '@/components/common/header';
 import Ribbon from '@/components/features/ribbon';
+import GlobalStoreProvider from '@/contexts/global-store-provider';
 import SessionStoreProvider from '@/contexts/session-store-provider';
 import WalletConnectProvider from '@/contexts/wallet-connect-provider';
 import { META_DATA_DEFAULT } from '@/utils/constants/seo';
@@ -30,22 +31,24 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <WalletConnectProvider>
       <SessionStoreProvider>
-        <html lang="en">
-          <body
-            className={cn(
-              'min-h-screen font-sans antialiased scrollbar',
-              fontSans.variable,
-            )}
-          >
-            <WebVitals />
-            <NextTopLoader color="#f2820e" />
-            <Header />
-            <main className="overflow-hidden relative">{children}</main>
-            <Footer />
-            <SonnerToaster />
-            <Ribbon />
-          </body>
-        </html>
+        <GlobalStoreProvider>
+          <html lang="en">
+            <body
+              className={cn(
+                'min-h-screen font-sans antialiased scrollbar',
+                fontSans.variable,
+              )}
+            >
+              <WebVitals />
+              <NextTopLoader color="#f2820e" />
+              <Header />
+              <main className="overflow-hidden relative">{children}</main>
+              <Footer />
+              <SonnerToaster />
+              <Ribbon />
+            </body>
+          </html>
+        </GlobalStoreProvider>
       </SessionStoreProvider>
     </WalletConnectProvider>
   );
