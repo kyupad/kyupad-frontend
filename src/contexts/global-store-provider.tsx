@@ -19,6 +19,7 @@ import {
 } from '@/utils/constants';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { deleteCookie, getCookie, hasCookie, setCookie } from 'cookies-next';
+import { env } from 'env.mjs';
 import { useStore, type StoreApi } from 'zustand';
 
 const GlobalStoreContext = createContext<StoreApi<IGlobalStore> | null>(null);
@@ -108,8 +109,12 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
     }));
 
     await disconnect();
-    deleteCookie(ACCESS_TOKEN_STORAGE_KEY);
-    deleteCookie(REFRESH_TOKEN_STORAGE_KEY);
+    deleteCookie(ACCESS_TOKEN_STORAGE_KEY, {
+      domain: env.NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN,
+    });
+    deleteCookie(REFRESH_TOKEN_STORAGE_KEY, {
+      domain: env.NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN,
+    });
   };
 
   const checkTokenExpiration = async () => {

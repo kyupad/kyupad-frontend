@@ -7,6 +7,7 @@ import {
 } from '@/utils/constants';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { deleteCookie } from 'cookies-next';
+import { env } from 'env.mjs';
 
 import PrimaryButton from '../button/primary';
 import {
@@ -63,8 +64,12 @@ function WalletConnected({ revalidatePath }: { revalidatePath: Function }) {
             onClick={async () => {
               changeSolanaConnection(false);
               await disconnect();
-              deleteCookie(ACCESS_TOKEN_STORAGE_KEY);
-              deleteCookie(REFRESH_TOKEN_STORAGE_KEY);
+              deleteCookie(ACCESS_TOKEN_STORAGE_KEY, {
+                domain: env.NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN,
+              });
+              deleteCookie(REFRESH_TOKEN_STORAGE_KEY, {
+                domain: env.NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN,
+              });
               revalidatePath(window.location.pathname);
             }}
           >
