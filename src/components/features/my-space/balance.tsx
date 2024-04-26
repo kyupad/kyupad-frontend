@@ -58,9 +58,9 @@ function MySpaceBalance() {
           <span>
             <span className="font-bold text-xl">Address:</span>{' '}
             <span className="text-xl">
-              {publicKey?.toBase58()?.slice(0, 5) +
+              {(publicKey?.toBase58()?.slice(0, 5) || '') +
                 '...' +
-                publicKey?.toBase58()?.slice(-5)}
+                (publicKey?.toBase58()?.slice(-5) || '')}
             </span>
           </span>
           <button

@@ -57,7 +57,13 @@ function ExclusivePool() {
   const [merkleTree, SetMerkleTree] = useState<PublicKey>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingPool, setLoadingPool] = useState<boolean>(false);
-  const { poolsCounter, updatePoolCounter } = useSessionStore((state) => state);
+  const {
+    poolsCounter,
+    updatePoolCounter,
+    updateUserSeasonMinted,
+    user_season_minted,
+  } = useSessionStore((state) => state);
+
   const [lookupTableAddress, setLookupTableAddress] = useState<PublicKey>();
   const poolId = currentPoolId || currentPool?.pool_id;
   const poolCounterKey = `${poolId}_${publicKey?.toBase58()}`;
@@ -121,7 +127,11 @@ function ExclusivePool() {
 
     const debounceFunction = setTimeout(() => {
       setLoadingPool(true);
-      fetchData();
+      try {
+        fetchData();
+      } catch (error) {
+        console.error(error);
+      }
     }, 200);
 
     return () => {
@@ -416,6 +426,7 @@ function ExclusivePool() {
         poolCounterKey,
         (poolsCounter[poolCounterKey] || 0) + 1,
       );
+      updateUserSeasonMinted((user_season_minted || 0) + 1);
 
       toast.success(
         <div>

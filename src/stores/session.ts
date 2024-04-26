@@ -4,6 +4,10 @@ import { createStore, Mutate, StoreApi } from 'zustand/vanilla';
 interface ISessionStore {
   poolsCounter: any;
   updatePoolCounter: (key: string, value: number) => void;
+  user_season_minted: number;
+  updateUserSeasonMinted: (value: number) => void;
+  seasonMinted: number;
+  updateSeasonMinted: (value: number) => void;
 }
 
 type StoreWithPersist = Mutate<
@@ -27,19 +31,28 @@ const withSessionStorageDOMEvents = (store: StoreWithPersist) => {
 
 const storage: PersistStorage<ISessionStore> = {
   getItem: (name) => {
+    if (typeof window === 'undefined') return null;
     const str = sessionStorage.getItem(name);
     if (!str) return null;
     return JSON.parse(str);
   },
   setItem: (name, value) => {
+    if (typeof window === 'undefined') return;
     sessionStorage.setItem(name, JSON.stringify(value));
   },
-  removeItem: (name) => sessionStorage.removeItem(name),
+  removeItem: (name) => {
+    if (typeof window === 'undefined') return;
+    sessionStorage.removeItem(name);
+  },
 };
 
 const initialState: ISessionStore = {
   poolsCounter: {},
   updatePoolCounter: () => {},
+  user_season_minted: 0,
+  updateUserSeasonMinted: () => {},
+  seasonMinted: 0,
+  updateSeasonMinted: () => {},
 };
 
 const createSessionStore = createStore<ISessionStore>()(
@@ -54,6 +67,9 @@ const createSessionStore = createStore<ISessionStore>()(
             [`${key}`]: value,
           },
         })),
+      updateUserSeasonMinted: (value: number) =>
+        set({ user_season_minted: value }),
+      updateSeasonMinted: (value: number) => set({ seasonMinted: value }),
     }),
     {
       name: 'session-storage',

@@ -67,7 +67,7 @@ function MobileMenu({
               doGetSignInData={doGetSignInData}
               doVerifySignInWithSolana={doVerifySignInWithSolana}
               setCookie={setCookie}
-              revalidateProjectDetail={revalidateProjectDetail}
+              revalidatePath={revalidateProjectDetail}
             />
           </div>
           <SheetFooter />

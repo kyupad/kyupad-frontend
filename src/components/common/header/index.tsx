@@ -3,8 +3,8 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { doGetSignInData, doVerifySignInWithSolana } from '@/actions/auth';
+import { revalidateCurrentPath } from '@/actions/common';
 import { setCookie } from '@/actions/jwt';
-import { revalidateProjectDetail } from '@/actions/project';
 import { WEB_ROUTES } from '@/utils/constants';
 
 import Skeleton from '../loading/skeleton';
@@ -38,7 +38,7 @@ const Header = () => {
           doGetSignInData={doGetSignInData}
           doVerifySignInWithSolana={doVerifySignInWithSolana}
           setCookie={setCookie}
-          revalidateProjectDetail={revalidateProjectDetail}
+          revalidatePath={revalidateCurrentPath}
         />
       </div>
     </header>

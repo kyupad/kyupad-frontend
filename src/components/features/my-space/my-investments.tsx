@@ -59,7 +59,9 @@ function MyInvestments() {
         alt="Cat Right"
         draggable={false}
       />
-      <p className="text-center font-heading text-4xl">Coming soon...</p>
+      <p className="text-center font-heading text-4xl h-[400px]">
+        Coming soon...
+      </p>
       {/* <div className="px-4 py-10 sm:p-10 border-2 border-kyu-color-10 rounded-[16px] max-w-[1080px] mx-auto flex gap-6 flex-col overflow-x-auto">
         {data.map((item) => (
           <div

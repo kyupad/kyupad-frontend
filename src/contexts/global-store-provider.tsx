@@ -7,6 +7,7 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
+import { usePathname } from 'next/navigation';
 import { doRefreshToken } from '@/adapters/auth';
 import { createGlobalStore, withStorageDOMEvents } from '@/stores';
 import type { IGlobalStore } from '@/stores';
@@ -27,23 +28,51 @@ interface GlobalStoreProviderProps {
 }
 
 const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
+  const pathName = usePathname();
   const storeRef = useRef<StoreApi<IGlobalStore>>();
   if (!storeRef.current) {
     storeRef.current = createGlobalStore;
   }
 
-  const { disconnect } = useWallet();
+  const { disconnect, connected, publicKey } = useWallet();
+
+  useEffect(() => {
+    storeRef.current?.setState((state) => ({
+      ...state,
+      is_solana_connected: connected && hasCookie(ACCESS_TOKEN_STORAGE_KEY),
+    }));
+  }, [connected]);
+
+  useEffect(() => {
+    let valildateLoginPolling: any;
+    const startValidateLogin = setTimeout(() => {
+      valildateLoginPolling = setInterval(() => {
+        if (window?.solana?.publicKey?.toBase58() !== publicKey?.toBase58()) {
+          logoutProcess();
+          clearInterval(valildateLoginPolling);
+          clearTimeout(startValidateLogin);
+          return;
+        }
+
+        if (
+          !window?.solana?.isConnected &&
+          hasCookie(REFRESH_TOKEN_STORAGE_KEY)
+        ) {
+          logoutProcess();
+          clearInterval(valildateLoginPolling);
+          clearTimeout(startValidateLogin);
+        }
+      }, 1000);
+    }, 5000);
+
+    return () => {
+      clearInterval(valildateLoginPolling);
+      clearTimeout(startValidateLogin);
+    };
+  }, [publicKey]);
 
   useEffect(() => {
     withStorageDOMEvents(createGlobalStore);
-    storeRef.current?.setState((state) => ({
-      ...state,
-      is_solana_connected:
-        localStorage.getItem('walletName') &&
-        hasCookie(ACCESS_TOKEN_STORAGE_KEY)
-          ? true
-          : false,
-    }));
   }, []);
 
   useEffect(() => {
@@ -66,56 +95,53 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (pathName) {
+      checkTokenExpiration();
+    }
+  }, [pathName]);
+
+  const logoutProcess = async () => {
+    storeRef.current?.setState((state) => ({
+      ...state,
+      is_solana_connected: false,
+    }));
+
+    await disconnect();
+    deleteCookie(ACCESS_TOKEN_STORAGE_KEY);
+    deleteCookie(REFRESH_TOKEN_STORAGE_KEY);
+  };
+
   const checkTokenExpiration = async () => {
-    const logoutProcess = async () => {
-      storeRef.current?.setState((state) => ({
-        ...state,
-        is_solana_connected: false,
-      }));
-
-      await disconnect();
-      deleteCookie(ACCESS_TOKEN_STORAGE_KEY);
-      deleteCookie(REFRESH_TOKEN_STORAGE_KEY);
-      localStorage.removeItem('walletName');
-    };
-
     const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
+    const refreshToken = getCookie(REFRESH_TOKEN_STORAGE_KEY);
 
-    if (!token) {
-      const refreshToken = getCookie(REFRESH_TOKEN_STORAGE_KEY);
+    if (!token && refreshToken) {
+      try {
+        const data = await doRefreshToken({ refresh_token: refreshToken });
 
-      if (!refreshToken) {
-        await logoutProcess();
-        return;
-      }
+        if (data?.data?.access_token) {
+          setCookie(
+            ACCESS_TOKEN_STORAGE_KEY,
+            data.data.access_token,
+            ACCESS_TOKEN_COOKIE_CONFIG,
+          );
 
-      if (refreshToken) {
-        try {
-          const data = await doRefreshToken({ refresh_token: refreshToken });
-
-          if (data?.data?.access_token) {
-            setCookie(
-              ACCESS_TOKEN_STORAGE_KEY,
-              data.data.access_token,
-              ACCESS_TOKEN_COOKIE_CONFIG,
-            );
-
-            setCookie(
-              REFRESH_TOKEN_STORAGE_KEY,
-              data.data.refresh_token,
-              REFRESH_TOKEN_COOKIE_CONFIG,
-            );
-          }
-
-          storeRef.current?.setState((state) => ({
-            ...state,
-            is_solana_connected: true,
-          }));
-          return;
-        } catch (e) {
-          console.error(e);
-          await logoutProcess();
+          setCookie(
+            REFRESH_TOKEN_STORAGE_KEY,
+            data.data.refresh_token,
+            REFRESH_TOKEN_COOKIE_CONFIG,
+          );
         }
+
+        storeRef.current?.setState((state) => ({
+          ...state,
+          is_solana_connected: true,
+        }));
+        return;
+      } catch (e) {
+        console.error(e);
+        await logoutProcess();
       }
     }
   };
