@@ -73,6 +73,7 @@ function WalletConnected({ revalidatePath }: { revalidatePath: Function }) {
                 REFRESH_TOKEN_STORAGE_KEY,
                 REFRESH_TOKEN_COOKIE_CONFIG,
               );
+              sessionStorage.clear();
               revalidatePath(window.location.pathname);
             }}
           >

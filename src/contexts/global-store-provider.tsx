@@ -19,24 +19,30 @@ import {
   REFRESH_TOKEN_STORAGE_KEY,
 } from '@/utils/constants';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
 import { deleteCookie, getCookie, hasCookie, setCookie } from 'cookies-next';
-import { env } from 'env.mjs';
 import { useStore, type StoreApi } from 'zustand';
 
 const GlobalStoreContext = createContext<StoreApi<IGlobalStore> | null>(null);
 
 interface GlobalStoreProviderProps {
   children: ReactNode;
+  revalidatePath: Function;
 }
 
-const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
+const GlobalStoreProvider = ({
+  children,
+  revalidatePath,
+}: GlobalStoreProviderProps) => {
   const pathName = usePathname();
   const storeRef = useRef<StoreApi<IGlobalStore>>();
   if (!storeRef.current) {
     storeRef.current = createGlobalStore;
   }
 
-  const { disconnect, connected, publicKey } = useWallet();
+  const previousWallet = useRef<PublicKey>(null);
+
+  const { disconnect, connected } = useWallet();
 
   useEffect(() => {
     storeRef.current?.setState((state) => ({
@@ -49,18 +55,17 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
     let valildateLoginPolling: any;
     const startValidateLogin = setTimeout(() => {
       valildateLoginPolling = setInterval(async () => {
-        console.error(window?.solana?.publicKey?.toBase58(), 'window');
-        console.error(publicKey?.toBase58(), 'publicKey');
-        if (
-          window?.solana?.publicKey?.toBase58() !== publicKey?.toBase58() &&
-          publicKey
-        ) {
-          console.info((publicKey as any)?.toBase58(), 'publicKey');
-          console.info(window?.solana?.publicKey?.toBase58(), '====');
+        const incomingWallet = window?.solana?.publicKey?.toBase58();
+        if (incomingWallet) {
+          if (
+            previousWallet.current?.toBase58() !== incomingWallet &&
+            previousWallet.current?.toBase58()
+          ) {
+            await logoutProcess();
+          }
 
-          await logoutProcess();
-          clearInterval(valildateLoginPolling);
-          clearTimeout(startValidateLogin);
+          (previousWallet as any).current = new PublicKey(incomingWallet);
+
           return;
         }
 
@@ -69,17 +74,15 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
           hasCookie(REFRESH_TOKEN_STORAGE_KEY)
         ) {
           await logoutProcess();
-          clearInterval(valildateLoginPolling);
-          clearTimeout(startValidateLogin);
         }
       }, 1000);
-    }, 5000);
+    }, 3000);
 
     return () => {
       clearInterval(valildateLoginPolling);
       clearTimeout(startValidateLogin);
     };
-  }, [publicKey]);
+  }, []);
 
   useEffect(() => {
     withStorageDOMEvents(createGlobalStore);
@@ -120,6 +123,8 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
     await disconnect();
     deleteCookie(ACCESS_TOKEN_STORAGE_KEY, ACCESS_TOKEN_COOKIE_CONFIG);
     deleteCookie(REFRESH_TOKEN_STORAGE_KEY, REFRESH_TOKEN_COOKIE_CONFIG);
+    sessionStorage.clear();
+    revalidatePath(pathName);
   };
 
   const checkTokenExpiration = async () => {

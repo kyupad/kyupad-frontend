@@ -1,3 +1,4 @@
+import { revalidateCurrentPath } from '@/actions/common';
 import Header from '@/components/common/header';
 import Ribbon from '@/components/features/ribbon';
 import GlobalStoreProvider from '@/contexts/global-store-provider';
@@ -31,7 +32,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <WalletConnectProvider>
       <SessionStoreProvider>
-        <GlobalStoreProvider>
+        <GlobalStoreProvider revalidatePath={revalidateCurrentPath}>
           <html lang="en">
             <body
               className={cn(
