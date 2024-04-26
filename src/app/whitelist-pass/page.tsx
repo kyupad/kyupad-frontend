@@ -4,14 +4,14 @@ import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import Skeleton from '@/components/common/loading/skeleton';
 import ExclusivePool from '@/components/features/whitelist-pass/exclusive-pool';
-import MyTotalNftMinted from '@/components/features/whitelist-pass/my-total-nft-minted';
+// import MyTotalNftMinted from '@/components/features/whitelist-pass/my-total-nft-minted';
 import SeasonStats from '@/components/features/whitelist-pass/season-stats';
 // import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
 import WhitelistPassTimeline from '@/components/features/whitelist-pass/whitelist-pass-timeline';
 import { cn } from '@/utils/helpers';
 
 import latDecorator from '/public/images/home/last-decorator.svg';
-import whitelist from '/public/images/whitelist/unbox_nft.png';
+import whitelist from '/public/images/whitelist/nft-image.jpg';
 
 const fontHeading = Knewave({
   subsets: ['latin'],
@@ -21,7 +21,7 @@ const fontHeading = Knewave({
 });
 
 export const metadata: Metadata = {
-  title: 'Whitelist NFT',
+  title: 'Mint NFT',
 };
 
 async function Whitelist() {
@@ -41,11 +41,11 @@ async function Whitelist() {
           <div className="flex flex-col gap-12 order-2 items-center sm:items-start lg:order-1">
             <h1 className="leading-tight text-kyu-color-11 flex flex-col gap-3">
               <span className="text-4xl sm:text-5xl xl:text-7xl font-heading">
-                Free Mint
+                NFT Pass Mint Round
               </span>
-              <span className="text-3xl sm:text-4xl xl:text-5xl font-bold">
-                Whitelist Pass NFT
-              </span>
+              {/* <span className="text-3xl sm:text-4xl xl:text-5xl font-bold">
+                Mint Round
+              </span> */}
             </h1>
 
             <div className="min-w-[300px] sm:min-w-[480px]">
@@ -82,7 +82,12 @@ async function Whitelist() {
           </div>
           <div className="flex flex-col gap-14 order-1 lg:order-2">
             <div className="max-w-[426px]">
-              <Image src={whitelist} alt="whitelist" draggable={false} />
+              <Image
+                src={whitelist}
+                className="rounded-[20px]"
+                alt="whitelist"
+                draggable={false}
+              />
             </div>
 
             <Suspense
@@ -99,9 +104,9 @@ async function Whitelist() {
               <SeasonStats />
             </Suspense>
 
-            <Suspense fallback={<Skeleton className="h-2 w-8/12 -mt-10" />}>
+            {/* <Suspense fallback={<Skeleton className="h-2 w-8/12 -mt-10" />}>
               <MyTotalNftMinted />
-            </Suspense>
+            </Suspense> */}
           </div>
         </div>
 

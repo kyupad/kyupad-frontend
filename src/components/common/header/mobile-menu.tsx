@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { revalidateProjectDetail } from '@/actions/project';
 import { WEB_ROUTES } from '@/utils/constants';
+import { env } from 'env.mjs';
 import PrimaryButton from '@components/common/button/primary';
 
 import {
@@ -44,22 +45,24 @@ function MobileMenu({
           <div className="grid gap-8 py-4">
             <nav className="flex gap-8 text-xl flex-col">
               <Link href={WEB_ROUTES.WHITELIST_PASS} className="relative group">
-                Whitelist NFT
+                Mint NFT
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link>
-              <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
+              {/* <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
                 My Space
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-              </Link>
+              </Link> */}
               {/* <Link href={WEB_ROUTES.HOME} className="relative group">
                 Catnip Points
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link> */}
               <Link
-                href={WEB_ROUTES.HOW_TO_JOIN_OUR_IDOS}
+                target="_blank"
+                href={env.NEXT_PUBLIC_DOCS_URL}
                 className="relative group"
+                rel="noreferrer noopener"
               >
-                How to join our IDOs
+                About KyuPad
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link>
             </nav>

@@ -1,8 +1,10 @@
 import React, { Suspense } from 'react';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 import PrimaryButton from '@/components/common/button/primary';
 import Pool from '@/components/features/landing/pool';
+import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 
 import catBanner from '/public/images/home/cat-banner.png';
@@ -21,6 +23,7 @@ const fontHeading = Knewave({
 });
 
 const Home = async () => {
+  redirect(WEB_ROUTES.WHITELIST_PASS);
   return (
     <>
       <Image

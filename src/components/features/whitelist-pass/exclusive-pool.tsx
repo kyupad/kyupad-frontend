@@ -101,7 +101,7 @@ function ExclusivePool() {
         setActivePool([
           ...(data?.data?.community_round?.active_pools || []),
           {
-            pool_name: 'More Communities announced soon.',
+            pool_name: 'Coming Soon',
           },
         ]);
       }
@@ -464,7 +464,7 @@ function ExclusivePool() {
     <div className="w-full flex flex-col gap-6">
       <div className="flex items-center gap-5 justify-between w-full flex-wrap">
         <h2 className="font-heading text-3xl sm:text-4xl xl:text-5xl">
-          Community Exclusive Pools
+          Mint Pools
         </h2>
         <button
           onClick={() => handleSetOpen(open)}
@@ -492,18 +492,20 @@ function ExclusivePool() {
         >
           <ul className="list-disc pl-7">
             <li>
-              To be eligible for the NFT Minting, you need to be a part of one
-              of our partnered communities. A list of whitelisted addresses
-              eligible for minting will be released prior to the mint date.
+              {'To be eligible for the NFT Minting, you need to become'}{' '}
+              <b>a member of our partnered communities on Solana</b> {'or'}{' '}
+              <b>join our events on X & Discord to be KyuPad contributors</b>.
             </li>
             <li>
-              Each wallet is permitted to mint a maximum of two NFTs, regardless
-              of eligibility for additional minting rounds or membership in more
-              than two partnered communities.
+              {" Details on partnered communities & each round's"}{' '}
+              <b>eligibility mechanism</b> {'will be publicly '}
+              <b>announced before mint date</b>.
             </li>
             <li>
-              Details on upcoming partnered communities will be announced
-              through our official channels soon.
+              {'Each wallet can mint'} <b>up to 2 NFTs</b>,{' '}
+              {
+                'regardless of eligibility for additional minting rounds or membership in more than 2 partnered communities.'
+              }
             </li>
           </ul>
         </div>
@@ -515,7 +517,7 @@ function ExclusivePool() {
             if (!pool?.pool_id) {
               return (
                 <span
-                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap"
+                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400"
                   key={index}
                 >
                   {pool?.pool_name}
@@ -579,7 +581,7 @@ function ExclusivePool() {
             <span className="text-xl font-bold">
               {currentPool?.pool_name || ''}{' '}
               {dayjs.utc(currentPool?.start_time).isBefore(now)
-                ? 'time left:'
+                ? 'ends in:'
                 : 'starts in:'}
             </span>
           )}
@@ -606,13 +608,16 @@ function ExclusivePool() {
             {loadingPool || !poolId ? (
               <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
             ) : (
-              <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-                {isSolanaConnected
-                  ? (currentPool?.minted_total || 0) -
-                    (currentPool?.user_pool_minted_total || 0) +
-                    (poolsCounter[poolCounterKey] || 0)
-                  : currentPool?.minted_total}
-              </span>
+              <>
+                <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
+                  <span className="text-kyu-color-14">{'Minted: '}</span>
+                  {isSolanaConnected
+                    ? (currentPool?.minted_total || 0) -
+                      (currentPool?.user_pool_minted_total || 0) +
+                      (poolsCounter[poolCounterKey] || 0)
+                    : currentPool?.minted_total}
+                </span>
+              </>
             )}
             {loadingPool || !poolId ? (
               <Skeleton className="h-2" />
@@ -639,7 +644,7 @@ function ExclusivePool() {
               <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
             ) : (
               <span className="absolute right-0 -top-8">
-                <span className="text-kyu-color-14 font-medium">Total</span>{' '}
+                <span className="text-kyu-color-14 font-medium">Total:</span>{' '}
                 <span className="font-bold text-kyu-color-11">
                   {currentPool?.pool_supply || 0}
                 </span>
