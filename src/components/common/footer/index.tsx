@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { WEB_ROUTES } from '@/utils/constants';
+
+// import { WEB_ROUTES } from '@/utils/constants';
 
 import discord from '/public/images/footer/discord.svg';
 import logoFooter from '/public/images/footer/logo-footer.svg';
@@ -18,15 +19,15 @@ function Footer() {
           </div>
 
           <div className="flex gap-5 sm:text-xl xl:gap-[60px] flex-wrap justify-center">
-            <Link href={WEB_ROUTES.FAQ} className="relative group">
+            <Link href={'#'} className="relative group">
               FAQ
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
             </Link>
-            <Link href={WEB_ROUTES.PERFORMANCE} className="group relative">
+            <Link href={'#'} className="group relative">
               Performance
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
             </Link>
-            <Link href={WEB_ROUTES.TERMS} className="group relative">
+            <Link href={'#'} className="group relative">
               Terms & Conditions
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
             </Link>

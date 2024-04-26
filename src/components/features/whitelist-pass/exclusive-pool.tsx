@@ -418,7 +418,7 @@ function ExclusivePool() {
           skipPreflight: process.env.NODE_ENV === 'development',
           maxRetries:
             process.env.NODE_ENV !== 'development'
-              ? env.NEXT_PUBLIC_MAX_RETRIES_ONCHAIN || 30
+              ? Number(env.NEXT_PUBLIC_MAX_RETRIES_ONCHAIN) || 30
               : 0,
         },
       );

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use client';
 
 import {
@@ -47,9 +48,17 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
   useEffect(() => {
     let valildateLoginPolling: any;
     const startValidateLogin = setTimeout(() => {
-      valildateLoginPolling = setInterval(() => {
-        if (window?.solana?.publicKey?.toBase58() !== publicKey?.toBase58()) {
-          logoutProcess();
+      valildateLoginPolling = setInterval(async () => {
+        console.error(window?.solana?.publicKey?.toBase58(), 'window');
+        console.error(publicKey?.toBase58(), 'publicKey');
+        if (
+          window?.solana?.publicKey?.toBase58() !== publicKey?.toBase58() &&
+          publicKey
+        ) {
+          console.info((publicKey as any)?.toBase58(), 'publicKey');
+          console.info(window?.solana?.publicKey?.toBase58(), '====');
+
+          await logoutProcess();
           clearInterval(valildateLoginPolling);
           clearTimeout(startValidateLogin);
           return;
@@ -59,7 +68,7 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
           !window?.solana?.isConnected &&
           hasCookie(REFRESH_TOKEN_STORAGE_KEY)
         ) {
-          logoutProcess();
+          await logoutProcess();
           clearInterval(valildateLoginPolling);
           clearTimeout(startValidateLogin);
         }
@@ -109,12 +118,8 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
     }));
 
     await disconnect();
-    deleteCookie(ACCESS_TOKEN_STORAGE_KEY, {
-      domain: env.NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN,
-    });
-    deleteCookie(REFRESH_TOKEN_STORAGE_KEY, {
-      domain: env.NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN,
-    });
+    deleteCookie(ACCESS_TOKEN_STORAGE_KEY, ACCESS_TOKEN_COOKIE_CONFIG);
+    deleteCookie(REFRESH_TOKEN_STORAGE_KEY, REFRESH_TOKEN_COOKIE_CONFIG);
   };
 
   const checkTokenExpiration = async () => {
