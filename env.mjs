@@ -14,7 +14,7 @@ const env = createEnv({
     ]),
     NEXT_PUBLIC_BASE_URL: z.string().min(1).includes('http'),
     NEXT_PUBLIC_NETWORK: z.union([
-      z.literal('mainnet-beta'),
+      z.literal('mainnet'),
       z.literal('testnet'),
       z.literal('devnet'),
     ]),
