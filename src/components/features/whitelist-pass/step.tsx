@@ -47,10 +47,14 @@ function WhitelistPassStep({
                   {item?.title || ''}
                 </h2>
 
-                <span>
-                  {dayjs.utc(item?.start).format(UTC_FORMAT_STRING)} -{' '}
-                  {dayjs.utc(item?.end).format(UTC_FORMAT_STRING)}
-                </span>
+                {item?.start && item?.end ? (
+                  <span>
+                    {dayjs.utc(item?.start).format(UTC_FORMAT_STRING)} -{' '}
+                    {dayjs.utc(item?.end).format(UTC_FORMAT_STRING)}
+                  </span>
+                ) : (
+                  <span>Coming Soon</span>
+                )}
               </div>
             ))}
           </div>
@@ -76,15 +80,25 @@ function WhitelistPassStep({
               >
                 {data?.map((item) => (
                   <div key={item.step} className="bg-kyu-color-12 min-w-[32px]">
-                    {dayjs.utc(item.start).isBefore(now) &&
-                      dayjs.utc(item.end).isAfter(now) && (
-                        <Image src={currentStep} alt="step" draggable={false} />
-                      )}
-                    {dayjs.utc(item.start).isAfter(now) && (
+                    {item?.start && item?.end ? (
+                      <>
+                        {dayjs.utc(item.start).isBefore(now) &&
+                          dayjs.utc(item.end).isAfter(now) && (
+                            <Image
+                              src={currentStep}
+                              alt="step"
+                              draggable={false}
+                            />
+                          )}
+                        {dayjs.utc(item.start).isAfter(now) && (
+                          <Image src={step} alt="step" draggable={false} />
+                        )}
+                        {dayjs.utc(item.end).isBefore(now) && (
+                          <Image src={stepDone} alt="step" draggable={false} />
+                        )}
+                      </>
+                    ) : (
                       <Image src={step} alt="step" draggable={false} />
-                    )}
-                    {dayjs.utc(item.end).isBefore(now) && (
-                      <Image src={stepDone} alt="step" draggable={false} />
                     )}
                   </div>
                 ))}

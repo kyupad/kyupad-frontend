@@ -27,6 +27,7 @@ const env = createEnv({
     NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN: z.string().min(1),
     NEXT_PUBLIC_MPL_BUBBLEGUM_PROGRAM_ID: z.string().min(1),
     NEXT_PUBLIC_MAX_RETRIES_ONCHAIN: z.string().nullish(),
+    NEXT_PUBLIC_DOCS_URL: z.string().min(1).includes('http'),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -47,6 +48,7 @@ const env = createEnv({
       process.env.NEXT_PUBLIC_MPL_BUBBLEGUM_PROGRAM_ID,
     NEXT_PUBLIC_MAX_RETRIES_ONCHAIN:
       process.env.NEXT_PUBLIC_MAX_RETRIES_ONCHAIN,
+    NEXT_PUBLIC_DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL,
   },
 });
 

@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
+import { env } from 'env.mjs';
 
 function DesktopMenu() {
   const pathName = usePathname();
   return (
     <nav className="flex gap-8 text-xl">
       <Link href={WEB_ROUTES.WHITELIST_PASS} className="relative group">
-        Whitelist NFT
+        Mint NFT
         <span
           className={cn(
             'absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full',
@@ -19,7 +20,7 @@ function DesktopMenu() {
           )}
         ></span>
       </Link>
-      <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
+      {/* <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
         My Space
         <span
           className={cn(
@@ -27,7 +28,7 @@ function DesktopMenu() {
             pathName === WEB_ROUTES.MY_SPACE ? 'w-full' : '',
           )}
         ></span>
-      </Link>
+      </Link> */}
       {/* <Link href={WEB_ROUTES.CATNIP_POINTS} className="relative group">
         Catnip Points
         <span
@@ -37,12 +38,16 @@ function DesktopMenu() {
           )}
         ></span>
       </Link> */}
-      <Link href={WEB_ROUTES.HOW_TO_JOIN_OUR_IDOS} className="relative group">
-        How to join our IDOs
+      <Link
+        href={env.NEXT_PUBLIC_DOCS_URL}
+        target="_blank"
+        className="relative group"
+        rel="noreferrer noopener"
+      >
+        About KyuPad
         <span
           className={cn(
             'absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full',
-            pathName === WEB_ROUTES.HOW_TO_JOIN_OUR_IDOS ? 'w-full' : '',
           )}
         ></span>
       </Link>

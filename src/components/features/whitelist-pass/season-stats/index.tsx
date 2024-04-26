@@ -13,7 +13,7 @@ async function SeasonStats() {
       />
 
       <span className="absolute right-0 -top-8">
-        <span className="text-kyu-color-14 font-medium">Total</span>{' '}
+        <span className="text-kyu-color-14 font-medium">Total:</span>{' '}
         <span className="font-bold text-kyu-color-11">
           {data?.data?.season?.total || 0}
         </span>
