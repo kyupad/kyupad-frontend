@@ -25,6 +25,7 @@ function SeasonStatsClient({
   return (
     <>
       <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
+        <span className="text-kyu-color-14 font-medium">Minted:</span>{' '}
         {seasonMinted}
       </span>
       <Progress

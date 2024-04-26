@@ -35,7 +35,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import dropdown from 'public/images/whitelist/drop-down.svg';
-import moreArrow from 'public/images/whitelist/more-arrow.svg';
+// import moreArrow from 'public/images/whitelist/more-arrow.svg';
 import { toast } from 'sonner';
 import { decrypt } from '@utils/helpers';
 
@@ -57,6 +57,8 @@ function ExclusivePool() {
   const [merkleTree, SetMerkleTree] = useState<PublicKey>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingPool, setLoadingPool] = useState<boolean>(false);
+  const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<number>();
+  const [creators, setCreators] = useState<any[]>([]);
   const {
     poolsCounter,
     updatePoolCounter,
@@ -120,6 +122,14 @@ function ExclusivePool() {
 
       if (data?.data?.lookup_table_address) {
         setLookupTableAddress(new PublicKey(data?.data?.lookup_table_address));
+      }
+
+      if (data?.data?.seller_fee_basis_points) {
+        setSellerFeeBasisPoints(data?.data?.seller_fee_basis_points);
+      }
+
+      if (data?.data?.creators) {
+        setCreators(data?.data?.creators);
       }
 
       setLoadingPool(false);
@@ -191,6 +201,16 @@ function ExclusivePool() {
       return;
     }
 
+    if (!sellerFeeBasisPoints) {
+      console.error('Seller fee basis points not found');
+      return;
+    }
+
+    if (!creators) {
+      console.error('Creators not found');
+      return;
+    }
+
     handleSetIsLoading(true);
 
     try {
@@ -248,14 +268,14 @@ function ExclusivePool() {
       const nftArgs: MetadataArgsArgs = {
         name: currentPool.pool_name,
         symbol: currentPool.pool_symbol,
-        creators: [],
+        creators: creators,
         uri: '',
         editionNonce: 253,
         tokenProgramVersion: TokenProgramVersion.Original,
         tokenStandard: TokenStandard.NonFungible,
         uses: null,
         primarySaleHappened: false,
-        sellerFeeBasisPoints: 0,
+        sellerFeeBasisPoints: sellerFeeBasisPoints,
         isMutable: false,
         collection: {
           verified: false,
@@ -555,7 +575,7 @@ function ExclusivePool() {
               </>
             ))}
         </div>
-        <Image src={moreArrow} alt="more" className="absolute right-0 top-0" />
+        {/* <Image src={moreArrow} alt="more" className="absolute right-0 top-0" /> */}
       </div>
 
       <div className="flex p-10 bg-kyu-color-16 rounded-[16px] justify-center gap-10 items-center flex-col lg:flex-row">
@@ -609,13 +629,15 @@ function ExclusivePool() {
               <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
             ) : (
               <>
-                <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
+                <span className="absolute left-0 -top-8">
                   <span className="text-kyu-color-14">{'Minted: '}</span>
-                  {isSolanaConnected
-                    ? (currentPool?.minted_total || 0) -
-                      (currentPool?.user_pool_minted_total || 0) +
-                      (poolsCounter[poolCounterKey] || 0)
-                    : currentPool?.minted_total}
+                  <span className="font-bold text-kyu-color-11">
+                    {isSolanaConnected
+                      ? (currentPool?.minted_total || 0) -
+                        (currentPool?.user_pool_minted_total || 0) +
+                        (poolsCounter[poolCounterKey] || 0)
+                      : currentPool?.minted_total}
+                  </span>
                 </span>
               </>
             )}
