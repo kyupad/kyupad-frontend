@@ -12,6 +12,7 @@ import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
 import Skeleton from '@/components/common/loading/skeleton';
 import { Progress } from '@/components/common/progress/progress';
+import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useSessionStore } from '@/contexts/session-store-provider';
 import { cn } from '@/utils/helpers';
 import { Program } from '@coral-xyz/anchor';
@@ -58,6 +59,8 @@ function ExclusivePool() {
   const [loadingPool, setLoadingPool] = useState<boolean>(false);
   const { poolsCounter, updatePoolCounter } = useSessionStore((state) => state);
   const [lookupTableAddress, setLookupTableAddress] = useState<PublicKey>();
+  const poolId = currentPoolId || currentPool?.pool_id;
+  const poolCounterKey = `${poolId}_${publicKey?.toBase58()}`;
 
   const { connection } = useConnection();
 
@@ -128,6 +131,27 @@ function ExclusivePool() {
     };
   }, [currentPoolId, publicKey]);
 
+  useEffect(() => {
+    if (publicKey && poolId && poolId === currentPool?.pool_id) {
+      const currentCounter = poolsCounter[poolCounterKey] || 0;
+
+      if (currentPool?.user_pool_minted_total > currentCounter) {
+        updatePoolCounter(
+          poolCounterKey,
+          currentPool?.user_pool_minted_total || 0,
+        );
+      }
+    }
+  }, [
+    currentPool?.pool_id,
+    currentPool?.user_pool_minted_total,
+    poolCounterKey,
+    poolId,
+    poolsCounter,
+    publicKey,
+    updatePoolCounter,
+  ]);
+
   const handleMint = async () => {
     if (!publicKey) {
       toast.warning('Please connect to wallet first!', {
@@ -142,7 +166,7 @@ function ExclusivePool() {
       return;
     }
 
-    if (!currentPoolId && !currentPool?.pool_id) {
+    if (!poolId) {
       console.error('Current pool id not found');
       return;
     }
@@ -233,7 +257,7 @@ function ExclusivePool() {
         name: nftArgs.name,
         symbol: nftArgs.symbol as string,
         seller_fee_basis_points: nftArgs.sellerFeeBasisPoints,
-        id: currentPoolId || currentPool?.pool_id,
+        id: poolId,
       });
 
       nftArgs.uri = cnftMetadata.data?.url;
@@ -257,18 +281,14 @@ function ExclusivePool() {
       );
 
       const [poolMinted] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from('pool_minted'),
-          poolsPDA.toBuffer(),
-          Buffer.from(currentPoolId || currentPool?.pool_id),
-        ],
+        [Buffer.from('pool_minted'), poolsPDA.toBuffer(), Buffer.from(poolId)],
         program.programId,
       );
 
       const [mintCounter] = PublicKey.findProgramAddressSync(
         [
           Buffer.from('mint_counter'),
-          Buffer.from(currentPoolId || currentPool?.pool_id),
+          Buffer.from(poolId),
           publicKey.toBuffer(),
           poolsPDA.toBuffer(),
         ],
@@ -325,7 +345,7 @@ function ExclusivePool() {
       const mintCnftInstruction = await program.methods
         .mintCnft(
           merkleProofDecodedParsedArray,
-          currentPoolId || currentPool?.pool_id,
+          poolId,
           Buffer.from(data) as Buffer,
         )
         .accounts({
@@ -366,6 +386,10 @@ function ExclusivePool() {
         signature.serialize(),
         {
           skipPreflight: process.env.NODE_ENV === 'development',
+          maxRetries:
+            process.env.NODE_ENV !== 'development'
+              ? env.NEXT_PUBLIC_MAX_RETRIES_ONCHAIN || 30
+              : 0,
         },
       );
 
@@ -384,13 +408,13 @@ function ExclusivePool() {
 
       await doSyncNftbySignature({
         id: cnftMetadata?.data?.id,
-        pool_id: currentPoolId || currentPool?.pool_id,
+        pool_id: poolId,
         signature: signatured,
       });
 
       updatePoolCounter(
-        currentPoolId || currentPool?.pool_id,
-        (poolsCounter[currentPoolId || currentPool?.pool_id] || 0) + 1,
+        poolCounterKey,
+        (poolsCounter[poolCounterKey] || 0) + 1,
       );
 
       toast.success(
@@ -420,6 +444,10 @@ function ExclusivePool() {
   };
 
   const now = dayjs.utc();
+
+  const isSolanaConnected = useGlobalStore(
+    (state) => state.is_solana_connected,
+  );
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -564,25 +592,31 @@ function ExclusivePool() {
           </div>
 
           <div className="relative mt-6">
-            {loadingPool || (!currentPoolId && !currentPool?.pool_id) ? (
+            {loadingPool || !poolId ? (
               <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
             ) : (
               <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-                {(currentPool?.minted_total || 0) +
-                  (poolsCounter[currentPoolId || currentPool?.pool_id] || 0)}
+                {isSolanaConnected
+                  ? (currentPool?.minted_total || 0) -
+                    (currentPool?.user_pool_minted_total || 0) +
+                    (poolsCounter[poolCounterKey] || 0)
+                  : currentPool?.minted_total}
               </span>
             )}
-            {loadingPool || (!currentPoolId && !currentPool?.pool_id) ? (
+            {loadingPool || !poolId ? (
               <Skeleton className="h-2" />
             ) : (
               <Progress
                 value={
                   (currentPool?.minted_total || 0) +
-                    (poolsCounter[currentPoolId || currentPool?.pool_id] || 0) >
+                    (isSolanaConnected
+                      ? poolsCounter[poolCounterKey] || 0
+                      : 0) >
                     0 && currentPool?.pool_supply > 0
                     ? (((currentPool?.minted_total || 0) +
-                        (poolsCounter[currentPoolId || currentPool?.pool_id] ||
-                          0)) /
+                        (isSolanaConnected
+                          ? poolsCounter[poolCounterKey] || 0
+                          : 0)) /
                         currentPool?.pool_supply) *
                       100
                     : 0
@@ -601,22 +635,23 @@ function ExclusivePool() {
               </span>
             )}
           </div>
-          {loadingPool || (!currentPoolId && !currentPool?.pool_id) ? (
+          {loadingPool || !poolId ? (
             <Skeleton className="h-[48px]" />
           ) : (
             <PrimaryButton
               loading={isLoading}
               disabled={
                 !currentPool?.is_active ||
-                poolsCounter[currentPoolId || currentPool?.pool_id] ||
+                poolsCounter[poolCounterKey] ||
                 !(
                   dayjs.utc(currentPool?.start_time).isBefore(now) &&
                   dayjs.utc(currentPool?.end_time).isAfter(now)
-                )
+                ) ||
+                currentPool?.is_minted
               }
               onClick={handleMint}
             >
-              {!poolsCounter[currentPoolId || currentPool?.pool_id] && (
+              {!poolsCounter[poolCounterKey] && !currentPool?.is_minted && (
                 <>
                   {currentPool?.is_active &&
                   dayjs.utc(currentPool?.start_time).isBefore(now) &&
@@ -626,7 +661,7 @@ function ExclusivePool() {
                 </>
               )}
 
-              {poolsCounter[currentPoolId || currentPool?.pool_id] && (
+              {(poolsCounter[poolCounterKey] || currentPool?.is_minted) && (
                 <>Minted</>
               )}
             </PrimaryButton>

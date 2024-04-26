@@ -8,6 +8,7 @@ const API_ROUTES = {
   GENERATE_CFNT_METADATA: '/v1/nft/metadata',
   GET_SEASON_ACTIVE: '/v1/seasons/active',
   SYNC_NFT_BY_SIGNATURE: '/v1/nft/sync-nft-by-signature',
+  REFRESH: '/v1/auth/refresh',
 };
 
 const WEB_ROUTES = {
