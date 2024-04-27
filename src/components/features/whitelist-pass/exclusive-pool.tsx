@@ -538,14 +538,15 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             View transaction
           </a>
         </div>,
-
         {
           position: 'top-right',
           closeButton: true,
         },
       );
     } catch (error) {
+      console.error(JSON.stringify(error), 'error');
       console.error(error, 'error');
+      console.error((error as any)?.message, 'error');
     } finally {
       handleSetIsLoading(false);
     }

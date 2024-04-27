@@ -10,7 +10,7 @@ import {
   // CoinbaseWalletAdapter,
   // MathWalletAdapter,
   PhantomWalletAdapter,
-  SolflareWalletAdapter,
+  // SolflareWalletAdapter,
   // SpotWalletAdapter,
   // TorusWalletAdapter,
   // TrustWalletAdapter,
@@ -21,7 +21,7 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
+      // new SolflareWalletAdapter(),
       // new Coin98WalletAdapter(),
       // new TrustWalletAdapter(),
       // new TorusWalletAdapter(),

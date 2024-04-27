@@ -29,7 +29,7 @@ function WalletNotConnect({
   signin: Function;
 }) {
   const [open, setOpen] = useState<boolean>(false);
-  const { wallets, select, disconnect } = useWallet();
+  const { wallets, select } = useWallet();
 
   const handleOpen = useCallback((value: boolean) => {
     setOpen(value);
@@ -42,7 +42,6 @@ function WalletNotConnect({
       <PrimaryButton
         className="min-h-[52px] w-[220px] flex items-center justify-center text-xl"
         onClick={() => {
-          disconnect();
           handleOpen(!open);
         }}
         loading={loading}
@@ -75,7 +74,11 @@ function WalletNotConnect({
             <div className="flex flex-col">
               {wallets
                 .filter((wl) =>
-                  ['Phantom', 'Backpack', 'Solflare'].includes(wl.adapter.name),
+                  [
+                    'Phantom',
+                    'Backpack',
+                    // 'Solflare'
+                  ].includes(wl.adapter.name),
                 )
                 .map((wl) => {
                   return (
