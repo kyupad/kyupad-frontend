@@ -689,19 +689,21 @@ function ExclusivePool() {
               }
               onClick={handleMint}
             >
-              {!poolsCounter[poolCounterKey] && !currentPool?.is_minted && (
-                <>
-                  {currentPool?.is_active &&
-                  dayjs.utc(currentPool?.start_time).isBefore(now) &&
-                  dayjs.utc(currentPool?.end_time).isAfter(now)
-                    ? 'Free Mint'
-                    : 'Not eligible'}
-                </>
-              )}
+              {!poolsCounter[poolCounterKey] &&
+                poolsCounter[poolCounterKey] !== 0 &&
+                !currentPool?.is_minted && (
+                  <>
+                    {currentPool?.is_active &&
+                    dayjs.utc(currentPool?.start_time).isBefore(now) &&
+                    dayjs.utc(currentPool?.end_time).isAfter(now)
+                      ? 'Free Mint'
+                      : 'Not eligible'}
+                  </>
+                )}
 
-              {(poolsCounter[poolCounterKey] || currentPool?.is_minted) && (
-                <>Minted</>
-              )}
+              {((poolsCounter[poolCounterKey] &&
+                poolsCounter[poolCounterKey] > 0) ||
+                currentPool?.is_minted) && <>Minted</>}
             </PrimaryButton>
           )}
         </div>
