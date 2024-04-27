@@ -8,7 +8,7 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { doRefreshToken } from '@/adapters/auth';
 import { createGlobalStore, withStorageDOMEvents } from '@/stores';
 import type { IGlobalStore } from '@/stores';
@@ -40,6 +40,7 @@ const GlobalStoreProvider = ({
   if (!storeRef.current) {
     storeRef.current = createGlobalStore;
   }
+  const router = useRouter();
 
   const { disconnect, connected, wallet } = useWallet();
 
@@ -69,6 +70,10 @@ const GlobalStoreProvider = ({
             break;
           default:
             break;
+        }
+
+        if (!incomingWallet) {
+          // router.refresh();
         }
 
         if (incomingWallet && accessToken) {

@@ -29,10 +29,12 @@ import {
 import { publicKey as publicKeyFn } from '@metaplex-foundation/umi';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import {
+  ComputeBudgetProgram,
   PublicKey,
   TransactionMessage,
   VersionedTransaction,
 } from '@solana/web3.js';
+import base58 from 'bs58';
 import { getCookie } from 'cookies-next';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -158,12 +160,6 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   }, [currentPoolId, publicKey]);
 
   useEffect(() => {
-    console.debug('poolsCounter', poolsCounter);
-    console.debug(publicKey?.toBase58(), 'publicKey');
-    console.debug(poolId, 'poolid');
-    console.debug(currentPool?.pool_id, 'currentPool id');
-    console.debug(currentPool?.user_pool_minted_total, 'currentPool minted');
-    console.debug(currentPool, 'current pool');
     if (publicKey && poolId && poolId === currentPool?.pool_id) {
       const currentCounter = poolsCounter[poolCounterKey] || 0;
 
@@ -431,10 +427,24 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         .remainingAccounts(remainingAccounts)
         .instruction();
 
+      // const estimatedComputeUnits = 1_000_000;
+      const additionalFeeInLamports = 100000;
+
+      const setComputeUnitPriceIx = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: additionalFeeInLamports,
+      });
+      // const setComputeUnitLimitIx = ComputeBudgetProgram.setComputeUnitLimit({
+      //   units: estimatedComputeUnits,
+      // });
+
       const messageV0 = new TransactionMessage({
         payerKey: publicKey,
         recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
-        instructions: [mintCnftInstruction],
+        instructions: [
+          setComputeUnitPriceIx,
+          mintCnftInstruction,
+          // setComputeUnitLimitIx,
+        ],
       }).compileToV0Message([lookupTableAccount!]);
 
       const transactionV0 = new VersionedTransaction(messageV0);
@@ -442,6 +452,8 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       const signature = await (wallet?.adapter as any)?.signTransaction(
         transactionV0,
       );
+
+      const signatureEncode = base58.encode(signature?.signatures?.[0]);
 
       const blockhash =
         await connection.getLatestBlockhashAndContext('confirmed');
@@ -457,9 +469,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       const waitToRetry = () =>
         new Promise((resolve) => setTimeout(resolve, 2000));
 
-      const numTry = 10;
-
-      let signatured: string | null = null;
+      const numTry = 30;
       for (let i = 0; i < numTry; i++) {
         // check transaction TTL
         const blockHeight = await connection.getBlockHeight('confirmed');
@@ -474,47 +484,41 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
           throw new Error('Network too busy. Please try again!');
         }
 
-        signatured = await connection?.sendRawTransaction(
-          signature.serialize(),
-          {
-            skipPreflight: process.env.NODE_ENV === 'development',
-            maxRetries: 0,
-          },
-        );
+        await connection?.sendRawTransaction(signature.serialize(), {
+          skipPreflight: process.env.NODE_ENV === 'development',
+          maxRetries: 0,
+        });
 
         await waitToConfirm();
 
-        const latestBlockHash = await connection.getLatestBlockhash();
+        const sigStatus = await connection.getSignatureStatus(signatureEncode);
 
-        const confirmed = await connection.confirmTransaction({
-          signature: signatured,
-          blockhash: latestBlockHash.blockhash,
-          lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-        });
+        if (sigStatus.value?.err) {
+          console.error(JSON.stringify(sigStatus.value?.err));
+          toast.error(
+            <div className="text-xl">
+              Transaction failed. Please try again!
+            </div>,
+            {
+              position: 'top-right',
+              closeButton: true,
+            },
+          );
+          throw new Error(
+            sigStatus.value?.err?.toString() || 'Transaction failed',
+          );
+        }
 
-        if (!confirmed?.value?.err) {
+        if (sigStatus.value?.confirmationStatus === 'confirmed') {
           break;
         }
 
         await waitToRetry();
       }
-
-      if (!signatured) {
-        console.error('Transaction failed');
-        toast.error(
-          <div className="text-xl">Transaction failed. Please try again!</div>,
-          {
-            position: 'top-right',
-            closeButton: true,
-          },
-        );
-        throw new Error('Transaction failed');
-      }
-
       await doSyncNftbySignature({
         id: cnftMetadata?.data?.id,
         pool_id: poolId,
-        signature: signatured,
+        signature: signatureEncode,
       });
 
       updatePoolCounter(
@@ -530,7 +534,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
           Minted successfully. Please check the wallet!
           <br />
           <a
-            href={`https://explorer.solana.com/tx/${signatured}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
+            href={`https://explorer.solana.com/tx/${signatureEncode}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
             target="_blank"
             rel="noreferrer noopener"
             className="underline"
@@ -544,9 +548,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         },
       );
     } catch (error) {
-      console.error(JSON.stringify(error), 'error');
-      console.error(error, 'error');
-      console.error((error as any)?.message, 'error');
+      console.error(JSON.stringify(error));
     } finally {
       handleSetIsLoading(false);
     }
