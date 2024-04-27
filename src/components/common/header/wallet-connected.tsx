@@ -63,8 +63,6 @@ function WalletConnected({ revalidatePath }: { revalidatePath: Function }) {
           <DropdownMenuItem
             className="flex justify-center cursor-pointer"
             onClick={async () => {
-              changeSolanaConnection(false);
-              await disconnect();
               deleteCookie(
                 ACCESS_TOKEN_STORAGE_KEY,
                 ACCESS_TOKEN_COOKIE_CONFIG,
@@ -74,6 +72,8 @@ function WalletConnected({ revalidatePath }: { revalidatePath: Function }) {
                 REFRESH_TOKEN_COOKIE_CONFIG,
               );
               sessionStorage.clear();
+              await disconnect();
+              changeSolanaConnection(false);
               revalidatePath(window.location.pathname);
             }}
           >

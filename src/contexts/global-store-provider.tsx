@@ -124,15 +124,14 @@ const GlobalStoreProvider = ({
   }, [pathName]);
 
   const logoutProcess = async () => {
+    deleteCookie(ACCESS_TOKEN_STORAGE_KEY, ACCESS_TOKEN_COOKIE_CONFIG);
+    deleteCookie(REFRESH_TOKEN_STORAGE_KEY, REFRESH_TOKEN_COOKIE_CONFIG);
+    sessionStorage.clear();
+    await disconnect();
     storeRef.current?.setState((state) => ({
       ...state,
       is_solana_connected: false,
     }));
-
-    await disconnect();
-    deleteCookie(ACCESS_TOKEN_STORAGE_KEY, ACCESS_TOKEN_COOKIE_CONFIG);
-    deleteCookie(REFRESH_TOKEN_STORAGE_KEY, REFRESH_TOKEN_COOKIE_CONFIG);
-    sessionStorage.clear();
     revalidatePath(pathName);
   };
 
