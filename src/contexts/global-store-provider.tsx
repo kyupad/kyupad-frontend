@@ -53,7 +53,9 @@ const GlobalStoreProvider = ({
   useEffect(() => {
     let valildateLoginPolling: any;
     const startValidateLogin = setTimeout(() => {
+      console.info('startValidateLogin');
       valildateLoginPolling = setInterval(async () => {
+        console.info('valildateLoginPolling');
         const walletName = wallet?.adapter.name;
         const accessToken = getCookie(ACCESS_TOKEN_STORAGE_KEY);
         let isConnected = true;
@@ -74,16 +76,19 @@ const GlobalStoreProvider = ({
         if (incomingWallet && accessToken) {
           const tokenDecoded = jsonwebtoken.decode(accessToken);
           console.info('incomingWallet', incomingWallet);
-          console.info('previousWallet', tokenDecoded?.sub);
+          console.info('previousWallet', tokenDecoded?.sub, tokenDecoded);
 
           if (tokenDecoded?.sub !== incomingWallet) {
+            console.info('wallet changed');
             await logoutProcess();
           }
 
+          console.info('wallet not changed');
           return;
         }
 
         if (!isConnected && hasCookie(REFRESH_TOKEN_STORAGE_KEY)) {
+          console.info('wallet not connected');
           await logoutProcess();
         }
       }, 1000);
