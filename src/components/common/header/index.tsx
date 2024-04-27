@@ -10,6 +10,8 @@ import { WEB_ROUTES } from '@/utils/constants';
 import Skeleton from '../loading/skeleton';
 import DesktopMenu from './desktop-menu';
 import MobileMenu from './mobile-menu';
+import discord from '/public/images/footer/discord.svg';
+import x from '/public/images/footer/x.svg';
 import kyupadLogo from '/public/images/header/kyupad-logo.svg';
 
 const WalletConnect = dynamic(() => import('./wallet-connect'), {
@@ -40,6 +42,22 @@ const Header = () => {
           setCookie={setCookie}
           revalidatePath={revalidateCurrentPath}
         />
+        <div className="flex gap-3">
+          <a
+            href="https://t.co/KjXOnvARym"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <Image src={discord} alt="Discord" />
+          </a>
+          <a
+            href="https://twitter.com/Kyupad_"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <Image src={x} alt="X" />
+          </a>
+        </div>
       </div>
     </header>
   );

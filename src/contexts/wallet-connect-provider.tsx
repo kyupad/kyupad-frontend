@@ -6,14 +6,14 @@ import {
   WalletProvider,
 } from '@solana/wallet-adapter-react';
 import {
-  Coin98WalletAdapter,
-  CoinbaseWalletAdapter,
-  MathWalletAdapter,
+  // Coin98WalletAdapter,
+  // CoinbaseWalletAdapter,
+  // MathWalletAdapter,
   PhantomWalletAdapter,
   SolflareWalletAdapter,
-  SpotWalletAdapter,
-  TorusWalletAdapter,
-  TrustWalletAdapter,
+  // SpotWalletAdapter,
+  // TorusWalletAdapter,
+  // TrustWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 import { env } from 'env.mjs';
 
@@ -22,12 +22,12 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
-      new Coin98WalletAdapter(),
-      new TrustWalletAdapter(),
-      new TorusWalletAdapter(),
-      new MathWalletAdapter(),
-      new CoinbaseWalletAdapter(),
-      new SpotWalletAdapter(),
+      // new Coin98WalletAdapter(),
+      // new TrustWalletAdapter(),
+      // new TorusWalletAdapter(),
+      // new MathWalletAdapter(),
+      // new CoinbaseWalletAdapter(),
+      // new SpotWalletAdapter(),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],

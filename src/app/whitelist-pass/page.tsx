@@ -26,10 +26,10 @@ export const metadata: Metadata = {
 
 async function Whitelist() {
   return (
-    <>
+    <div className="relative">
       <div
         className={cn(
-          'px-4 lg:px-[60px] py-5 mx-auto flex flex-col items-center gap-[100px]',
+          'px-4 lg:px-[60px] py-5 pb-[150px] mx-auto flex flex-col items-center gap-[100px]',
           fontHeading.variable,
         )}
       >
@@ -122,10 +122,10 @@ async function Whitelist() {
       <Image
         src={latDecorator}
         alt="decorator"
-        className="mx-auto w-full"
+        className="mx-auto w-full absolute bottom-0 -z-10"
         draggable={false}
       />
-    </>
+    </div>
   );
 }
 

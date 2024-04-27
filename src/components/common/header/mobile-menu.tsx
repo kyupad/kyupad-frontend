@@ -14,6 +14,8 @@ import {
   SheetTrigger,
 } from '../sheet';
 import WalletConnect from './wallet-connect';
+import discord from '/public/images/footer/discord.svg';
+import x from '/public/images/footer/x.svg';
 
 function MobileMenu({
   doGetSignInData,
@@ -72,6 +74,23 @@ function MobileMenu({
               setCookie={setCookie}
               revalidatePath={revalidateProjectDetail}
             />
+
+            <div className="flex gap-3">
+              <a
+                href="https://t.co/KjXOnvARym"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Image src={discord} alt="Discord" />
+              </a>
+              <a
+                href="https://twitter.com/Kyupad_"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Image src={x} alt="X" />
+              </a>
+            </div>
           </div>
           <SheetFooter />
         </SheetContent>

@@ -4,12 +4,12 @@ import { useGlobalStore } from '@/contexts/global-store-provider';
 import { WalletReadyState } from '@solana/wallet-adapter-base';
 import { useWallet } from '@solana/wallet-adapter-react';
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '../accordion';
+// import {
+//   Accordion,
+//   AccordionContent,
+//   AccordionItem,
+//   AccordionTrigger,
+// } from '../accordion';
 import PrimaryButton from '../button/primary';
 import {
   Dialog,
@@ -127,7 +127,7 @@ function WalletNotConnect({
                   );
                 })}
 
-              <div className="mt-4">
+              {/* <div className="mt-4">
                 <div className="h-0.5 w-full bg-kyu-color-6" />
               </div>
 
@@ -213,7 +213,7 @@ function WalletNotConnect({
                       })}
                   </AccordionContent>
                 </AccordionItem>
-              </Accordion>
+              </Accordion> */}
             </div>
           )}
         </div>
