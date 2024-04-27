@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use client';
 
 import React, { memo, useCallback, useEffect, useState } from 'react';
@@ -152,6 +153,12 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   }, [currentPoolId, publicKey]);
 
   useEffect(() => {
+    console.debug('poolsCounter', poolsCounter);
+    console.debug(publicKey?.toBase58(), 'publicKey');
+    console.debug(poolId, 'poolid');
+    console.debug(currentPool?.pool_id, 'currentPool id');
+    console.debug(currentPool?.user_pool_minted_total, 'currentPool minted');
+    console.debug(currentPool, 'current pool');
     if (publicKey && poolId && poolId === currentPool?.pool_id) {
       const currentCounter = poolsCounter[poolCounterKey] || 0;
 
