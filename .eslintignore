@@ -10,3 +10,4 @@ src/assets/*
 *.d.ts
 !.storybook
 src/__generated__/*
+src/utils/enums/*

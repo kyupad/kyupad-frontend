@@ -100,11 +100,13 @@ function WalletConnect({
       ]);
 
       changeSolanaConnection(true);
+      revalidatePath(window.location.pathname);
     },
     [
       changeSolanaConnection,
       doGetSignInData,
       doVerifySignInWithSolana,
+      revalidatePath,
       setCookie,
     ],
   );

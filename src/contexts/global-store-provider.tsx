@@ -22,6 +22,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { deleteCookie, getCookie, hasCookie, setCookie } from 'cookies-next';
 import { useStore, type StoreApi } from 'zustand';
+import { EWalletName } from '@utils/enums/solana';
 
 const GlobalStoreContext = createContext<StoreApi<IGlobalStore> | null>(null);
 
@@ -55,7 +56,21 @@ const GlobalStoreProvider = ({
     let valildateLoginPolling: any;
     const startValidateLogin = setTimeout(() => {
       valildateLoginPolling = setInterval(async () => {
-        const incomingWallet = window?.solana?.publicKey?.toBase58();
+        const walletName = localStorage.getItem('walletName');
+        let isConnected = true;
+        let incomingWallet;
+        switch (walletName) {
+          case EWalletName.Backpack:
+            incomingWallet = (window as any)?.backpack?.publicKey?.toBase58();
+            isConnected = (window as any)?.backpack?.isConnected;
+            break;
+          case EWalletName.Phantom:
+            incomingWallet = window?.solana?.publicKey?.toBase58();
+            isConnected = window?.solana?.isConnected;
+            break;
+          default:
+            break;
+        }
         if (incomingWallet) {
           if (
             previousWallet.current?.toBase58() !== incomingWallet &&
@@ -69,10 +84,7 @@ const GlobalStoreProvider = ({
           return;
         }
 
-        if (
-          !window?.solana?.isConnected &&
-          hasCookie(REFRESH_TOKEN_STORAGE_KEY)
-        ) {
+        if (!isConnected && hasCookie(REFRESH_TOKEN_STORAGE_KEY)) {
           await logoutProcess();
         }
       }, 1000);
