@@ -140,6 +140,10 @@ const GlobalStoreProvider = ({
     const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
     const refreshToken = getCookie(REFRESH_TOKEN_STORAGE_KEY);
 
+    if (!token && !refreshToken && connected) {
+      await logoutProcess();
+    }
+
     if (!token && refreshToken) {
       try {
         const data = await doRefreshToken({ refresh_token: refreshToken });

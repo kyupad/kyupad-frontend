@@ -685,7 +685,8 @@ function ExclusivePool() {
                   dayjs.utc(currentPool?.start_time).isBefore(now) &&
                   dayjs.utc(currentPool?.end_time).isAfter(now)
                 ) ||
-                currentPool?.is_minted
+                currentPool?.is_minted ||
+                !isSolanaConnected
               }
               onClick={handleMint}
             >
@@ -695,14 +696,16 @@ function ExclusivePool() {
                   <>
                     {currentPool?.is_active &&
                     dayjs.utc(currentPool?.start_time).isBefore(now) &&
-                    dayjs.utc(currentPool?.end_time).isAfter(now)
+                    dayjs.utc(currentPool?.end_time).isAfter(now) &&
+                    isSolanaConnected
                       ? 'Free Mint'
                       : 'Not eligible'}
                   </>
                 )}
 
               {((poolsCounter[poolCounterKey] &&
-                poolsCounter[poolCounterKey] > 0) ||
+                poolsCounter[poolCounterKey] > 0 &&
+                isSolanaConnected) ||
                 currentPool?.is_minted) && <>Minted</>}
             </PrimaryButton>
           )}
