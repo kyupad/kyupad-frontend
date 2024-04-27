@@ -15,6 +15,7 @@ import Skeleton from '@/components/common/loading/skeleton';
 import { Progress } from '@/components/common/progress/progress';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useSessionStore } from '@/contexts/session-store-provider';
+import { ACCESS_TOKEN_STORAGE_KEY } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { Program } from '@coral-xyz/anchor';
 import {
@@ -32,9 +33,11 @@ import {
   TransactionMessage,
   VersionedTransaction,
 } from '@solana/web3.js';
+import { getCookie } from 'cookies-next';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
+import jsonwebtoken from 'jsonwebtoken';
 import dropdown from 'public/images/whitelist/drop-down.svg';
 // import moreArrow from 'public/images/whitelist/more-arrow.svg';
 import { toast } from 'sonner';
@@ -65,6 +68,8 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     updatePoolCounter,
     updateUserSeasonMinted,
     user_season_minted,
+    seasonMinted,
+    updateSeasonMinted,
   } = useSessionStore((state) => state);
 
   const [lookupTableAddress, setLookupTableAddress] = useState<PublicKey>();
@@ -162,7 +167,14 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     if (publicKey && poolId && poolId === currentPool?.pool_id) {
       const currentCounter = poolsCounter[poolCounterKey] || 0;
 
-      if (currentPool?.user_pool_minted_total > currentCounter) {
+      const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
+
+      const sub = token ? jsonwebtoken.decode(token)?.sub : '';
+
+      if (
+        currentPool?.user_pool_minted_total > currentCounter &&
+        sub === publicKey?.toBase58()
+      ) {
         updatePoolCounter(
           poolCounterKey,
           currentPool?.user_pool_minted_total || 0,
@@ -185,6 +197,19 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         position: 'top-right',
         closeButton: true,
       });
+      return;
+    }
+
+    const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
+
+    const sub = token ? jsonwebtoken.decode(token)?.sub : '';
+
+    if (sub !== publicKey?.toBase58()) {
+      toast.warning(<div>{`Please select the wallet: ${sub}`}</div>, {
+        position: 'top-right',
+        closeButton: true,
+      });
+      console.error('Please select the wallet: ' + sub);
       return;
     }
 
@@ -408,8 +433,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
       const messageV0 = new TransactionMessage({
         payerKey: publicKey,
-        recentBlockhash: (await connection.getLatestBlockhash('finalized'))
-          .blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
         instructions: [mintCnftInstruction],
       }).compileToV0Message([lookupTableAccount!]);
 
@@ -419,29 +443,73 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         transactionV0,
       );
 
-      const signatured = await connection?.sendRawTransaction(
-        signature.serialize(),
-        {
-          skipPreflight: process.env.NODE_ENV === 'development',
-          maxRetries:
-            process.env.NODE_ENV !== 'development'
-              ? Number(env.NEXT_PUBLIC_MAX_RETRIES_ONCHAIN) || 30
-              : 0,
-        },
-      );
+      const blockhash =
+        await connection.getLatestBlockhashAndContext('confirmed');
+      const blockHeight = await connection.getBlockHeight({
+        commitment: 'confirmed',
+        minContextSlot: blockhash.context.slot,
+      });
+
+      const transactionTTL = blockHeight + 151;
+
+      const waitToConfirm = () =>
+        new Promise((resolve) => setTimeout(resolve, 5000));
+      const waitToRetry = () =>
+        new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const numTry = 10;
+
+      let signatured: string | null = null;
+      for (let i = 0; i < numTry; i++) {
+        // check transaction TTL
+        const blockHeight = await connection.getBlockHeight('confirmed');
+        if (blockHeight >= transactionTTL) {
+          toast.error(
+            <div className="text-xl">Network too busy. Please try again!</div>,
+            {
+              position: 'top-right',
+              closeButton: true,
+            },
+          );
+          throw new Error('Network too busy. Please try again!');
+        }
+
+        signatured = await connection?.sendRawTransaction(
+          signature.serialize(),
+          {
+            skipPreflight: process.env.NODE_ENV === 'development',
+            maxRetries: 0,
+          },
+        );
+
+        await waitToConfirm();
+
+        const latestBlockHash = await connection.getLatestBlockhash();
+
+        const confirmed = await connection.confirmTransaction({
+          signature: signatured,
+          blockhash: latestBlockHash.blockhash,
+          lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+        });
+
+        if (!confirmed?.value?.err) {
+          break;
+        }
+
+        await waitToRetry();
+      }
 
       if (!signatured) {
         console.error('Transaction failed');
-        return;
+        toast.error(
+          <div className="text-xl">Transaction failed. Please try again!</div>,
+          {
+            position: 'top-right',
+            closeButton: true,
+          },
+        );
+        throw new Error('Transaction failed');
       }
-
-      const latestBlockHash = await connection.getLatestBlockhash();
-
-      await connection.confirmTransaction({
-        signature: signatured,
-        blockhash: latestBlockHash.blockhash,
-        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-      });
 
       await doSyncNftbySignature({
         id: cnftMetadata?.data?.id,
@@ -453,10 +521,12 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         poolCounterKey,
         (poolsCounter[poolCounterKey] || 0) + 1,
       );
+
       updateUserSeasonMinted((user_season_minted || 0) + 1);
+      updateSeasonMinted((seasonMinted || 0) + 1);
 
       toast.success(
-        <div>
+        <div className="text-xl">
           Minted successfully. Please check the wallet!
           <br />
           <a
