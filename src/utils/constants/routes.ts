@@ -15,7 +15,7 @@ const WEB_ROUTES = {
   HOME: '/',
   NOTFOUND: '/404',
   FAQ: '/faq',
-  WHITELIST_PASS: '/whitelist-pass',
+  WHITELIST_PASS: '/mint-nft',
   MY_SPACE: '/my-space',
   CATNIP_POINTS: '/catnip-points',
   PERFORMANCE: '/performance',

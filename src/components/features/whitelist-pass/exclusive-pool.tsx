@@ -46,7 +46,7 @@ const tokenMetaDataProgramId = new PublicKey(
   env.NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID,
 );
 
-function ExclusivePool() {
+function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   const [open, setOpen] = useState<boolean>(false);
   const { publicKey, wallet } = useWallet();
 
@@ -620,6 +620,7 @@ function ExclusivePool() {
                   )
                   .valueOf()}
                 fullWidth
+                revalidatePath={revalidatePath}
               />
             )}
           </div>
@@ -690,23 +691,18 @@ function ExclusivePool() {
               }
               onClick={handleMint}
             >
-              {!poolsCounter[poolCounterKey] &&
-                poolsCounter[poolCounterKey] !== 0 &&
-                !currentPool?.is_minted && (
-                  <>
-                    {currentPool?.is_active &&
-                    dayjs.utc(currentPool?.start_time).isBefore(now) &&
-                    dayjs.utc(currentPool?.end_time).isAfter(now) &&
-                    isSolanaConnected
+              {!isSolanaConnected && <>Not eligible</>}
+              {isSolanaConnected && (
+                <>
+                  {(poolsCounter[poolCounterKey] &&
+                    poolsCounter[poolCounterKey] > 0) ||
+                  currentPool?.is_minted
+                    ? 'Minted'
+                    : currentPool?.is_active
                       ? 'Free Mint'
                       : 'Not eligible'}
-                  </>
-                )}
-
-              {((poolsCounter[poolCounterKey] &&
-                poolsCounter[poolCounterKey] > 0 &&
-                isSolanaConnected) ||
-                currentPool?.is_minted) && <>Minted</>}
+                </>
+              )}
             </PrimaryButton>
           )}
         </div>

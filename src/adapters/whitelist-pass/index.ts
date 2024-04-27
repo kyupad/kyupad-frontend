@@ -21,6 +21,7 @@ const doGetMintingPool = async (
     },
     {
       signal,
+      cache: 'no-store',
     },
   );
   return data;

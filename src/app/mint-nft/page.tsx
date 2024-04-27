@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
+import { revalidateCurrentPath } from '@/actions/common';
 import Skeleton from '@/components/common/loading/skeleton';
 import ExclusivePool from '@/components/features/whitelist-pass/exclusive-pool';
 // import MyTotalNftMinted from '@/components/features/whitelist-pass/my-total-nft-minted';
@@ -111,7 +112,7 @@ async function Whitelist() {
         </div>
 
         <div className="w-full max-w-[1198px]">
-          <ExclusivePool />
+          <ExclusivePool revalidatePath={revalidateCurrentPath} />
         </div>
 
         {/* <div className="w-full max-w-[1198px]">

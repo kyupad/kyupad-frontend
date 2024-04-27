@@ -4,7 +4,7 @@ import { env } from 'env.mjs';
 const ACCESS_TOKEN_STORAGE_KEY = 'access_token';
 const REFRESH_TOKEN_STORAGE_KEY = 'refresh_token';
 
-const MAX_AGE_ACCESS_TOKEN = 60 * 5; // 5 minutes
+const MAX_AGE_ACCESS_TOKEN = 60 * 60 * 2; // 2 hours
 const MAX_AGE_REFRESH_TOKEN = 60 * 60 * 24 * 7; // 7 days
 
 const ACCESS_TOKEN_COOKIE_CONFIG: CookieSerializeOptions = {

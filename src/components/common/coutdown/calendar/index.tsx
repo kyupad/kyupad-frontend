@@ -8,9 +8,11 @@ import CountdownItem from './item';
 const CalendarCountdown = ({
   time,
   fullWidth,
+  revalidatePath,
 }: {
   time: number;
   fullWidth?: boolean;
+  revalidatePath?: Function;
 }) => {
   const [days, setDays] = useState<number>(0);
   const [hours, setHours] = useState<number>(0);
@@ -42,6 +44,9 @@ const CalendarCountdown = ({
 
       if (difference <= 0) {
         cancelAnimationFrame(animationFrameId);
+        if (revalidatePath) {
+          revalidatePath();
+        }
         setDays(0);
         setHours(0);
         setMinutes(0);
