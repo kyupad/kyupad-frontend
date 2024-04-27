@@ -44,8 +44,11 @@ const CalendarCountdown = ({
 
       if (difference <= 0) {
         cancelAnimationFrame(animationFrameId);
-        if (revalidatePath) {
-          revalidatePath();
+        if (
+          revalidatePath &&
+          (days !== 0 || hours !== 0 || minutes !== 0 || seconds !== 0)
+        ) {
+          revalidatePath(window.location.pathname);
         }
         setDays(0);
         setHours(0);

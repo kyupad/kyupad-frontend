@@ -72,15 +72,12 @@ const GlobalStoreProvider = ({
             break;
         }
 
-        if (!incomingWallet) {
-          // router.refresh();
-        }
-
         if (incomingWallet && accessToken) {
           const tokenDecoded = jsonwebtoken.decode(accessToken);
 
           if (tokenDecoded?.sub !== incomingWallet) {
             await logoutProcess();
+            router.refresh();
           }
 
           return;

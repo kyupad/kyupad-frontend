@@ -15,7 +15,7 @@ import Skeleton from '@/components/common/loading/skeleton';
 import { Progress } from '@/components/common/progress/progress';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useSessionStore } from '@/contexts/session-store-provider';
-import { ACCESS_TOKEN_STORAGE_KEY } from '@/utils/constants';
+import { ACCESS_TOKEN_STORAGE_KEY, THROW_EXCEPTION } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { Program } from '@coral-xyz/anchor';
 import {
@@ -427,32 +427,20 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         .remainingAccounts(remainingAccounts)
         .instruction();
 
-      // const estimatedComputeUnits = 1_000_000;
-      const additionalFeeInLamports = 100000;
-
       const setComputeUnitPriceIx = ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: additionalFeeInLamports,
+        microLamports: Number(env.NEXT_PUBLIC_PRIORITY_FEES),
       });
-      // const setComputeUnitLimitIx = ComputeBudgetProgram.setComputeUnitLimit({
-      //   units: estimatedComputeUnits,
-      // });
 
       const messageV0 = new TransactionMessage({
         payerKey: publicKey,
         recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
-        instructions: [
-          setComputeUnitPriceIx,
-          mintCnftInstruction,
-          // setComputeUnitLimitIx,
-        ],
+        instructions: [setComputeUnitPriceIx, mintCnftInstruction],
       }).compileToV0Message([lookupTableAccount!]);
 
       const transactionV0 = new VersionedTransaction(messageV0);
-
       const signature = await (wallet?.adapter as any)?.signTransaction(
         transactionV0,
       );
-
       const signatureEncode = base58.encode(signature?.signatures?.[0]);
 
       const blockhash =
@@ -463,7 +451,6 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       });
 
       const transactionTTL = blockHeight + 151;
-
       const waitToConfirm = () =>
         new Promise((resolve) => setTimeout(resolve, 5000));
       const waitToRetry = () =>
@@ -474,14 +461,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         // check transaction TTL
         const blockHeight = await connection.getBlockHeight('confirmed');
         if (blockHeight >= transactionTTL) {
-          toast.error(
-            <div className="text-xl">Network too busy. Please try again!</div>,
-            {
-              position: 'top-right',
-              closeButton: true,
-            },
-          );
-          throw new Error('Network too busy. Please try again!');
+          throw new Error('ONCHAIN_TIMEOUT');
         }
 
         await connection?.sendRawTransaction(signature.serialize(), {
@@ -494,19 +474,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         const sigStatus = await connection.getSignatureStatus(signatureEncode);
 
         if (sigStatus.value?.err) {
-          console.error(JSON.stringify(sigStatus.value?.err));
-          toast.error(
-            <div className="text-xl">
-              Transaction failed. Please try again!
-            </div>,
-            {
-              position: 'top-right',
-              closeButton: true,
-            },
-          );
-          throw new Error(
-            sigStatus.value?.err?.toString() || 'Transaction failed',
-          );
+          throw new Error('UNKNOWN_TRANSACTION');
         }
 
         if (sigStatus.value?.confirmationStatus === 'confirmed') {
@@ -515,6 +483,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
         await waitToRetry();
       }
+
       await doSyncNftbySignature({
         id: cnftMetadata?.data?.id,
         pool_id: poolId,
@@ -547,8 +516,25 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
           closeButton: true,
         },
       );
-    } catch (error) {
-      console.error(JSON.stringify(error));
+    } catch (error: any) {
+      console.error(error?.message, '---message---');
+      console.error(JSON.stringify(error), '---error---');
+
+      const msg =
+        THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
+
+      if (msg) {
+        toast.error(msg, {
+          position: 'top-right',
+          closeButton: true,
+        });
+
+        return;
+      }
+      toast.error(THROW_EXCEPTION.UNKNOWN_TRANSACTION, {
+        position: 'top-right',
+        closeButton: true,
+      });
     } finally {
       handleSetIsLoading(false);
     }
@@ -786,6 +772,22 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             </PrimaryButton>
           )}
         </div>
+      </div>
+
+      <div className="w-full">
+        <ol className="list-decimal pl-4 font-bold flex flex-col gap-4">
+          <li>Minimum balance: 0.015 SOL.</li>
+          <li>
+            Phantom wallet is highly recommended for optimal minting experience.
+          </li>
+          <li>
+            Due to Solana network congestion & multiple users accessing the
+            website at the same time, the minting experience might be a bit
+            slower than expected.
+          </li>
+          <li>Participants can retry as many times as you want.</li>
+        </ol>
+        <p className="font-bold mt-5"> Happy minting! </p>
       </div>
     </div>
   );
