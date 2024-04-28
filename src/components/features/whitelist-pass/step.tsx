@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 import currentStep from '/public/images/detail/current-step.svg';
+import incomingStep from '/public/images/detail/incoming-step.svg';
 import stepDone from '/public/images/detail/step-done.svg';
 import step from '/public/images/detail/step.svg';
 
@@ -91,7 +92,11 @@ function WhitelistPassStep({
                             />
                           )}
                         {dayjs.utc(item.start).isAfter(now) && (
-                          <Image src={step} alt="step" draggable={false} />
+                          <Image
+                            src={incomingStep}
+                            alt="step"
+                            draggable={false}
+                          />
                         )}
                         {dayjs.utc(item.end).isBefore(now) && (
                           <Image src={stepDone} alt="step" draggable={false} />
