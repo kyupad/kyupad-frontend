@@ -34,7 +34,13 @@ function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ConnectionProvider endpoint={env.NEXT_PUBLIC_RPC_URL}>
+    <ConnectionProvider
+      endpoint={env.NEXT_PUBLIC_RPC_URL}
+      config={{
+        commitment: 'confirmed',
+        confirmTransactionInitialTimeout: 30000,
+      }}
+    >
       <WalletProvider wallets={wallets} autoConnect>
         {children}
       </WalletProvider>
