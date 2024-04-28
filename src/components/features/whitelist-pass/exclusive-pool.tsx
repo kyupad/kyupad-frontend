@@ -433,7 +433,8 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
       const messageV0 = new TransactionMessage({
         payerKey: publicKey,
-        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+        recentBlockhash: (await connection.getLatestBlockhash('confirmed'))
+          .blockhash,
         instructions: [setComputeUnitPriceIx, mintCnftInstruction],
       }).compileToV0Message([lookupTableAccount!]);
 
@@ -518,7 +519,10 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       );
     } catch (error: any) {
       console.error(error?.message, '---message---');
-      console.error(JSON.stringify(error), '---error---');
+      console.error(error?.stack, '---stack---');
+      console.error(error?.status, '---status---');
+      console.error(JSON.stringify(error), '---erro string---');
+      console.error(error, '---error---');
 
       const msg =
         THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
@@ -644,150 +648,154 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         {/* <Image src={moreArrow} alt="more" className="absolute right-0 top-0" /> */}
       </div>
 
-      <div className="flex p-10 bg-kyu-color-16 rounded-[16px] justify-center gap-10 items-center flex-col lg:flex-row">
-        <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
-          {loadingPool || !currentPool?.pool_image ? (
-            <Skeleton className="h-full w-full" />
-          ) : (
-            <Image
-              src={currentPool?.pool_image || ''}
-              alt={currentPool?.pool_image || ''}
-              fill
-              style={{ objectFit: 'cover' }}
-              draggable={false}
-            />
-          )}
-        </div>
-        <div className="w-full lg:w-1/2 flex flex-col gap-5">
-          {loadingPool ||
-          !currentPool?.pool_name ||
-          !currentPool?.start_time ? (
-            <Skeleton className="h-5 w-1/2" />
-          ) : (
-            <span className="text-xl font-bold">
-              {currentPool?.pool_name || ''}{' '}
-              {dayjs.utc(currentPool?.start_time).isBefore(now)
-                ? 'ends in:'
-                : 'starts in:'}
-            </span>
-          )}
-          <div className="-mt-4">
-            {loadingPool ||
-            !currentPool?.start_time ||
-            !currentPool?.end_time ? (
-              <Skeleton className="h-[116px]" />
+      <div className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10">
+        <div className="flex justify-center gap-10 items-center flex-col lg:flex-row">
+          <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
+            {loadingPool || !currentPool?.pool_image ? (
+              <Skeleton className="h-full w-full" />
             ) : (
-              <CalendarCountdown
-                time={dayjs
-                  .utc(
-                    dayjs.utc(currentPool?.start_time).isBefore(now)
-                      ? currentPool?.end_time?.valueOf()
-                      : currentPool?.start_time?.valueOf(),
-                  )
-                  .valueOf()}
-                fullWidth
-                revalidatePath={revalidatePath}
+              <Image
+                src={currentPool?.pool_image || ''}
+                alt={currentPool?.pool_image || ''}
+                fill
+                style={{ objectFit: 'cover' }}
+                draggable={false}
               />
             )}
           </div>
-
-          <div className="relative mt-6">
-            {loadingPool || !poolId ? (
-              <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
-            ) : (
-              <>
-                <span className="absolute left-0 -top-8">
-                  <span className="text-kyu-color-14">{'Minted: '}</span>
-                  <span className="font-bold text-kyu-color-11">
-                    {isSolanaConnected
-                      ? (currentPool?.minted_total || 0) -
-                        (currentPool?.user_pool_minted_total || 0) +
-                        (poolsCounter[poolCounterKey] || 0)
-                      : currentPool?.minted_total}
-                  </span>
-                </span>
-              </>
-            )}
-            {loadingPool || !poolId ? (
-              <Skeleton className="h-2" />
-            ) : (
-              <Progress
-                value={
-                  (currentPool?.minted_total || 0) +
-                    (isSolanaConnected
-                      ? poolsCounter[poolCounterKey] || 0
-                      : 0) >
-                    0 && currentPool?.pool_supply > 0
-                    ? (((currentPool?.minted_total || 0) +
-                        (isSolanaConnected
-                          ? poolsCounter[poolCounterKey] || 0
-                          : 0)) /
-                        currentPool?.pool_supply) *
-                      100
-                    : 0
-                }
-              />
-            )}
+          <div className="w-full lg:w-1/2 flex flex-col gap-5">
             {loadingPool ||
-            (!currentPool?.pool_supply && currentPool?.pool_supply !== 0) ? (
-              <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
+            !currentPool?.pool_name ||
+            !currentPool?.start_time ? (
+              <Skeleton className="h-5 w-1/2" />
             ) : (
-              <span className="absolute right-0 -top-8">
-                <span className="text-kyu-color-14 font-medium">Total:</span>{' '}
-                <span className="font-bold text-kyu-color-11">
-                  {currentPool?.pool_supply || 0}
-                </span>
+              <span className="text-xl font-bold">
+                {currentPool?.pool_name || ''}{' '}
+                {dayjs.utc(currentPool?.start_time).isBefore(now)
+                  ? 'ends in:'
+                  : 'starts in:'}
               </span>
             )}
-          </div>
-          {loadingPool || !poolId ? (
-            <Skeleton className="h-[48px]" />
-          ) : (
-            <PrimaryButton
-              loading={isLoading}
-              disabled={
-                !currentPool?.is_active ||
-                poolsCounter[poolCounterKey] ||
-                !(
-                  dayjs.utc(currentPool?.start_time).isBefore(now) &&
-                  dayjs.utc(currentPool?.end_time).isAfter(now)
-                ) ||
-                currentPool?.is_minted ||
-                !isSolanaConnected
-              }
-              onClick={handleMint}
-            >
-              {!isSolanaConnected && <>Not eligible</>}
-              {isSolanaConnected && (
+            <div className="-mt-4">
+              {loadingPool ||
+              !currentPool?.start_time ||
+              !currentPool?.end_time ? (
+                <Skeleton className="h-[116px]" />
+              ) : (
+                <CalendarCountdown
+                  time={dayjs
+                    .utc(
+                      dayjs.utc(currentPool?.start_time).isBefore(now)
+                        ? currentPool?.end_time?.valueOf()
+                        : currentPool?.start_time?.valueOf(),
+                    )
+                    .valueOf()}
+                  fullWidth
+                  revalidatePath={revalidatePath}
+                />
+              )}
+            </div>
+
+            <div className="relative mt-6">
+              {loadingPool || !poolId ? (
+                <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
+              ) : (
                 <>
-                  {(poolsCounter[poolCounterKey] &&
-                    poolsCounter[poolCounterKey] > 0) ||
-                  currentPool?.is_minted
-                    ? 'Minted'
-                    : currentPool?.is_active
-                      ? 'Free Mint'
-                      : 'Not eligible'}
+                  <span className="absolute left-0 -top-8">
+                    <span className="text-kyu-color-14">{'Minted: '}</span>
+                    <span className="font-bold text-kyu-color-11">
+                      {isSolanaConnected
+                        ? (currentPool?.minted_total || 0) -
+                          (currentPool?.user_pool_minted_total || 0) +
+                          (poolsCounter[poolCounterKey] || 0)
+                        : currentPool?.minted_total}
+                    </span>
+                  </span>
                 </>
               )}
-            </PrimaryButton>
-          )}
+              {loadingPool || !poolId ? (
+                <Skeleton className="h-2" />
+              ) : (
+                <Progress
+                  value={
+                    (currentPool?.minted_total || 0) +
+                      (isSolanaConnected
+                        ? poolsCounter[poolCounterKey] || 0
+                        : 0) >
+                      0 && currentPool?.pool_supply > 0
+                      ? (((currentPool?.minted_total || 0) +
+                          (isSolanaConnected
+                            ? poolsCounter[poolCounterKey] || 0
+                            : 0)) /
+                          currentPool?.pool_supply) *
+                        100
+                      : 0
+                  }
+                />
+              )}
+              {loadingPool ||
+              (!currentPool?.pool_supply && currentPool?.pool_supply !== 0) ? (
+                <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
+              ) : (
+                <span className="absolute right-0 -top-8">
+                  <span className="text-kyu-color-14 font-medium">Total:</span>{' '}
+                  <span className="font-bold text-kyu-color-11">
+                    {currentPool?.pool_supply || 0}
+                  </span>
+                </span>
+              )}
+            </div>
+            {loadingPool || !poolId ? (
+              <Skeleton className="h-[48px]" />
+            ) : (
+              <PrimaryButton
+                loading={isLoading}
+                disabled={
+                  !currentPool?.is_active ||
+                  poolsCounter[poolCounterKey] ||
+                  !(
+                    dayjs.utc(currentPool?.start_time).isBefore(now) &&
+                    dayjs.utc(currentPool?.end_time).isAfter(now)
+                  ) ||
+                  currentPool?.is_minted ||
+                  !isSolanaConnected
+                }
+                onClick={handleMint}
+              >
+                {!isSolanaConnected && <>Not eligible</>}
+                {isSolanaConnected && (
+                  <>
+                    {(poolsCounter[poolCounterKey] &&
+                      poolsCounter[poolCounterKey] > 0) ||
+                    currentPool?.is_minted
+                      ? 'Minted'
+                      : currentPool?.is_active
+                        ? 'Mint'
+                        : 'Not eligible'}
+                  </>
+                )}
+              </PrimaryButton>
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="w-full">
-        <ol className="list-decimal pl-4 font-bold flex flex-col gap-4">
-          <li>Minimum balance: 0.015 SOL.</li>
-          <li>
-            Phantom wallet is highly recommended for optimal minting experience.
-          </li>
-          <li>
-            Due to Solana network congestion & multiple users accessing the
-            website at the same time, the minting experience might be a bit
-            slower than expected.
-          </li>
-          <li>Participants can retry as many times as you want.</li>
-        </ol>
-        <p className="font-bold mt-5"> Happy minting! </p>
+        <div className="w-full">
+          <p className="font-bold text-xl mb-4">Note: </p>
+          <ol className="list-decimal pl-4 font-bold flex flex-col gap-4">
+            <li>Minimum balance: 0.015 SOL.</li>
+            <li>
+              Phantom wallet is highly recommended for optimal minting
+              experience.
+            </li>
+            <li>
+              Due to Solana network congestion & multiple users accessing the
+              website at the same time, the minting experience might be a bit
+              slower than expected.
+            </li>
+            <li>Participants can retry as many times as you want.</li>
+          </ol>
+          <p className="font-bold mt-5"> Happy minting! </p>
+        </div>
       </div>
     </div>
   );

@@ -74,7 +74,7 @@ const GlobalStoreProvider = ({
         if (incomingWallet && accessToken) {
           const tokenDecoded = jsonwebtoken.decode(accessToken);
 
-          if (tokenDecoded?.sub !== incomingWallet) {
+          if (tokenDecoded?.sub && tokenDecoded?.sub !== incomingWallet) {
             await logoutProcess();
             window.location.reload();
           }
