@@ -61,8 +61,16 @@ function WalletNotConnect({
           {!is_agree_terms ? (
             <div className="flex flex-col gap-3">
               <p className="text-justify">
-                By continuing, you agree to the Kyupad Terms and Conditions and
-                acknowledge that you have read and understood the Kyupad
+                By continuing, you agree to the{' '}
+                <a
+                  className="text-kyu-color-5 underline"
+                  href="https://docs.kyupad.xyz/our-product/terms-and-condition"
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  Kyupad Terms and Conditions{' '}
+                </a>
+                and acknowledge that you have read and understood the Kyupad
               </p>
               <div>
                 <PrimaryButton onClick={agreeTerms}>
@@ -95,7 +103,14 @@ function WalletNotConnect({
 
                           select(wl.adapter.name);
                           await signin(wl.adapter);
+                          // eslint-disable-next-line no-console
+                          console.debug(
+                            window.solana.publicKey?.toBase58(),
+                            'user_wallet_after',
+                          );
                         } catch (e) {
+                          // eslint-disable-next-line no-console
+                          console.debug(e, 'login error');
                           setLoading && setLoading(false);
 
                           return false;

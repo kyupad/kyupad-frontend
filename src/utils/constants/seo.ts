@@ -12,7 +12,7 @@ const META_DATA_DEFAULT: Metadata = {
     'Whisker Winning Launchpad built on Solana endeavors to seek Midas-touch Alpha for Degens',
   keywords: ['kyupad', 'solana', 'community', 'launchpad'],
   title: {
-    template: '%s | The Whisker-Winning',
+    template: '%s | Kyupad',
     default: 'Kyupad',
   },
   metadataBase: new URL(env.NEXT_PUBLIC_BASE_URL),

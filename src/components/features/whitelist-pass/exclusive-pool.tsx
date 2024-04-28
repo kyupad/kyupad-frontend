@@ -65,6 +65,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   const [loadingPool, setLoadingPool] = useState<boolean>(false);
   const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<number>();
   const [creators, setCreators] = useState<any[]>([]);
+  const [priorityFees, setPriorityFees] = useState<number>();
   const {
     poolsCounter,
     updatePoolCounter,
@@ -140,6 +141,10 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         setCreators(data?.data?.creators);
       }
 
+      if (data?.data?.priority_fees) {
+        setPriorityFees(data?.data?.priority_fees);
+      }
+
       setLoadingPool(false);
     };
 
@@ -201,11 +206,13 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     const sub = token ? jsonwebtoken.decode(token)?.sub : '';
 
     if (sub !== publicKey?.toBase58()) {
-      toast.warning(<div>{`Please select the wallet: ${sub}`}</div>, {
-        position: 'top-right',
-        closeButton: true,
-      });
-      console.error('Please select the wallet: ' + sub);
+      toast.warning(
+        <div>{`Wrong wallet connected. <br /> Please change to wallet: ${sub}`}</div>,
+        {
+          position: 'top-right',
+          closeButton: true,
+        },
+      );
       return;
     }
 
@@ -236,6 +243,11 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
     if (!creators) {
       console.error('Creators not found');
+      return;
+    }
+
+    if (!priorityFees) {
+      console.error('Priority fees not found');
       return;
     }
 
@@ -428,7 +440,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         .instruction();
 
       const setComputeUnitPriceIx = ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: Number(env.NEXT_PUBLIC_PRIORITY_FEES),
+        microLamports: Number(priorityFees),
       });
 
       const messageV0 = new TransactionMessage({
@@ -518,12 +530,6 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         },
       );
     } catch (error: any) {
-      console.error(error?.message, '---message---');
-      console.error(error?.stack, '---stack---');
-      console.error(error?.status, '---status---');
-      console.error(JSON.stringify(error), '---erro string---');
-      console.error(error, '---error---');
-
       const msg =
         THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
 
@@ -535,10 +541,13 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
         return;
       }
-      toast.error(THROW_EXCEPTION.UNKNOWN_TRANSACTION, {
-        position: 'top-right',
-        closeButton: true,
-      });
+
+      if (msg && error?.message?.THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
+        toast.error(THROW_EXCEPTION.UNKNOWN_TRANSACTION, {
+          position: 'top-right',
+          closeButton: true,
+        });
+      }
     } finally {
       handleSetIsLoading(false);
     }
