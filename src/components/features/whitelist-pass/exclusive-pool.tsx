@@ -781,7 +781,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
         <div className="w-full">
           <p className="font-bold text-xl mb-4">Note: </p>
-          <ol className="list-decimal pl-4 font-bold flex flex-col gap-4">
+          <ol className="list-disc pl-4 flex flex-col gap-2 text-xl">
             <li>Minimum balance: 0.015 SOL.</li>
             <li>
               Phantom wallet is highly recommended for optimal minting
@@ -794,7 +794,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             </li>
             <li>Participants can retry as many times as you want.</li>
           </ol>
-          <p className="font-bold mt-5"> Happy minting! </p>
+          <p className="font-bold mt-5 text-xl"> Happy minting! </p>
         </div>
       </div>
     </div>
