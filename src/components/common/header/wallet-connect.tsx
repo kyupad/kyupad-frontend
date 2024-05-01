@@ -99,11 +99,6 @@ function WalletConnect({
         ),
       ]);
 
-      // eslint-disable-next-line no-console
-      console.debug(adapter.publicKey?.toBase58(), 'user_wallet');
-      // eslint-disable-next-line no-console
-      console.debug(window.solana.publicKey?.toBase58(), 'user_wallet_loging');
-
       changeSolanaConnection(true);
       revalidatePath(window.location.pathname);
     },

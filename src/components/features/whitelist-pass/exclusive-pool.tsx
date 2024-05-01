@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 'use client';
 
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   doGenerateMetadata,
   doGetMintingPool,
@@ -15,7 +16,11 @@ import Skeleton from '@/components/common/loading/skeleton';
 import { Progress } from '@/components/common/progress/progress';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useSessionStore } from '@/contexts/session-store-provider';
-import { ACCESS_TOKEN_STORAGE_KEY, THROW_EXCEPTION } from '@/utils/constants';
+import {
+  ACCESS_TOKEN_STORAGE_KEY,
+  THROW_EXCEPTION,
+  WEB_ROUTES,
+} from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { Program } from '@coral-xyz/anchor';
 import {
@@ -42,7 +47,7 @@ import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import jsonwebtoken from 'jsonwebtoken';
 import dropdown from 'public/images/whitelist/drop-down.svg';
-// import moreArrow from 'public/images/whitelist/more-arrow.svg';
+import moreArrow from 'public/images/whitelist/more-arrow.svg';
 import { toast } from 'sonner';
 import { decrypt } from '@utils/helpers';
 
@@ -57,9 +62,12 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   const [open, setOpen] = useState<boolean>(false);
   const { publicKey, wallet } = useWallet();
 
+  const searchParams = useSearchParams();
   const [activePool, setActivePool] = useState<any[]>([]);
   const [currentPool, setCurrentPool] = useState<any>({});
-  const [currentPoolId, setCurrentPoolId] = useState<string>();
+  const [currentPoolId, setCurrentPoolId] = useState<string>(
+    searchParams.get('id') || '',
+  );
   const [collectionMint, setCollectionMint] = useState<PublicKey>();
   const [merkleTree, SetMerkleTree] = useState<PublicKey>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -67,6 +75,10 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<number>();
   const [creators, setCreators] = useState<any[]>([]);
   const [priorityFees, setPriorityFees] = useState<number>();
+  const activePoolWrapper = useRef<HTMLDivElement>(null);
+  const moreArrowRef = useRef<HTMLImageElement>(null);
+  const router = useRouter();
+
   const {
     poolsCounter,
     updatePoolCounter,
@@ -90,9 +102,15 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     setOpen(!value);
   }, []);
 
-  const handleChangePoolId = useCallback((poolId: string) => {
-    setCurrentPoolId(poolId);
-  }, []);
+  const handleChangePoolId = useCallback(
+    (poolId: string) => {
+      setCurrentPoolId(poolId);
+      router.push(`${WEB_ROUTES.WHITELIST_PASS}?id=${poolId}`, {
+        scroll: false,
+      });
+    },
+    [router],
+  );
 
   const handleSetIsLoading = useCallback((value: boolean) => {
     setIsLoading(value);
@@ -108,6 +126,12 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         },
         controller.signal,
       );
+
+      if (!data?.data && data?.statusCode && currentPoolId) {
+        setCurrentPoolId('');
+        router.replace(WEB_ROUTES.WHITELIST_PASS, { scroll: false });
+        return;
+      }
 
       if (data?.data?.community_round?.active_pools) {
         setActivePool([
@@ -163,7 +187,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       clearTimeout(debounceFunction);
       setLoadingPool(false);
     };
-  }, [currentPoolId, publicKey]);
+  }, [currentPoolId, publicKey, router, searchParams]);
 
   useEffect(() => {
     if (publicKey && poolId && poolId === currentPool?.pool_id) {
@@ -192,6 +216,36 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     publicKey,
     updatePoolCounter,
   ]);
+
+  useEffect(() => {
+    const checkActivePoolWidth = () => {
+      const activePoolWrapperWidth =
+        activePoolWrapper.current?.clientWidth || 0;
+      const activePoolItems = document.querySelectorAll('.active-pool-item');
+      const activePoolItemsWidth = Array.from(activePoolItems).reduce(
+        (acc, item) => acc + (item as HTMLElement).clientWidth,
+        0,
+      );
+
+      if (activePoolItemsWidth + 80 > activePoolWrapperWidth) {
+        moreArrowRef.current?.classList.remove('hidden');
+      } else {
+        moreArrowRef.current?.classList.add('hidden');
+      }
+    };
+
+    const id = setTimeout(() => {
+      checkActivePoolWidth();
+      clearTimeout(id);
+    }, 3000);
+
+    window.addEventListener('resize', checkActivePoolWidth);
+
+    return () => {
+      clearTimeout(id);
+      window.removeEventListener('resize', checkActivePoolWidth);
+    };
+  }, []);
 
   const handleMint = async () => {
     if (!publicKey) {
@@ -655,13 +709,13 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         </div>
       </div>
 
-      <div className="relative">
-        <div className="flex gap-3 overflow-x-auto scrollbar pb-4">
+      <div className="relative" ref={activePoolWrapper}>
+        <div className="flex gap-3 overflow-x-auto scrollbar pb-4 pr-4">
           {activePool?.map((pool, index) => {
             if (!pool?.pool_id) {
               return (
                 <span
-                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400"
+                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400 active-pool-item"
                   key={index}
                 >
                   {pool?.pool_name}
@@ -675,7 +729,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                   handleChangePoolId(pool?.pool_id);
                 }}
                 className={cn(
-                  'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap',
+                  'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap active-pool-item',
                   (currentPoolId || currentPool?.pool_id) === pool?.pool_id
                     ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
                     : 'text-[#8E8FA2]',
@@ -699,10 +753,18 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
               </>
             ))}
         </div>
-        {/* <Image src={moreArrow} alt="more" className="absolute right-0 top-0" /> */}
+        <Image
+          src={moreArrow}
+          alt="more"
+          className="absolute right-0 top-0 hidden"
+          ref={moreArrowRef}
+        />
       </div>
 
-      <div className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10">
+      <div
+        className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10"
+        id="mint-pool"
+      >
         <div className="flex justify-center gap-10 items-center flex-col lg:flex-row">
           <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
             {loadingPool || !currentPool?.pool_image ? (
@@ -751,7 +813,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             </div>
 
             <div className="relative mt-6">
-              {loadingPool || !poolId ? (
+              {loadingPool || !poolId || !currentPool?.pool_id ? (
                 <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
               ) : (
                 <>
@@ -769,7 +831,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                   </span>
                 </>
               )}
-              {loadingPool || !poolId ? (
+              {loadingPool || !poolId || !currentPool?.pool_id ? (
                 <Skeleton className="h-2" />
               ) : (
                 <Progress
@@ -801,7 +863,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                 </span>
               )}
             </div>
-            {loadingPool || !poolId ? (
+            {loadingPool || !poolId || !currentPool?.pool_id ? (
               <Skeleton className="h-[48px]" />
             ) : (
               <PrimaryButton

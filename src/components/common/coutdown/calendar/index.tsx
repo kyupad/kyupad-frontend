@@ -18,6 +18,7 @@ const CalendarCountdown = ({
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
   const [seconds, setSeconds] = useState<number>(0);
+  const [diff] = useState<number>(time - new Date().getTime());
 
   useEffect(() => {
     let animationFrameId: number;
@@ -44,12 +45,11 @@ const CalendarCountdown = ({
 
       if (difference <= 0) {
         cancelAnimationFrame(animationFrameId);
-        if (
-          revalidatePath &&
-          (days !== 0 || hours !== 0 || minutes !== 0 || seconds !== 0)
-        ) {
+
+        if (revalidatePath && diff > 0) {
           revalidatePath(window.location.pathname);
         }
+
         setDays(0);
         setHours(0);
         setMinutes(0);
