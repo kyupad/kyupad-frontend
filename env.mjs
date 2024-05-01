@@ -29,6 +29,7 @@ const env = createEnv({
     NEXT_PUBLIC_MAX_RETRIES_ONCHAIN: z.string().nullish(),
     NEXT_PUBLIC_DOCS_URL: z.string().min(1).includes('http'),
     NEXT_PUBLIC_PRIORITY_FEES: z.string().min(1),
+    NEXT_PUBLIC_SENTRY_DSN: z.string().min(1).includes('http').nullish(),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -51,6 +52,7 @@ const env = createEnv({
       process.env.NEXT_PUBLIC_MAX_RETRIES_ONCHAIN,
     NEXT_PUBLIC_DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL,
     NEXT_PUBLIC_PRIORITY_FEES: process.env.NEXT_PUBLIC_PRIORITY_FEES,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   },
 });
 

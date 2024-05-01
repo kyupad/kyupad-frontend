@@ -27,6 +27,7 @@ import {
   TokenStandard,
 } from '@metaplex-foundation/mpl-bubblegum';
 import { publicKey as publicKeyFn } from '@metaplex-foundation/umi';
+import * as Sentry from '@sentry/nextjs';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import {
   ComputeBudgetProgram,
@@ -253,6 +254,10 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
     handleSetIsLoading(true);
 
+    let tried = 0;
+    let minted = false;
+    let mint_error = '';
+    let mint_message = '';
     try {
       const merkleProof = currentPool?.merkle_proof;
       const merkleProofDecoded = decrypt(
@@ -470,6 +475,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         new Promise((resolve) => setTimeout(resolve, 2000));
 
       const numTry = 30;
+
       for (let i = 0; i < numTry; i++) {
         // check transaction TTL
         const blockHeight = await connection.getBlockHeight('confirmed');
@@ -495,7 +501,10 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         }
 
         await waitToRetry();
+        tried++;
       }
+
+      minted = true;
 
       await doSyncNftbySignature({
         id: cnftMetadata?.data?.id,
@@ -530,6 +539,9 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         },
       );
     } catch (error: any) {
+      mint_error = error?.stack;
+      mint_message = error?.message;
+
       const msg =
         THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
 
@@ -538,17 +550,50 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
           position: 'top-right',
           closeButton: true,
         });
-
         return;
       }
 
-      if (msg && error?.message?.THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
+      if (error?.message !== THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
         toast.error(THROW_EXCEPTION.UNKNOWN_TRANSACTION, {
           position: 'top-right',
           closeButton: true,
         });
       }
     } finally {
+      if (mint_error) {
+        Sentry.captureException(
+          {
+            tried,
+            minted,
+            mint_error,
+            mint_message,
+            id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+          },
+          {
+            user: {
+              id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+            },
+          },
+        );
+      } else {
+        Sentry.captureMessage(
+          JSON.stringify({
+            tried,
+            minted,
+            mint_error,
+            mint_message,
+            id:
+              (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() || '',
+          }),
+          {
+            user: {
+              id:
+                (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() ||
+                '',
+            },
+          },
+        );
+      }
       handleSetIsLoading(false);
     }
   };
@@ -711,7 +756,9 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
               ) : (
                 <>
                   <span className="absolute left-0 -top-8">
-                    <span className="text-kyu-color-14">{'Minted: '}</span>
+                    <span className="text-kyu-color-14 font-medium">
+                      {'Minted: '}
+                    </span>
                     <span className="font-bold text-kyu-color-11">
                       {isSolanaConnected
                         ? (currentPool?.minted_total || 0) -
@@ -771,7 +818,10 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                 }
                 onClick={handleMint}
               >
-                {!isSolanaConnected && <>Not eligible</>}
+                {!isSolanaConnected &&
+                  (dayjs.utc(currentPool?.end_time).isBefore(now)
+                    ? 'Event ended!'
+                    : 'Not eligible')}
                 {isSolanaConnected && (
                   <>
                     {(poolsCounter[poolCounterKey] &&
@@ -780,7 +830,9 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                       ? 'Minted'
                       : currentPool?.is_active
                         ? 'Mint'
-                        : 'Not eligible'}
+                        : dayjs.utc(currentPool?.end_time).isBefore(now)
+                          ? 'Event ended!'
+                          : 'Not eligible'}
                   </>
                 )}
               </PrimaryButton>
