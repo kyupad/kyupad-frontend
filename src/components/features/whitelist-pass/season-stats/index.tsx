@@ -10,6 +10,7 @@ async function SeasonStats() {
       <SeasonStatsClient
         mintedTotal={data?.data?.season?.minted_total || 0}
         total={data?.data?.season?.total || 0}
+        seasonId={data?.data?.season?._id}
       />
 
       <span className="absolute right-0 -top-8">

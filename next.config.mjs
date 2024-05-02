@@ -53,6 +53,7 @@ const nextConfig = runWithBundleAnalyzer({
       'crypto-js',
       '@coral-xyz/anchor',
     ],
+    serverComponentsExternalPackages: ['pino-pretty'],
   },
   compiler: {
     removeConsole:

@@ -75,6 +75,8 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<number>();
   const [creators, setCreators] = useState<any[]>([]);
   const [priorityFees, setPriorityFees] = useState<number>();
+  const [seasonId, setSeasonId] = useState<string>();
+
   const activePoolWrapper = useRef<HTMLDivElement>(null);
   const moreArrowRef = useRef<HTMLImageElement>(null);
   const router = useRouter();
@@ -127,7 +129,12 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         controller.signal,
       );
 
-      if (!data?.data && data?.statusCode && currentPoolId) {
+      if (
+        (!data?.data && data?.statusCode && currentPoolId) ||
+        (currentPoolId &&
+          data?.statusCode &&
+          !data?.data?.community_round?.current_pool?.pool_id)
+      ) {
         setCurrentPoolId('');
         router.replace(WEB_ROUTES.WHITELIST_PASS, { scroll: false });
         return;
@@ -168,6 +175,10 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
       if (data?.data?.priority_fees) {
         setPriorityFees(data?.data?.priority_fees);
+      }
+
+      if (data?.data?.season_id) {
+        setSeasonId(data?.data?.season_id);
       }
 
       setLoadingPool(false);
@@ -303,6 +314,11 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
     if (!priorityFees) {
       console.error('Priority fees not found');
+      return;
+    }
+
+    if (!seasonId) {
+      console.error('Season id not found');
       return;
     }
 
@@ -572,7 +588,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       );
 
       updateUserSeasonMinted((user_season_minted || 0) + 1);
-      updateSeasonMinted((seasonMinted || 0) + 1);
+      updateSeasonMinted(seasonId, (seasonMinted[seasonId] || 0) + 1);
 
       toast.success(
         <div className="text-xl">
@@ -657,6 +673,12 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
   );
+
+  const userPoolMinted = isSolanaConnected
+    ? (currentPool?.minted_total || 0) -
+      (currentPool?.user_pool_minted_total || 0) +
+      (poolsCounter[poolCounterKey] || 0)
+    : currentPool?.minted_total;
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -822,11 +844,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                       {'Minted: '}
                     </span>
                     <span className="font-bold text-kyu-color-11">
-                      {isSolanaConnected
-                        ? (currentPool?.minted_total || 0) -
-                          (currentPool?.user_pool_minted_total || 0) +
-                          (poolsCounter[poolCounterKey] || 0)
-                        : currentPool?.minted_total}
+                      {userPoolMinted}
                     </span>
                   </span>
                 </>
@@ -836,17 +854,8 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
               ) : (
                 <Progress
                   value={
-                    (currentPool?.minted_total || 0) +
-                      (isSolanaConnected
-                        ? poolsCounter[poolCounterKey] || 0
-                        : 0) >
-                      0 && currentPool?.pool_supply > 0
-                      ? (((currentPool?.minted_total || 0) +
-                          (isSolanaConnected
-                            ? poolsCounter[poolCounterKey] || 0
-                            : 0)) /
-                          currentPool?.pool_supply) *
-                        100
+                    userPoolMinted > 0 && currentPool?.pool_supply > 0
+                      ? (userPoolMinted / currentPool?.pool_supply) * 100
                       : 0
                   }
                 />
@@ -870,7 +879,8 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                 loading={isLoading}
                 disabled={
                   !currentPool?.is_active ||
-                  poolsCounter[poolCounterKey] ||
+                  poolsCounter[poolCounterKey] >
+                    currentPool?.total_mint_per_wallet ||
                   !(
                     dayjs.utc(currentPool?.start_time).isBefore(now) &&
                     dayjs.utc(currentPool?.end_time).isAfter(now)
@@ -887,7 +897,8 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                 {isSolanaConnected && (
                   <>
                     {(poolsCounter[poolCounterKey] &&
-                      poolsCounter[poolCounterKey] > 0) ||
+                      poolsCounter[poolCounterKey] >
+                        currentPool?.total_mint_per_wallet) ||
                     currentPool?.is_minted
                       ? 'Minted'
                       : currentPool?.is_active
