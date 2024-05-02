@@ -46,6 +46,13 @@ const nextConfig = runWithBundleAnalyzer({
     serverActions: {
       allowedOrigins: process.env.NEXT_PUBLIC_ALLOWED_ORIGINS.split(','),
     },
+    optimizePackageImports: [
+      '@metaplex-foundation/mpl-bubblegum',
+      '@metaplex-foundation/mpl-token-metadata',
+      '@metaplex-foundation/umi',
+      'crypto-js',
+      '@coral-xyz/anchor',
+    ],
   },
   compiler: {
     removeConsole:
