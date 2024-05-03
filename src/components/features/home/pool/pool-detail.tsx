@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PrimaryButton from '@/components/common/button/primary';
@@ -17,50 +17,26 @@ dayjs.extend(utc);
 dayjs.extend(advancedFormat);
 
 interface IPoolDetailProps {
-  active?: boolean;
   direction?: 'row' | 'column';
   data: any;
-  isSuccess?: boolean;
+  mode?: 'upcoming' | 'active' | 'success';
 }
 
-const PoolDetail = ({
-  active,
-  direction = 'row',
-  data,
-  isSuccess,
-}: IPoolDetailProps) => {
+const PoolDetail = ({ direction = 'row', data, mode }: IPoolDetailProps) => {
   const now = dayjs.utc();
-  const [registrationEndAt, setRegistrationEndAt] = useState<string>(
-    dayjs.utc(data?.timeline?.registration_end_at).isSame(now) ||
-      dayjs.utc(data?.timeline?.registration_end_at).isBefore(now)
-      ? dayjs
-          .utc(data?.timeline?.registration_end_at)
-          .format(ENDED_AT_FORMAT_STRING)
-      : '',
-  );
+  const isNotRegisterStarted = dayjs
+    .utc(data?.timeline?.registration_start_at)
+    .isAfter(now);
 
-  const [investmentEndAt] = useState<string>(
-    dayjs.utc(data?.timeline?.investment_end_at).isSame(now) ||
-      dayjs.utc(data?.timeline?.investment_end_at).isBefore(now)
-      ? dayjs
-          .utc(data?.timeline?.investment_end_at)
-          .format(ENDED_AT_FORMAT_STRING)
-      : '',
-  );
-
-  const handleChangeRegistrationEndAt = useCallback(() => {
-    setRegistrationEndAt(
-      dayjs
-        .utc(data?.timeline?.registration_end_at)
-        .format(ENDED_AT_FORMAT_STRING),
-    );
-  }, [data?.timeline?.registration_end_at]);
+  const isRegistering =
+    dayjs.utc(data?.timeline?.registration_start_at).isBefore(now) &&
+    dayjs.utc(data?.timeline?.registration_end_at).isAfter(now);
 
   return (
     <div
       className={cn(
         'flex bg-[#FFF9EB] border-4 lg:p-10 border-button-primary-border rounded-[12px] shadow-[19px_18px_0px_0px_rgba(42,_39,_58,_0.1)] md:w-full lg:gap-10 flex-col lg:flex-row relative',
-        direction === 'column' ? '!flex-col !p-0 !gap-0' : '',
+        direction === 'column' ? '!flex-col !p-0 !gap-0 max-w-[410px]' : '',
       )}
     >
       <div
@@ -72,20 +48,29 @@ const PoolDetail = ({
         {/* countdown time end */}
         <div className="flex justify-between gap-3 items-center flex-wrap">
           <span className="text-xs sm:text-base text-button-primary-border font-medium whitespace-nowrap">
-            {investmentEndAt ? 'Ended on' : `Registration Ends in`}
+            {mode === 'success'
+              ? 'Ended on'
+              : isNotRegisterStarted
+                ? 'Registration Starts in'
+                : `Registration Ends in`}
           </span>
-          {investmentEndAt ? (
+          {mode === 'success' ? (
             <span className="font-bold text-xl text-[#F2820E]">
-              {investmentEndAt}
+              {dayjs
+                .utc(data?.timeline?.investment_end_at)
+                .format(ENDED_AT_FORMAT_STRING)}
             </span>
           ) : (
             <>
-              {!registrationEndAt ? (
+              {isRegistering || isNotRegisterStarted ? (
                 <CountdownTime
-                  time={dayjs
-                    .utc(data?.timeline?.registration_end_at)
-                    .valueOf()}
-                  action={handleChangeRegistrationEndAt}
+                  time={
+                    isRegistering
+                      ? dayjs.utc(data?.timeline?.registration_end_at).valueOf()
+                      : dayjs
+                          .utc(data?.timeline?.registration_start_at)
+                          .valueOf()
+                  }
                 />
               ) : (
                 <span className="font-bold text-xl text-[#F2820E]">Ended</span>
@@ -97,7 +82,7 @@ const PoolDetail = ({
         <div className="min-h-[180px] bg-[#FDEDC8] rounded-[24px] border-2 border-[#FCD88B] p-5 flex gap-5 overflow-hidden items-center">
           <div
             className={cn(
-              `min-w-[100px] lg:min-w-[140px] h-[100px] lg:h-[140px] rounded-full overflow-hidden relative border-2 ${active ? 'border-button-primary' : 'border-[#25252C]'}`,
+              `min-w-[100px] lg:min-w-[140px] h-[100px] lg:h-[140px] rounded-full overflow-hidden relative border-2 ${mode === 'active' ? 'border-button-primary' : 'border-[#25252C]'}`,
               direction === 'column' ? '!min-w-[100px] !h-[100px]' : '',
             )}
           >
@@ -165,7 +150,7 @@ const PoolDetail = ({
             </span>
           </div>
 
-          {investmentEndAt && (
+          {mode === 'success' && (
             <>
               <div className="flex justify-between">
                 <span className="text-button-primary-border font-medium">
@@ -187,7 +172,7 @@ const PoolDetail = ({
             </>
           )}
 
-          {!investmentEndAt && (
+          {mode !== 'success' && (
             <>
               <div className="flex justify-between">
                 <span className="text-button-primary-border font-medium">
@@ -211,16 +196,19 @@ const PoolDetail = ({
         </div>
 
         <div>
-          {!investmentEndAt && (
+          {mode !== 'success' && (
             <Link
               href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', data?.slug || '')}`}
             >
-              <PrimaryButton block className={cn(active ? 'font-heading' : '')}>
+              <PrimaryButton
+                block
+                className={cn(mode === 'active' ? 'font-heading' : '')}
+              >
                 Join now
               </PrimaryButton>
             </Link>
           )}
-          {investmentEndAt && (
+          {mode === 'success' && (
             <Link
               href={`${WEB_ROUTES.PROJECT_DETAIL.replace('[id]', data?.slug || '')}`}
             >
@@ -230,7 +218,7 @@ const PoolDetail = ({
         </div>
       </div>
 
-      {isSuccess && !investmentEndAt && (
+      {mode === 'success' && (
         <div
           className={cn(
             'lg:w-7/12 relative rounded-tl-[8px] border-b-4 rounded-tr-[8px] lg:rounded-[8px] overflow-hidden border-[#25252C] order-1 lg:order-2 pb-[56.25%] lg:pb-0 lg:border-2',
@@ -249,7 +237,7 @@ const PoolDetail = ({
           />
         </div>
       )}
-      {!isSuccess && (
+      {mode !== 'success' && (
         <div
           className={cn(
             'lg:w-7/12 relative rounded-tl-[8px] border-b-4 rounded-tr-[8px] lg:rounded-[8px] overflow-hidden border-[#25252C] order-1 lg:order-2 pb-[56.25%] lg:pb-0 lg:border-2',
