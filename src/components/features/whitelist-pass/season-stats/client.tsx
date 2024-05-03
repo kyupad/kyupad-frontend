@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { memo, useEffect } from 'react';
 import { Progress } from '@/components/common/progress/progress';
 import { useSessionStore } from '@/contexts/session-store-provider';
 import { appSyncClient } from '@/services/appsync';
@@ -47,13 +47,13 @@ function SeasonStatsClient({
     return () => {
       mintedSubscription.unsubscribe();
     };
-  }, [publicKey, seasonId, seasonMinted, total]);
+  }, [publicKey, seasonId, seasonMinted, total, updateSeasonMinted]);
 
   useEffect(() => {
-    if (mintedTotal > seasonMinted[seasonId]) {
+    if (mintedTotal > (seasonMinted[seasonId] || 0)) {
       updateSeasonMinted(seasonId, mintedTotal);
     }
-  }, [mintedTotal, seasonId, seasonMinted]);
+  }, [mintedTotal, seasonId, seasonMinted, updateSeasonMinted]);
 
   return (
     <>
@@ -74,4 +74,4 @@ function SeasonStatsClient({
   );
 }
 
-export default SeasonStatsClient;
+export default memo(SeasonStatsClient);

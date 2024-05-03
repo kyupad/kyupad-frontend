@@ -35,10 +35,10 @@ function UserPoolMinted({
   );
 
   const userPoolMinted = isSolanaConnected
-    ? (currentMintedTotal || 0) -
+    ? (poolsCounter[poolId || currentPoolId] || currentMintedTotal || 0) -
       (currentUserPoolMintedTotal || 0) +
       (poolsCounter[poolCounterKey] || 0)
-    : currentMintedTotal;
+    : poolsCounter[poolId || currentPoolId] || currentMintedTotal;
 
   useEffect(() => {
     if (!seasonId) return;
@@ -52,13 +52,15 @@ function UserPoolMinted({
       }) as any
     ).subscribe({
       next: ({ data }: any) => {
-        const currentCounter = poolsCounter[poolCounterKey];
+        const currentCounter = poolsCounter[poolId || currentPoolId] || 0;
+
         if (
+          poolId &&
           data?.subscribeToNftAction?.minted_wallet !== publicKey?.toBase58() &&
           currentCounter < currentPoolSupply &&
           data?.subscribeToNftAction?.pool_id === poolId
         ) {
-          updatePoolCounter(poolCounterKey, currentCounter + 1);
+          updatePoolCounter(poolId, (currentCounter || 0) + 1);
         }
       },
       error: (error: any) => console.error(error),
@@ -67,11 +69,20 @@ function UserPoolMinted({
     return () => {
       mintedSubscription.unsubscribe();
     };
-  }, [currentPoolSupply, poolCounterKey, poolsCounter, publicKey, seasonId]);
+  }, [
+    currentMintedTotal,
+    currentPoolId,
+    currentPoolSupply,
+    poolId,
+    poolsCounter,
+    publicKey,
+    seasonId,
+    updatePoolCounter,
+  ]);
 
   useEffect(() => {
     if (publicKey && poolId && poolId === currentPoolId) {
-      const currentCounter = poolsCounter[poolCounterKey];
+      const currentCounter = poolsCounter[poolCounterKey] || 0;
 
       const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
 
@@ -91,7 +102,25 @@ function UserPoolMinted({
     poolId,
     poolsCounter,
     publicKey,
+    updatePoolCounter,
   ]);
+
+  useEffect(() => {
+    if (poolId && poolId === currentPoolId) {
+      const currentCounter = poolsCounter[poolId] || 0;
+
+      if (currentMintedTotal > currentCounter) {
+        updatePoolCounter(poolId, currentMintedTotal || 0);
+      }
+    }
+  }, [
+    currentMintedTotal,
+    currentPoolId,
+    poolId,
+    poolsCounter,
+    updatePoolCounter,
+  ]);
+
   return (
     <>
       {loading ? (
