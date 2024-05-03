@@ -301,6 +301,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     let minted = false;
     let mint_error = '';
     let mint_message = '';
+    let mint_transaction = '';
     try {
       const merkleProof = currentPool?.merkle_proof;
       const merkleProofDecoded = decrypt(
@@ -503,6 +504,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         transactionV0,
       );
       const signatureEncode = base58.encode(signature?.signatures?.[0]);
+      mint_transaction = signatureEncode;
 
       const blockhash =
         await connection.getLatestBlockhashAndContext('confirmed');
@@ -611,6 +613,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             mint_error,
             mint_message,
             id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+            mint_transaction,
           },
           {
             user: {
@@ -627,6 +630,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             mint_message,
             id:
               (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() || '',
+            mint_transaction,
           }),
           {
             user: {
