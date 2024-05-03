@@ -30,6 +30,9 @@ const env = createEnv({
     NEXT_PUBLIC_DOCS_URL: z.string().min(1).includes('http'),
     NEXT_PUBLIC_PRIORITY_FEES: z.string().min(1),
     NEXT_PUBLIC_SENTRY_DSN: z.string().min(1).includes('http').nullish(),
+    NEXT_PUBLIC_AWS_APPSYNC_ENDPOINT: z.string().min(1).includes('http'),
+    NEXT_PUBLIC_AWS_APPSYNC_API_KEY: z.string().min(1),
+    NEXT_PUBLIC_AWS_REGION: z.string().min(1),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -53,6 +56,11 @@ const env = createEnv({
     NEXT_PUBLIC_DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL,
     NEXT_PUBLIC_PRIORITY_FEES: process.env.NEXT_PUBLIC_PRIORITY_FEES,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_AWS_APPSYNC_ENDPOINT:
+      process.env.NEXT_PUBLIC_AWS_APPSYNC_ENDPOINT,
+    NEXT_PUBLIC_AWS_APPSYNC_API_KEY:
+      process.env.NEXT_PUBLIC_AWS_APPSYNC_API_KEY,
+    NEXT_PUBLIC_AWS_REGION: process.env.NEXT_PUBLIC_AWS_REGION,
   },
 });
 

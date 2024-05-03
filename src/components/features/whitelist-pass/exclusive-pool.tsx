@@ -13,7 +13,6 @@ import { IDL, KyupadSmartContract } from '@/anchor/kyupad_smart_contract';
 import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
 import Skeleton from '@/components/common/loading/skeleton';
-import { Progress } from '@/components/common/progress/progress';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useSessionStore } from '@/contexts/session-store-provider';
 import {
@@ -50,6 +49,8 @@ import dropdown from 'public/images/whitelist/drop-down.svg';
 import moreArrow from 'public/images/whitelist/more-arrow.svg';
 import { toast } from 'sonner';
 import { decrypt } from '@utils/helpers';
+
+import UserPoolMinted from './user-pool-minted';
 
 dayjs.extend(utc);
 
@@ -199,34 +200,6 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       setLoadingPool(false);
     };
   }, [currentPoolId, publicKey, router, searchParams]);
-
-  useEffect(() => {
-    if (publicKey && poolId && poolId === currentPool?.pool_id) {
-      const currentCounter = poolsCounter[poolCounterKey] || 0;
-
-      const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
-
-      const sub = token ? jsonwebtoken.decode(token)?.sub : '';
-
-      if (
-        currentPool?.user_pool_minted_total > currentCounter &&
-        sub === publicKey?.toBase58()
-      ) {
-        updatePoolCounter(
-          poolCounterKey,
-          currentPool?.user_pool_minted_total || 0,
-        );
-      }
-    }
-  }, [
-    currentPool?.pool_id,
-    currentPool?.user_pool_minted_total,
-    poolCounterKey,
-    poolId,
-    poolsCounter,
-    publicKey,
-    updatePoolCounter,
-  ]);
 
   useEffect(() => {
     const checkActivePoolWidth = () => {
@@ -674,12 +647,6 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     (state) => state.is_solana_connected,
   );
 
-  const userPoolMinted = isSolanaConnected
-    ? (currentPool?.minted_total || 0) -
-      (currentPool?.user_pool_minted_total || 0) +
-      (poolsCounter[poolCounterKey] || 0)
-    : currentPool?.minted_total;
-
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="flex items-center gap-5 justify-between w-full flex-wrap">
@@ -835,31 +802,15 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             </div>
 
             <div className="relative mt-6">
-              {loadingPool || !poolId || !currentPool?.pool_id ? (
-                <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
-              ) : (
-                <>
-                  <span className="absolute left-0 -top-8">
-                    <span className="text-kyu-color-14 font-medium">
-                      {'Minted: '}
-                    </span>
-                    <span className="font-bold text-kyu-color-11">
-                      {userPoolMinted}
-                    </span>
-                  </span>
-                </>
-              )}
-              {loadingPool || !poolId || !currentPool?.pool_id ? (
-                <Skeleton className="h-2" />
-              ) : (
-                <Progress
-                  value={
-                    userPoolMinted > 0 && currentPool?.pool_supply > 0
-                      ? (userPoolMinted / currentPool?.pool_supply) * 100
-                      : 0
-                  }
-                />
-              )}
+              <UserPoolMinted
+                currentPoolId={currentPool?.pool_id}
+                poolId={poolId}
+                currentUserPoolMintedTotal={currentPool?.user_pool_minted_total}
+                loading={loadingPool || !poolId || !currentPool?.pool_id}
+                currentMintedTotal={currentPool?.minted_total}
+                currentPoolSupply={currentPool?.pool_supply}
+                seasonId={seasonId}
+              />
               {loadingPool ||
               (!currentPool?.pool_supply && currentPool?.pool_supply !== 0) ? (
                 <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />

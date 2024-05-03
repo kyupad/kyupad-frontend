@@ -18,7 +18,7 @@ function MyTotalNftMintedClient({ mintedTotal }: { mintedTotal: number }) {
     if (mintedTotal > userSeasonMinted) {
       updateUserSeasonMinted(mintedTotal);
     }
-  }, [mintedTotal, updateUserSeasonMinted, userSeasonMinted]);
+  }, [mintedTotal, userSeasonMinted]);
 
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
