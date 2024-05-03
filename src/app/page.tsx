@@ -3,7 +3,9 @@ import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import PrimaryButton from '@/components/common/button/primary';
-import Pool from '@/components/features/landing/pool';
+import FurtureLaunch from '@/components/features/landing/furture-launch';
+import SuccessLaunch from '@/components/features/landing/success-launch';
+import UpcomingLaunch from '@/components/features/landing/upcoming-launch';
 import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 
@@ -72,12 +74,7 @@ const Home = async () => {
 
           <div className="py-5">
             <Suspense fallback={null}>
-              <Pool
-                title="Fur-ture Launch"
-                active
-                mode="active"
-                direction="row"
-              />
+              <FurtureLaunch />
             </Suspense>
           </div>
         </div>
@@ -93,7 +90,7 @@ const Home = async () => {
             className="top-[-40px] left-[40px] max-w-[100px] sm:max-w-[180px] sm:top-[-120px] sm:left-[80px] md:left-[30px] lg:max-w-[237px] lg:top-[-130px] lg:left-[-50px] xl:left-[120px] 2xl:left-[-80px] 2xl:top-[-140px] absolute -translate-x-1/2"
           />
           <Suspense fallback={null}>
-            <Pool title="Upcoming Launches" mode="upcoming" upcoming />
+            <UpcomingLaunch />
           </Suspense>
         </div>
 
@@ -108,7 +105,7 @@ const Home = async () => {
             className="right-[-475px] top-[-100px] max-w-[403px] absolute"
           />
           <Suspense fallback={null}>
-            <Pool paging title="Success-fur Launches" mode="success" />
+            <SuccessLaunch />
           </Suspense>
         </div>
 

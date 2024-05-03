@@ -2,12 +2,17 @@ import { API_ROUTES } from '@/utils/constants';
 
 import { request } from '../xhr';
 
-const doGetUpcomingProjects = async () => {
+const doGetUpcomingProjects = async (params: {
+  limit?: number;
+  skip?: number;
+}) => {
   const data = await request(
     'GET',
     API_ROUTES.GET_PROJECTS,
     {
       type: 'upcoming',
+      ...(params?.limit ? { limit: params.limit } : {}),
+      ...(params?.skip ? { skip: params.skip } : {}),
     },
     {
       cache: 'no-store',
