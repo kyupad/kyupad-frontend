@@ -830,14 +830,15 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                 loading={isLoading}
                 disabled={
                   !currentPool?.is_active ||
-                  poolsCounter[poolCounterKey] >
+                  poolsCounter[poolCounterKey] >=
                     currentPool?.total_mint_per_wallet ||
                   !(
                     dayjs.utc(currentPool?.start_time).isBefore(now) &&
                     dayjs.utc(currentPool?.end_time).isAfter(now)
                   ) ||
                   currentPool?.is_minted ||
-                  !isSolanaConnected
+                  !isSolanaConnected ||
+                  poolsCounter[poolId] >= currentPool?.pool_supply
                 }
                 onClick={handleMint}
               >
