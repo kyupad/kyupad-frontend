@@ -10,14 +10,28 @@ import ViewSnapshot from './view-snapshot';
 interface IDetailControllerProps {
   data: any;
   isApplied: boolean;
+  usersAssets?: { total_assets?: number; participants?: number };
+  revalidatePath?: Function;
 }
 
-function DetailController({ data, isApplied }: IDetailControllerProps) {
+function DetailController({
+  data,
+  isApplied,
+  usersAssets,
+  revalidatePath,
+}: IDetailControllerProps) {
   const viewMode = useProjectDetailStore((state) => state.viewMode);
 
   return (
     <div>
-      {!viewMode && <Registration data={data} isApplied={isApplied} />}
+      {!viewMode && (
+        <Registration
+          data={data}
+          isApplied={isApplied}
+          usersAssets={usersAssets}
+          revalidatePath={revalidatePath}
+        />
+      )}
       {viewMode === 'registration' && (
         <ViewRegistration
           registrationEndAt={data?.timeline?.registration_end_at}
