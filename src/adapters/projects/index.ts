@@ -4,7 +4,7 @@ import { request } from '../xhr';
 
 const doGetUpcomingProjects = async (params: {
   limit?: number;
-  skip?: number;
+  page?: number;
 }) => {
   const data = await request(
     'GET',
@@ -12,7 +12,7 @@ const doGetUpcomingProjects = async (params: {
     {
       type: 'upcoming',
       ...(params?.limit ? { limit: params.limit } : {}),
-      ...(params?.skip ? { skip: params.skip } : {}),
+      ...(params?.page ? { page: params.page } : {}),
     },
     {
       cache: 'no-store',
@@ -21,15 +21,24 @@ const doGetUpcomingProjects = async (params: {
   return data;
 };
 
-const doGetSuccessProjects = async () => {
+const doGetSuccessProjects = async (
+  params: {
+    limit?: number;
+    page?: number;
+  },
+  signal?: AbortSignal,
+) => {
   const data = await request(
     'GET',
     API_ROUTES.GET_PROJECTS,
     {
       type: 'success',
+      ...(params?.limit ? { limit: params.limit } : {}),
+      ...(params?.page ? { page: params.page } : {}),
     },
     {
       cache: 'no-store',
+      signal,
     },
   );
 
