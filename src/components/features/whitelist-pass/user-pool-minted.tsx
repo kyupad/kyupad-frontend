@@ -102,7 +102,6 @@ function UserPoolMinted({
     poolId,
     poolsCounter,
     publicKey,
-    updatePoolCounter,
   ]);
 
   useEffect(() => {
@@ -113,13 +112,7 @@ function UserPoolMinted({
         updatePoolCounter(poolId, currentMintedTotal || 0);
       }
     }
-  }, [
-    currentMintedTotal,
-    currentPoolId,
-    poolId,
-    poolsCounter,
-    updatePoolCounter,
-  ]);
+  }, [currentMintedTotal, currentPoolId, poolId, poolsCounter]);
 
   return (
     <>

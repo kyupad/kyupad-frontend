@@ -60,7 +60,7 @@ const CalendarCountdown = ({
     updateTime();
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [time]);
+  }, [time, diff]);
 
   return (
     <div

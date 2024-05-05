@@ -47,13 +47,13 @@ function SeasonStatsClient({
     return () => {
       mintedSubscription.unsubscribe();
     };
-  }, [publicKey, seasonId, seasonMinted, total, updateSeasonMinted]);
+  }, [publicKey, seasonId, seasonMinted, total]);
 
   useEffect(() => {
     if (mintedTotal > (seasonMinted[seasonId] || 0)) {
       updateSeasonMinted(seasonId, mintedTotal);
     }
-  }, [mintedTotal, seasonId, seasonMinted, updateSeasonMinted]);
+  }, [mintedTotal, seasonId, seasonMinted]);
 
   return (
     <>

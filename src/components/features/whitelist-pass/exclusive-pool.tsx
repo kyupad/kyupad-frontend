@@ -72,7 +72,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   const [collectionMint, setCollectionMint] = useState<PublicKey>();
   const [merkleTree, SetMerkleTree] = useState<PublicKey>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loadingPool, setLoadingPool] = useState<boolean>(false);
+  const [loadingPool, setLoadingPool] = useState<boolean>(true);
   const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<number>();
   const [creators, setCreators] = useState<any[]>([]);
   const [priorityFees, setPriorityFees] = useState<number>();
@@ -181,23 +181,21 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       if (data?.data?.season_id) {
         setSeasonId(data?.data?.season_id);
       }
-
-      setLoadingPool(false);
     };
 
     const debounceFunction = setTimeout(() => {
-      setLoadingPool(true);
       try {
         fetchData();
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoadingPool(false);
       }
     }, 200);
 
     return () => {
       controller.abort();
       clearTimeout(debounceFunction);
-      setLoadingPool(false);
     };
   }, [currentPoolId, publicKey, router, searchParams]);
 
