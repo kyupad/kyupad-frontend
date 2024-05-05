@@ -52,23 +52,22 @@ function RegistrationStep({
   data,
   projectId,
   isApplied,
+  revalidatePath,
 }: {
   data: any[];
   projectId: string;
   isApplied: boolean;
+  revalidatePath?: Function;
 }) {
   const [activeStep] = useState<number>(getActiveStep(data));
   const [loading, setLoading] = useState<boolean>(false);
+  const now = dayjs.utc();
 
   const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
 
   const handleChangeLoading = useCallback((value: boolean) => {
     setLoading(value);
   }, []);
-
-  // const handleChangeActiveStep = useCallback((value: number) => {
-  //   setActiveStep(value);
-  // }, []);
 
   let progress = 'w-0';
   switch (activeStep) {
@@ -169,12 +168,19 @@ function RegistrationStep({
 
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div className="flex gap-4 md:gap-8 items-center flex-wrap">
-          <div className="text-2xl font-bold">Registration Ends in</div>
+          <div className="text-2xl font-bold">
+            {dayjs.utc(data?.[0]?.start).isAfter(now)
+              ? 'Registration Starts in'
+              : 'Registration Ends in'}
+          </div>
           {activeStep === 1 ? (
             <SimpleCountdown
-              // action={() => handleChangeActiveStep(activeStep + 1)}
               className="!text-xl md:!text-2xl"
-              time={dayjs.utc(data?.[1]?.end).valueOf()}
+              time={
+                dayjs.utc(data?.[0]?.start).isAfter(now)
+                  ? dayjs.utc(data?.[0]?.start).valueOf()
+                  : dayjs.utc(data?.[0]?.end).valueOf()
+              }
             />
           ) : (
             <span className="font-bold text-2xl text-kyu-color-18">Ended</span>
@@ -202,6 +208,10 @@ function RegistrationStep({
             loading={loading}
             loadingText="Registering..."
             className="min-w-[200px]"
+            disabled={
+              dayjs.utc(data?.[0]?.start).isAfter(now) ||
+              dayjs.utc(data?.[0]?.end).isBefore(now)
+            }
             onClick={async () => {
               handleChangeLoading(true);
               try {
@@ -219,6 +229,7 @@ function RegistrationStep({
                 //
               } finally {
                 handleChangeLoading(false);
+                revalidatePath && revalidatePath();
               }
             }}
           >
