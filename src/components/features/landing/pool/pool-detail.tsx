@@ -20,9 +20,15 @@ interface IPoolDetailProps {
   direction?: 'row' | 'column';
   data: any;
   mode?: 'upcoming' | 'active' | 'success';
+  revalidatePath?: Function;
 }
 
-const PoolDetail = ({ direction = 'row', data, mode }: IPoolDetailProps) => {
+const PoolDetail = ({
+  direction = 'row',
+  data,
+  mode,
+  revalidatePath,
+}: IPoolDetailProps) => {
   const now = dayjs.utc();
   const isNotRegisterStarted = dayjs
     .utc(data?.timeline?.registration_start_at)
@@ -71,6 +77,7 @@ const PoolDetail = ({ direction = 'row', data, mode }: IPoolDetailProps) => {
                           .utc(data?.timeline?.registration_start_at)
                           .valueOf()
                   }
+                  revalidatePath={revalidatePath}
                 />
               ) : (
                 <span className="font-bold text-xl text-[#F2820E]">Ended</span>

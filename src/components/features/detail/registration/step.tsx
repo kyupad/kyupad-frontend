@@ -57,7 +57,7 @@ function RegistrationStep({
   projectId: string;
   isApplied: boolean;
 }) {
-  const [activeStep, setActiveStep] = useState<number>(getActiveStep(data));
+  const [activeStep] = useState<number>(getActiveStep(data));
   const [loading, setLoading] = useState<boolean>(false);
 
   const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
@@ -66,9 +66,9 @@ function RegistrationStep({
     setLoading(value);
   }, []);
 
-  const handleChangeActiveStep = useCallback((value: number) => {
-    setActiveStep(value);
-  }, []);
+  // const handleChangeActiveStep = useCallback((value: number) => {
+  //   setActiveStep(value);
+  // }, []);
 
   let progress = 'w-0';
   switch (activeStep) {
@@ -172,7 +172,7 @@ function RegistrationStep({
           <div className="text-2xl font-bold">Registration Ends in</div>
           {activeStep === 1 ? (
             <SimpleCountdown
-              action={() => handleChangeActiveStep(activeStep + 1)}
+              // action={() => handleChangeActiveStep(activeStep + 1)}
               className="!text-xl md:!text-2xl"
               time={dayjs.utc(data?.[1]?.end).valueOf()}
             />
