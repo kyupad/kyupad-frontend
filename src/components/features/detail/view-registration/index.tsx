@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useState } from 'react';
 import Image from 'next/image';
 import SecondaryButton from '@/components/common/button/secondary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
@@ -15,11 +15,11 @@ function ViewRegistration({
 }: {
   registrationEndAt: string;
 }) {
-  const [ended, setEnded] = useState<boolean>(false);
+  const [ended] = useState<boolean>(false);
 
-  const handleChangeEnded = useCallback((value: boolean) => {
-    setEnded(value);
-  }, []);
+  // const handleChangeEnded = useCallback((value: boolean) => {
+  //   setEnded(value);
+  // }, []);
   return (
     <>
       <div className="w-full max-w-8xl mx-auto px-4 lg:px-[60px] flex flex-col gap-5 pb-4">
@@ -60,7 +60,7 @@ function ViewRegistration({
             <div className="text-2xl font-bold">Registration Ends in</div>
             {!ended ? (
               <SimpleCountdown
-                action={() => handleChangeEnded(true)}
+                // action={() => handleChangeEnded(true)}
                 className="!text-xl md:!text-2xl"
                 time={dayjs.utc(registrationEndAt).valueOf()}
               />

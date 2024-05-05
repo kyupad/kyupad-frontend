@@ -8,20 +8,20 @@ import arrowRight from '/public/images/home/arrow-right.svg';
 
 interface IPoolProps {
   title?: string;
-  upcoming?: boolean;
-  paging?: boolean;
+  pagination?: any;
   mode: 'upcoming' | 'active' | 'success';
   direction?: 'row' | 'column';
   data?: any[];
+  revalidatePath?: Function;
 }
 
-const Pool = async ({
+const Pool = ({
   title,
-  upcoming,
-  paging,
+  pagination,
   mode,
   direction = 'column',
   data,
+  revalidatePath,
 }: IPoolProps) => {
   return (
     <div className="w-full">
@@ -36,18 +36,36 @@ const Pool = async ({
             direction={direction}
             data={item}
             mode={mode}
+            revalidatePath={revalidatePath}
           />
         ))}
-        {upcoming && data && data?.length > 0 && <UpcomingPool />}
+        {mode === 'upcoming' &&
+          data &&
+          data?.length > 0 &&
+          data?.length < 3 && <UpcomingPool />}
       </div>
 
-      {paging && data && data?.length > 0 && (
+      {pagination?.total > 1 && (
         <div className="flex justify-center items-center gap-12 pt-8">
-          <button className="p-4">
+          <button
+            disabled={pagination?.page === 1}
+            className="p-4"
+            onClick={() => {
+              pagination?.handleNext && pagination.handleNext();
+            }}
+          >
             <Image src={arrowLeft} alt="Previous" />
           </button>
-          <div className="font-bold text-2xl">1/5</div>
-          <button className="p-4">
+          <div className="font-bold text-2xl">
+            {pagination?.page}/{pagination?.total}
+          </div>
+          <button
+            disabled={pagination?.page === pagination?.total}
+            className="p-4"
+            onClick={() => {
+              pagination?.handlePrevious && pagination.handlePrevious();
+            }}
+          >
             <Image src={arrowRight} alt="Next" />
           </button>
         </div>
