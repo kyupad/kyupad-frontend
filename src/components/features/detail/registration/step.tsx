@@ -225,11 +225,11 @@ function RegistrationStep({
                 }
 
                 changeViewMode('registration');
+                revalidatePath && revalidatePath(window.location.pathname);
               } catch {
                 //
               } finally {
                 handleChangeLoading(false);
-                revalidatePath && revalidatePath();
               }
             }}
           >

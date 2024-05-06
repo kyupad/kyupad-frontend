@@ -122,7 +122,7 @@ const Registation = ({
                   ? currencyFormatter.format(
                       Big(usersAssets.total_assets).toNumber(),
                     )
-                  : 0}
+                  : '$0'}
               </span>
             </div>
 

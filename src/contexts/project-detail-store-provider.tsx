@@ -7,6 +7,7 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   createProjectDetailStore,
   IProjectDetailStore,
@@ -28,9 +29,13 @@ const ProjectDetailStoreProvider = ({
     storeRef.current = createProjectDetailStore;
   }
 
+  const pathName = usePathname();
+
   useEffect(() => {
-    storeRef.current && storeRef.current.setState({ viewMode: null });
-  }, []);
+    if (pathName) {
+      storeRef.current && storeRef.current.setState({ viewMode: null });
+    }
+  }, [pathName]);
 
   return (
     <ProjectDetailStoreContext.Provider value={storeRef.current}>
