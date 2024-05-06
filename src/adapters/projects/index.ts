@@ -50,4 +50,18 @@ const doApplyProject = async (payload: { project_id: string }) => {
   return data;
 };
 
-export { doGetUpcomingProjects, doGetSuccessProjects, doApplyProject };
+const doViewRegistration = async (params: { wallet: string; slug: string }) => {
+  const data = await request(
+    'GET',
+    API_ROUTES.VIEW_REGISTRATION.replace('[slug]', params.slug),
+    { wallet: params.wallet },
+  );
+  return data;
+};
+
+export {
+  doGetUpcomingProjects,
+  doGetSuccessProjects,
+  doApplyProject,
+  doViewRegistration,
+};

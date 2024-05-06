@@ -47,7 +47,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                 <Header />
                 <main className="overflow-hidden relative">{children}</main>
                 <Footer />
-                <SonnerToaster />
+                <SonnerToaster position="top-right" closeButton />
                 <Ribbon />
               </body>
             </html>

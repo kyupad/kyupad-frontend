@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { WEB_ROUTES } from '@/utils/constants';
 import { env } from 'env.mjs';
+import menu from 'public/images/header/menu.svg';
 import PrimaryButton from '@components/common/button/primary';
 
 import {
@@ -40,12 +41,7 @@ function MobileMenu({
       <Sheet>
         <SheetTrigger asChild>
           <PrimaryButton>
-            <Image
-              src="/images/header/menu.svg"
-              width={24}
-              height={24}
-              alt="Menu"
-            />
+            <Image src={menu} width={24} height={24} alt="Menu" />
           </PrimaryButton>
         </SheetTrigger>
         <SheetContent side="left">
