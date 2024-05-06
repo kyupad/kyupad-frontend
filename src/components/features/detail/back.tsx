@@ -20,7 +20,7 @@ function Back() {
         }
       }}
     >
-      <Image src={arrowLeft} alt="Back" />
+      <Image src={arrowLeft} alt="Back" draggable={false} />
     </button>
   );
 }

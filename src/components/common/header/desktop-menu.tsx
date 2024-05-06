@@ -20,7 +20,7 @@ function DesktopMenu() {
           )}
         ></span>
       </Link>
-      {/* <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
+      <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
         My Space
         <span
           className={cn(
@@ -28,7 +28,7 @@ function DesktopMenu() {
             pathName === WEB_ROUTES.MY_SPACE ? 'w-full' : '',
           )}
         ></span>
-      </Link> */}
+      </Link>
       {/* <Link href={WEB_ROUTES.CATNIP_POINTS} className="relative group">
         Catnip Points
         <span

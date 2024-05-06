@@ -35,10 +35,14 @@ function DetailController({
       {viewMode === 'registration' && (
         <ViewRegistration
           registrationEndAt={data?.timeline?.registration_end_at}
+          revalidatePath={revalidatePath}
+          usersAssets={usersAssets}
         />
       )}
 
-      {viewMode === 'snapshot' && <ViewSnapshot data={data} />}
+      {viewMode === 'snapshot' && (
+        <ViewSnapshot data={data} usersAssets={usersAssets} />
+      )}
     </div>
   );
 }

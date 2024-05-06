@@ -46,11 +46,11 @@ function SuccessLaunch() {
 
     const debounceFunction = setTimeout(() => {
       try {
-        fetchData();
+        fetchData().finally(() => {
+          setLoading(false);
+        });
       } catch (error) {
         console.error(error);
-      } finally {
-        setLoading(false);
       }
     }, 200);
 

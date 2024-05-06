@@ -10,6 +10,7 @@ const API_ROUTES = {
   SYNC_NFT_BY_SIGNATURE: '/v1/nft/sync-nft-by-signature',
   REFRESH: '/v1/auth/refresh',
   GENERATE_REFER_LINK: '/v1/nft/generate-prefer-code',
+  VIEW_REGISTRATION: '/v1/projects/[slug]/registration-detail',
 };
 
 const WEB_ROUTES = {

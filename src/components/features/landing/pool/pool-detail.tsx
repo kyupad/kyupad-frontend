@@ -109,7 +109,7 @@ const PoolDetail = ({
                 direction === 'column' ? '!text-2xl' : '',
               )}
             >
-              {data?.name || 'Project A'}
+              {data?.name || ''}
             </h4>
             <div
               className={cn(
@@ -117,7 +117,9 @@ const PoolDetail = ({
                 direction === 'column' ? '!text-xl' : '',
               )}
             >
-              ${data?.token_info?.symbol || 'XXX'}
+              {data?.token_info?.symbol
+                ? `$${data.token_info.symbol.toUpperCase()}`
+                : ''}
             </div>
 
             <div className="flex gap-[10px] flex-wrap">
