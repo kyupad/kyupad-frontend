@@ -186,7 +186,7 @@ function RegistrationStep({
             <span className="font-bold text-2xl text-kyu-color-18">Ended</span>
           )}
         </div>
-        {activeStep < 3 && isApplied && (
+        {isApplied && (
           <div className="flex gap-4 flex-wrap">
             <SecondaryButton disabled>Registered</SecondaryButton>
             <PrimaryButton
@@ -195,10 +195,12 @@ function RegistrationStep({
                   changeViewMode('registration');
                 } else if (activeStep === 2) {
                   changeViewMode('snapshot');
+                } else if (activeStep === 3) {
+                  changeViewMode('investment');
                 }
               }}
             >
-              View Registration
+              {activeStep === 3 ? 'Invest Now' : 'View Registration'}
             </PrimaryButton>
           </div>
         )}

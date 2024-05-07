@@ -12,7 +12,7 @@ import x from '/public/images/detail/x.svg';
 
 function ProjectDetailHeader({ detail }: { detail?: any }) {
   const viewMode = useProjectDetailStore((state) => state.viewMode);
-  return viewMode !== 'snapshot' ? (
+  return viewMode !== 'snapshot' && viewMode !== 'investment' ? (
     <>
       <div className="max-w-8xl mx-auto px-4 lg:px-[60px] pt-5 flex items-center">
         <Back />
