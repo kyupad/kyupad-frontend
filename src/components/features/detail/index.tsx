@@ -4,6 +4,7 @@ import React, { memo } from 'react';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
 
 import Registration from './registration';
+import ViewInvestment from './view-investment';
 import ViewRegistration from './view-registration';
 import ViewSnapshot from './view-snapshot';
 
@@ -41,6 +42,7 @@ function DetailController({
       )}
 
       {viewMode === 'snapshot' && <ViewSnapshot data={data} />}
+      {viewMode === 'investment' && <ViewInvestment data={data} />}
     </div>
   );
 }
