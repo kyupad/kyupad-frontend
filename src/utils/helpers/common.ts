@@ -1,7 +1,6 @@
 import chalk from 'chalk';
 import clsx, { ClassValue } from 'clsx';
 import dayjs from 'dayjs';
-import { SweetAlertOptions } from 'sweetalert2';
 import { twMerge } from 'tailwind-merge';
 
 function isEmpty(obj: Array<any> | object): boolean {
@@ -28,22 +27,6 @@ function removeUndefinedAndNull(obj: Object) {
 
   return result;
 }
-
-const getSweetErrorConfig = (message: string): SweetAlertOptions => {
-  return {
-    icon: 'error',
-    title: message,
-    width: 600,
-    padding: '3em',
-    color: '#716add',
-    backdrop: `
-            rgba(0,0,123,0.4)
-            url("/images/common/nyan-cat.gif")
-            left top
-            no-repeat
-        `,
-  };
-};
 
 const logger = ({
   message,
@@ -112,7 +95,6 @@ const debounce = (func: any, wait: number, immediate?: any) => {
 export {
   removeUndefinedAndNull,
   isEmpty,
-  getSweetErrorConfig,
   logger,
   getInfoDevice,
   cn,

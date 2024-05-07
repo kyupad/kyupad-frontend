@@ -25,6 +25,11 @@ const SessionStoreProvider = ({ children }: SessionStoreProviderProps) => {
 
   useEffect(() => {
     withSessionStorageDOMEvents(createSessionStore);
+    storeRef.current?.setState((state) => ({
+      ...state,
+      poolsCounter: {},
+      seasonMinted: {},
+    }));
   }, []);
 
   return (

@@ -6,8 +6,8 @@ interface ISessionStore {
   updatePoolCounter: (key: string, value: number) => void;
   user_season_minted: number;
   updateUserSeasonMinted: (value: number) => void;
-  seasonMinted: number;
-  updateSeasonMinted: (value: number) => void;
+  seasonMinted: any;
+  updateSeasonMinted: (key: string, value: number) => void;
 }
 
 type StoreWithPersist = Mutate<
@@ -51,7 +51,7 @@ const initialState: ISessionStore = {
   updatePoolCounter: () => {},
   user_season_minted: 0,
   updateUserSeasonMinted: () => {},
-  seasonMinted: 0,
+  seasonMinted: {},
   updateSeasonMinted: () => {},
 };
 
@@ -69,7 +69,13 @@ const createSessionStore = createStore<ISessionStore>()(
         })),
       updateUserSeasonMinted: (value: number) =>
         set({ user_season_minted: value }),
-      updateSeasonMinted: (value: number) => set({ seasonMinted: value }),
+      updateSeasonMinted: (key: string, value: number) =>
+        set((state) => ({
+          seasonMinted: {
+            ...state.seasonMinted,
+            [`${key}`]: value,
+          },
+        })),
     }),
     {
       name: 'session-storage',

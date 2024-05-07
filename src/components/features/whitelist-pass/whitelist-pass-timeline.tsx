@@ -8,10 +8,12 @@ async function WhitelistPassTimeline() {
   const mintingRoundRoadMap = data?.data?.minting_round_road_map || [];
 
   const roundStep = mintingRoundRoadMap?.map((r: any, i: number) => ({
+    id: r?._id,
     step: i + 1,
     start: r?.start_time,
     end: r?.end_time,
     title: r?.community_name || '',
+    active: r?.is_active_pool,
   }));
 
   return (

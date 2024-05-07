@@ -2,7 +2,8 @@
 
 import React, { memo } from 'react';
 import Image from 'next/image';
-import { UTC_FORMAT_STRING } from '@/utils/constants';
+import { useRouter } from 'next/navigation';
+import { UTC_FORMAT_STRING, WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -22,6 +23,7 @@ function WhitelistPassStep({
   direction?: 'horizontal' | 'vertical';
 }) {
   const now = dayjs.utc();
+  const router = useRouter();
   return (
     <div className="flex flex-col gap-5">
       <div className="text-kyu-color-11">
@@ -42,9 +44,26 @@ function WhitelistPassStep({
             {data?.map((item, index) => (
               <div
                 key={item.step}
-                className={cn('', index === data?.length - 1 ? '' : 'pb-5')}
+                className={cn(
+                  'cursor-pointer group',
+                  index === data?.length - 1 ? '' : 'pb-5',
+                )}
+                onClick={() => {
+                  if (item?.active) {
+                    router.push(
+                      `${WEB_ROUTES.WHITELIST_PASS}?id=${item?.id}#mint-pool`,
+                      { scroll: false },
+                    );
+
+                    const mintPool = document.querySelector('#mint-pool');
+                    mintPool?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'center',
+                    });
+                  }
+                }}
               >
-                <h2 className="text-xl sm:text-2xl font-bold">
+                <h2 className="text-xl sm:text-2xl font-bold cursor-pointer group-hover:text-kyu-color-5 transition-all">
                   {item?.title || ''}
                 </h2>
 

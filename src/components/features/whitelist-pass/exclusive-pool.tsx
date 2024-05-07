@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 'use client';
 
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   doGenerateMetadata,
   doGetMintingPool,
@@ -11,11 +12,22 @@ import {
 import { IDL, KyupadSmartContract } from '@/anchor/kyupad_smart_contract';
 import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
+import WalletConnect from '@/components/common/header/wallet-connect';
 import Skeleton from '@/components/common/loading/skeleton';
-import { Progress } from '@/components/common/progress/progress';
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/common/tooltip';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useSessionStore } from '@/contexts/session-store-provider';
-import { ACCESS_TOKEN_STORAGE_KEY, THROW_EXCEPTION } from '@/utils/constants';
+import {
+  ACCESS_TOKEN_STORAGE_KEY,
+  THROW_EXCEPTION,
+  WEB_ROUTES,
+} from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { Program } from '@coral-xyz/anchor';
 import {
@@ -27,6 +39,7 @@ import {
   TokenStandard,
 } from '@metaplex-foundation/mpl-bubblegum';
 import { publicKey as publicKeyFn } from '@metaplex-foundation/umi';
+import * as Sentry from '@sentry/nextjs';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import {
   ComputeBudgetProgram,
@@ -40,10 +53,13 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import jsonwebtoken from 'jsonwebtoken';
+import infoIcon from 'public/images/detail/info-icon.svg';
 import dropdown from 'public/images/whitelist/drop-down.svg';
-// import moreArrow from 'public/images/whitelist/more-arrow.svg';
+import moreArrow from 'public/images/whitelist/more-arrow.svg';
 import { toast } from 'sonner';
 import { decrypt } from '@utils/helpers';
+
+import UserPoolMinted from './user-pool-minted';
 
 dayjs.extend(utc);
 
@@ -52,20 +68,39 @@ const tokenMetaDataProgramId = new PublicKey(
   env.NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID,
 );
 
-function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
+function ExclusivePool({
+  revalidatePath,
+  doGetSignInData,
+  doVerifySignInWithSolana,
+  setCookie,
+}: {
+  revalidatePath: Function;
+  doGetSignInData: Function;
+  doVerifySignInWithSolana: Function;
+  setCookie: Function;
+}) {
   const [open, setOpen] = useState<boolean>(false);
   const { publicKey, wallet } = useWallet();
 
+  const searchParams = useSearchParams();
   const [activePool, setActivePool] = useState<any[]>([]);
   const [currentPool, setCurrentPool] = useState<any>({});
-  const [currentPoolId, setCurrentPoolId] = useState<string>();
+  const [currentPoolId, setCurrentPoolId] = useState<string>(
+    searchParams.get('id') || '',
+  );
   const [collectionMint, setCollectionMint] = useState<PublicKey>();
   const [merkleTree, SetMerkleTree] = useState<PublicKey>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loadingPool, setLoadingPool] = useState<boolean>(false);
+  const [loadingPool, setLoadingPool] = useState<boolean>(true);
   const [sellerFeeBasisPoints, setSellerFeeBasisPoints] = useState<number>();
   const [creators, setCreators] = useState<any[]>([]);
   const [priorityFees, setPriorityFees] = useState<number>();
+  const [seasonId, setSeasonId] = useState<string>();
+
+  const activePoolWrapper = useRef<HTMLDivElement>(null);
+  const moreArrowRef = useRef<HTMLImageElement>(null);
+  const router = useRouter();
+
   const {
     poolsCounter,
     updatePoolCounter,
@@ -89,9 +124,15 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     setOpen(!value);
   }, []);
 
-  const handleChangePoolId = useCallback((poolId: string) => {
-    setCurrentPoolId(poolId);
-  }, []);
+  const handleChangePoolId = useCallback(
+    (poolId: string) => {
+      setCurrentPoolId(poolId);
+      router.push(`${WEB_ROUTES.WHITELIST_PASS}?id=${poolId}`, {
+        scroll: false,
+      });
+    },
+    [router],
+  );
 
   const handleSetIsLoading = useCallback((value: boolean) => {
     setIsLoading(value);
@@ -107,6 +148,17 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         },
         controller.signal,
       );
+
+      if (
+        (!data?.data && data?.statusCode && currentPoolId) ||
+        (currentPoolId &&
+          data?.statusCode &&
+          !data?.data?.community_round?.current_pool?.pool_id)
+      ) {
+        setCurrentPoolId('');
+        router.replace(WEB_ROUTES.WHITELIST_PASS, { scroll: false });
+        return;
+      }
 
       if (data?.data?.community_round?.active_pools) {
         setActivePool([
@@ -145,13 +197,16 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         setPriorityFees(data?.data?.priority_fees);
       }
 
-      setLoadingPool(false);
+      if (data?.data?.season_id) {
+        setSeasonId(data?.data?.season_id);
+      }
     };
 
     const debounceFunction = setTimeout(() => {
-      setLoadingPool(true);
       try {
-        fetchData();
+        fetchData().finally(() => {
+          setLoadingPool(false);
+        });
       } catch (error) {
         console.error(error);
       }
@@ -160,37 +215,38 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     return () => {
       controller.abort();
       clearTimeout(debounceFunction);
-      setLoadingPool(false);
     };
-  }, [currentPoolId, publicKey]);
+  }, [currentPoolId, publicKey, router, searchParams]);
 
   useEffect(() => {
-    if (publicKey && poolId && poolId === currentPool?.pool_id) {
-      const currentCounter = poolsCounter[poolCounterKey] || 0;
+    const checkActivePoolWidth = () => {
+      const activePoolWrapperWidth =
+        activePoolWrapper.current?.clientWidth || 0;
+      const activePoolItems = document.querySelectorAll('.active-pool-item');
+      const activePoolItemsWidth = Array.from(activePoolItems).reduce(
+        (acc, item) => acc + (item as HTMLElement).clientWidth,
+        0,
+      );
 
-      const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
-
-      const sub = token ? jsonwebtoken.decode(token)?.sub : '';
-
-      if (
-        currentPool?.user_pool_minted_total > currentCounter &&
-        sub === publicKey?.toBase58()
-      ) {
-        updatePoolCounter(
-          poolCounterKey,
-          currentPool?.user_pool_minted_total || 0,
-        );
+      if (activePoolItemsWidth + 80 > activePoolWrapperWidth) {
+        moreArrowRef.current?.classList.remove('hidden');
+      } else {
+        moreArrowRef.current?.classList.add('hidden');
       }
-    }
-  }, [
-    currentPool?.pool_id,
-    currentPool?.user_pool_minted_total,
-    poolCounterKey,
-    poolId,
-    poolsCounter,
-    publicKey,
-    updatePoolCounter,
-  ]);
+    };
+
+    const id = setTimeout(() => {
+      checkActivePoolWidth();
+      clearTimeout(id);
+    }, 3000);
+
+    window.addEventListener('resize', checkActivePoolWidth);
+
+    return () => {
+      clearTimeout(id);
+      window.removeEventListener('resize', checkActivePoolWidth);
+    };
+  }, []);
 
   const handleMint = async () => {
     if (!publicKey) {
@@ -251,8 +307,18 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       return;
     }
 
+    if (!seasonId) {
+      console.error('Season id not found');
+      return;
+    }
+
     handleSetIsLoading(true);
 
+    let tried = 0;
+    let minted = false;
+    let mint_error = '';
+    let mint_message = '';
+    let mint_transaction = '';
     try {
       const merkleProof = currentPool?.merkle_proof;
       const merkleProofDecoded = decrypt(
@@ -455,6 +521,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         transactionV0,
       );
       const signatureEncode = base58.encode(signature?.signatures?.[0]);
+      mint_transaction = signatureEncode;
 
       const blockhash =
         await connection.getLatestBlockhashAndContext('confirmed');
@@ -470,6 +537,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         new Promise((resolve) => setTimeout(resolve, 2000));
 
       const numTry = 30;
+
       for (let i = 0; i < numTry; i++) {
         // check transaction TTL
         const blockHeight = await connection.getBlockHeight('confirmed');
@@ -495,7 +563,10 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         }
 
         await waitToRetry();
+        tried++;
       }
+
+      minted = true;
 
       await doSyncNftbySignature({
         id: cnftMetadata?.data?.id,
@@ -509,7 +580,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
       );
 
       updateUserSeasonMinted((user_season_minted || 0) + 1);
-      updateSeasonMinted((seasonMinted || 0) + 1);
+      updateSeasonMinted(seasonId, (seasonMinted[seasonId] || 0) + 1);
 
       toast.success(
         <div className="text-xl">
@@ -530,6 +601,9 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         },
       );
     } catch (error: any) {
+      mint_error = error?.stack;
+      mint_message = error?.message;
+
       const msg =
         THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
 
@@ -538,17 +612,52 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
           position: 'top-right',
           closeButton: true,
         });
-
         return;
       }
 
-      if (msg && error?.message?.THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
+      if (error?.message !== THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
         toast.error(THROW_EXCEPTION.UNKNOWN_TRANSACTION, {
           position: 'top-right',
           closeButton: true,
         });
       }
     } finally {
+      if (mint_error) {
+        Sentry.captureException(
+          {
+            tried,
+            minted,
+            mint_error,
+            mint_message,
+            id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+            mint_transaction,
+          },
+          {
+            user: {
+              id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+            },
+          },
+        );
+      } else {
+        Sentry.captureMessage(
+          JSON.stringify({
+            tried,
+            minted,
+            mint_error,
+            mint_message,
+            id:
+              (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() || '',
+            mint_transaction,
+          }),
+          {
+            user: {
+              id:
+                (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() ||
+                '',
+            },
+          },
+        );
+      }
       handleSetIsLoading(false);
     }
   };
@@ -558,6 +667,71 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
   );
+
+  const renderButtonMint = useCallback(() => {
+    if (dayjs.utc(currentPool?.end_time).isBefore(now)) {
+      return <PrimaryButton disabled>Event ended!</PrimaryButton>;
+    }
+
+    if (!currentPool?.is_active) {
+      return <PrimaryButton disabled>Not eligible</PrimaryButton>;
+    }
+
+    if (
+      (poolsCounter[poolCounterKey] &&
+        poolsCounter[poolCounterKey] >= currentPool?.total_mint_per_wallet) ||
+      currentPool?.is_minted
+    ) {
+      return <PrimaryButton disabled>Minted</PrimaryButton>;
+    }
+
+    if (
+      poolsCounter[poolId] >= currentPool?.pool_supply ||
+      currentPool?.minted_total >= currentPool?.pool_supply
+    ) {
+      return <PrimaryButton disabled>Sold Out</PrimaryButton>;
+    }
+
+    const isNotStart = dayjs.utc(currentPool?.start_time).isAfter(now);
+
+    return (
+      <TooltipProvider delayDuration={0}>
+        <Tooltip>
+          <TooltipTrigger>
+            <PrimaryButton
+              loading={isLoading}
+              disabled={isNotStart}
+              onClick={handleMint}
+              block
+            >
+              Mint &nbsp; {isNotStart && <Image src={infoIcon} alt="info" />}
+            </PrimaryButton>
+          </TooltipTrigger>
+          {isNotStart && (
+            <TooltipContent className="max-w-[274px] px-5 py-4">
+              <p className="text-base font-medium text-justify">
+                Please wait until mint time!
+              </p>
+              <TooltipArrow fill="#8E8FA2" />
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }, [
+    currentPool?.end_time,
+    currentPool?.is_active,
+    currentPool?.is_minted,
+    currentPool?.minted_total,
+    currentPool?.pool_supply,
+    currentPool?.start_time,
+    currentPool?.total_mint_per_wallet,
+    isLoading,
+    now,
+    poolCounterKey,
+    poolId,
+    poolsCounter,
+  ]);
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -610,13 +784,13 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
         </div>
       </div>
 
-      <div className="relative">
-        <div className="flex gap-3 overflow-x-auto scrollbar pb-4">
+      <div className="relative" ref={activePoolWrapper}>
+        <div className="flex gap-3 overflow-x-auto scrollbar pb-4 pr-4">
           {activePool?.map((pool, index) => {
             if (!pool?.pool_id) {
               return (
                 <span
-                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400"
+                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400 active-pool-item"
                   key={index}
                 >
                   {pool?.pool_name}
@@ -630,7 +804,7 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                   handleChangePoolId(pool?.pool_id);
                 }}
                 className={cn(
-                  'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap',
+                  'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap active-pool-item',
                   (currentPoolId || currentPool?.pool_id) === pool?.pool_id
                     ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
                     : 'text-[#8E8FA2]',
@@ -654,10 +828,18 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
               </>
             ))}
         </div>
-        {/* <Image src={moreArrow} alt="more" className="absolute right-0 top-0" /> */}
+        <Image
+          src={moreArrow}
+          alt="more"
+          className="absolute right-0 top-0 hidden"
+          ref={moreArrowRef}
+        />
       </div>
 
-      <div className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10">
+      <div
+        className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10"
+        id="mint-pool"
+      >
         <div className="flex justify-center gap-10 items-center flex-col lg:flex-row">
           <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
             {loadingPool || !currentPool?.pool_image ? (
@@ -706,42 +888,15 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             </div>
 
             <div className="relative mt-6">
-              {loadingPool || !poolId ? (
-                <Skeleton className="h-4 w-1/12 absolute left-0 -top-6" />
-              ) : (
-                <>
-                  <span className="absolute left-0 -top-8">
-                    <span className="text-kyu-color-14">{'Minted: '}</span>
-                    <span className="font-bold text-kyu-color-11">
-                      {isSolanaConnected
-                        ? (currentPool?.minted_total || 0) -
-                          (currentPool?.user_pool_minted_total || 0) +
-                          (poolsCounter[poolCounterKey] || 0)
-                        : currentPool?.minted_total}
-                    </span>
-                  </span>
-                </>
-              )}
-              {loadingPool || !poolId ? (
-                <Skeleton className="h-2" />
-              ) : (
-                <Progress
-                  value={
-                    (currentPool?.minted_total || 0) +
-                      (isSolanaConnected
-                        ? poolsCounter[poolCounterKey] || 0
-                        : 0) >
-                      0 && currentPool?.pool_supply > 0
-                      ? (((currentPool?.minted_total || 0) +
-                          (isSolanaConnected
-                            ? poolsCounter[poolCounterKey] || 0
-                            : 0)) /
-                          currentPool?.pool_supply) *
-                        100
-                      : 0
-                  }
-                />
-              )}
+              <UserPoolMinted
+                currentPoolId={currentPool?.pool_id}
+                poolId={poolId}
+                currentUserPoolMintedTotal={currentPool?.user_pool_minted_total}
+                loading={loadingPool || !poolId || !currentPool?.pool_id}
+                currentMintedTotal={currentPool?.minted_total}
+                currentPoolSupply={currentPool?.pool_supply}
+                seasonId={seasonId}
+              />
               {loadingPool ||
               (!currentPool?.pool_supply && currentPool?.pool_supply !== 0) ? (
                 <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
@@ -754,36 +909,18 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
                 </span>
               )}
             </div>
-            {loadingPool || !poolId ? (
+            {loadingPool || !poolId || !currentPool?.pool_id ? (
               <Skeleton className="h-[48px]" />
+            ) : isSolanaConnected ? (
+              renderButtonMint()
             ) : (
-              <PrimaryButton
-                loading={isLoading}
-                disabled={
-                  !currentPool?.is_active ||
-                  poolsCounter[poolCounterKey] ||
-                  !(
-                    dayjs.utc(currentPool?.start_time).isBefore(now) &&
-                    dayjs.utc(currentPool?.end_time).isAfter(now)
-                  ) ||
-                  currentPool?.is_minted ||
-                  !isSolanaConnected
-                }
-                onClick={handleMint}
-              >
-                {!isSolanaConnected && <>Not eligible</>}
-                {isSolanaConnected && (
-                  <>
-                    {(poolsCounter[poolCounterKey] &&
-                      poolsCounter[poolCounterKey] > 0) ||
-                    currentPool?.is_minted
-                      ? 'Minted'
-                      : currentPool?.is_active
-                        ? 'Mint'
-                        : 'Not eligible'}
-                  </>
-                )}
-              </PrimaryButton>
+              <WalletConnect
+                doGetSignInData={doGetSignInData}
+                doVerifySignInWithSolana={doVerifySignInWithSolana}
+                setCookie={setCookie}
+                revalidatePath={revalidatePath}
+                block
+              />
             )}
           </div>
         </div>

@@ -14,7 +14,7 @@ import logoFooter from '/public/images/footer/logo-footer.svg';
 function Footer() {
   return (
     <footer className="bg-kyu-color-4 flex items-center justify-center min-h-[80px]">
-      <div className="max-w-8xl w-full flex flex-col items-center gap-3">
+      <div className="max-w-8xl w-full flex flex-col items-center gap-3 pt-5">
         <div className="max-w-[150px] min-w-[150px] xl:min-w-[240px]">
           <Image src={logoFooter} alt="Logo Footer" draggable={false} />
         </div>

@@ -24,6 +24,7 @@ const fontHeading = Knewave({
 
 const Home = async () => {
   redirect(WEB_ROUTES.WHITELIST_PASS);
+
   return (
     <>
       <Image

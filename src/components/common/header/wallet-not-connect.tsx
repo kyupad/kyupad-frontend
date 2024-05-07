@@ -23,10 +23,12 @@ function WalletNotConnect({
   loading,
   setLoading,
   signin,
+  block,
 }: {
   loading?: boolean;
   setLoading?: Function;
   signin: Function;
+  block?: boolean;
 }) {
   const [open, setOpen] = useState<boolean>(false);
   const { wallets, select } = useWallet();
@@ -46,6 +48,7 @@ function WalletNotConnect({
         }}
         loading={loading}
         loadingText="Connecting"
+        block={block}
       >
         Connect Wallet
       </PrimaryButton>
@@ -103,17 +106,8 @@ function WalletNotConnect({
 
                           select(wl.adapter.name);
                           await signin(wl.adapter);
-                          // eslint-disable-next-line no-console
-                          console.debug(
-                            window.solana.publicKey?.toBase58(),
-                            'user_wallet_after',
-                          );
                         } catch (e) {
-                          // eslint-disable-next-line no-console
-                          console.debug(e, 'login error');
                           setLoading && setLoading(false);
-
-                          return false;
                         } finally {
                           setLoading && setLoading(false);
                         }

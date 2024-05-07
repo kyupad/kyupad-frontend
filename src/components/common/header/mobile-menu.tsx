@@ -77,7 +77,7 @@ function MobileMenu({
 
             <div className="flex gap-3">
               <a
-                href="https://t.co/KjXOnvARym"
+                href="https://discord.gg/kyupad"
                 rel="noopener noreferrer"
                 target="_blank"
               >
