@@ -23,6 +23,7 @@ interface IWalletConnectProps {
   doVerifySignInWithSolana: Function;
   setCookie: Function;
   revalidatePath: Function;
+  block?: boolean;
 }
 
 function WalletConnect({
@@ -30,6 +31,7 @@ function WalletConnect({
   doVerifySignInWithSolana,
   setCookie,
   revalidatePath,
+  block,
 }: IWalletConnectProps) {
   const { connecting, disconnecting } = useWallet();
   const accessToken = getCookie(ACCESS_TOKEN_STORAGE_KEY);
@@ -120,6 +122,7 @@ function WalletConnect({
           loading={loading || connecting || disconnecting}
           setLoading={handleLoading}
           signin={signInWithSolana}
+          block={block}
         />
       )}
     </>

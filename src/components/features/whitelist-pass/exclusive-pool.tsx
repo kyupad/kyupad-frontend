@@ -12,7 +12,15 @@ import {
 import { IDL, KyupadSmartContract } from '@/anchor/kyupad_smart_contract';
 import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
+import WalletConnect from '@/components/common/header/wallet-connect';
 import Skeleton from '@/components/common/loading/skeleton';
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/common/tooltip';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useSessionStore } from '@/contexts/session-store-provider';
 import {
@@ -45,6 +53,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import jsonwebtoken from 'jsonwebtoken';
+import infoIcon from 'public/images/detail/info-icon.svg';
 import dropdown from 'public/images/whitelist/drop-down.svg';
 import moreArrow from 'public/images/whitelist/more-arrow.svg';
 import { toast } from 'sonner';
@@ -59,7 +68,17 @@ const tokenMetaDataProgramId = new PublicKey(
   env.NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID,
 );
 
-function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
+function ExclusivePool({
+  revalidatePath,
+  doGetSignInData,
+  doVerifySignInWithSolana,
+  setCookie,
+}: {
+  revalidatePath: Function;
+  doGetSignInData: Function;
+  doVerifySignInWithSolana: Function;
+  setCookie: Function;
+}) {
   const [open, setOpen] = useState<boolean>(false);
   const { publicKey, wallet } = useWallet();
 
@@ -185,11 +204,11 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
 
     const debounceFunction = setTimeout(() => {
       try {
-        fetchData();
+        fetchData().finally(() => {
+          setLoadingPool(false);
+        });
       } catch (error) {
         console.error(error);
-      } finally {
-        setLoadingPool(false);
       }
     }, 200);
 
@@ -649,6 +668,71 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
     (state) => state.is_solana_connected,
   );
 
+  const renderButtonMint = useCallback(() => {
+    if (dayjs.utc(currentPool?.end_time).isBefore(now)) {
+      return <PrimaryButton disabled>Event ended!</PrimaryButton>;
+    }
+
+    if (!currentPool?.is_active) {
+      return <PrimaryButton disabled>Not eligible</PrimaryButton>;
+    }
+
+    if (
+      (poolsCounter[poolCounterKey] &&
+        poolsCounter[poolCounterKey] >= currentPool?.total_mint_per_wallet) ||
+      currentPool?.is_minted
+    ) {
+      return <PrimaryButton disabled>Minted</PrimaryButton>;
+    }
+
+    if (
+      poolsCounter[poolId] >= currentPool?.pool_supply ||
+      currentPool?.minted_total >= currentPool?.pool_supply
+    ) {
+      return <PrimaryButton disabled>Sold Out</PrimaryButton>;
+    }
+
+    const isNotStart = dayjs.utc(currentPool?.start_time).isAfter(now);
+
+    return (
+      <TooltipProvider delayDuration={0}>
+        <Tooltip>
+          <TooltipTrigger>
+            <PrimaryButton
+              loading={isLoading}
+              disabled={isNotStart}
+              onClick={handleMint}
+              block
+            >
+              Mint &nbsp; {isNotStart && <Image src={infoIcon} alt="info" />}
+            </PrimaryButton>
+          </TooltipTrigger>
+          {isNotStart && (
+            <TooltipContent className="max-w-[274px] px-5 py-4">
+              <p className="text-base font-medium text-justify">
+                Please wait until mint time!
+              </p>
+              <TooltipArrow fill="#8E8FA2" />
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }, [
+    currentPool?.end_time,
+    currentPool?.is_active,
+    currentPool?.is_minted,
+    currentPool?.minted_total,
+    currentPool?.pool_supply,
+    currentPool?.start_time,
+    currentPool?.total_mint_per_wallet,
+    isLoading,
+    now,
+    poolCounterKey,
+    poolId,
+    poolsCounter,
+  ]);
+
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="flex items-center gap-5 justify-between w-full flex-wrap">
@@ -827,42 +911,16 @@ function ExclusivePool({ revalidatePath }: { revalidatePath: Function }) {
             </div>
             {loadingPool || !poolId || !currentPool?.pool_id ? (
               <Skeleton className="h-[48px]" />
+            ) : isSolanaConnected ? (
+              renderButtonMint()
             ) : (
-              <PrimaryButton
-                loading={isLoading}
-                disabled={
-                  !currentPool?.is_active ||
-                  poolsCounter[poolCounterKey] >=
-                    currentPool?.total_mint_per_wallet ||
-                  !(
-                    dayjs.utc(currentPool?.start_time).isBefore(now) &&
-                    dayjs.utc(currentPool?.end_time).isAfter(now)
-                  ) ||
-                  currentPool?.is_minted ||
-                  !isSolanaConnected ||
-                  poolsCounter[poolId] >= currentPool?.pool_supply
-                }
-                onClick={handleMint}
-              >
-                {!isSolanaConnected &&
-                  (dayjs.utc(currentPool?.end_time).isBefore(now)
-                    ? 'Event ended!'
-                    : 'Not eligible')}
-                {isSolanaConnected && (
-                  <>
-                    {(poolsCounter[poolCounterKey] &&
-                      poolsCounter[poolCounterKey] >
-                        currentPool?.total_mint_per_wallet) ||
-                    currentPool?.is_minted
-                      ? 'Minted'
-                      : currentPool?.is_active
-                        ? 'Mint'
-                        : dayjs.utc(currentPool?.end_time).isBefore(now)
-                          ? 'Event ended!'
-                          : 'Not eligible'}
-                  </>
-                )}
-              </PrimaryButton>
+              <WalletConnect
+                doGetSignInData={doGetSignInData}
+                doVerifySignInWithSolana={doVerifySignInWithSolana}
+                setCookie={setCookie}
+                revalidatePath={revalidatePath}
+                block
+              />
             )}
           </div>
         </div>

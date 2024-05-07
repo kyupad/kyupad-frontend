@@ -23,10 +23,12 @@ function WalletNotConnect({
   loading,
   setLoading,
   signin,
+  block,
 }: {
   loading?: boolean;
   setLoading?: Function;
   signin: Function;
+  block?: boolean;
 }) {
   const [open, setOpen] = useState<boolean>(false);
   const { wallets, select } = useWallet();
@@ -46,6 +48,7 @@ function WalletNotConnect({
         }}
         loading={loading}
         loadingText="Connecting"
+        block={block}
       >
         Connect Wallet
       </PrimaryButton>
@@ -101,6 +104,7 @@ function WalletNotConnect({
                             return;
                           }
 
+                          select(wl.adapter.name);
                           select(wl.adapter.name);
                           await signin(wl.adapter);
                         } catch (e) {
