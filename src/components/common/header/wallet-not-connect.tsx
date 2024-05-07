@@ -105,7 +105,6 @@ function WalletNotConnect({
                           }
 
                           select(wl.adapter.name);
-                          select(wl.adapter.name);
                           await signin(wl.adapter);
                         } catch (e) {
                           setLoading && setLoading(false);
