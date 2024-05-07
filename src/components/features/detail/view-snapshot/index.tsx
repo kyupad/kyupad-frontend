@@ -1,8 +1,16 @@
-import React, { memo, useEffect, useState } from 'react';
-import Image from 'next/image';
+import React, { memo, useEffect, useRef, useState } from 'react';
+import { Nunito } from 'next/font/google';
+import ImageNext from 'next/image';
 import { useParams } from 'next/navigation';
 import { doViewRegistration } from '@/adapters/projects';
 import Skeleton from '@/components/common/loading/skeleton';
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/common/tooltip';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
 import { currencyFormatter } from '@/utils/helpers';
@@ -10,30 +18,113 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import Big from 'big.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import down from 'public/images/detail/down.svg';
 
 import Back from '../back';
+import catnipTable from '/public/images/detail/catnip-table.png';
 import infoIcon from '/public/images/detail/info-icon.svg';
-import percentWining from '/public/images/detail/percent-winning.svg';
 import snapshottingKyu from '/public/images/detail/snapshotting-kyu.png';
 import viewRegistrationDeco from '/public/images/detail/view-registration-decor.svg';
-import winningCatTmp from '/public/images/detail/winning-cat-tmp.png';
 
 dayjs.extend(utc);
 
 interface IViewSnapshotProps {
   data: any;
-  usersAssets?: { total_assets?: number; participants?: number };
 }
 
-function ViewSnapshot({ data, usersAssets }: IViewSnapshotProps) {
+const fontSans = Nunito({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  preload: true,
+  display: 'swap',
+});
+
+function ViewSnapshot({ data }: IViewSnapshotProps) {
   const { publicKey } = useWallet();
-  const [catnipInfo, setCatnipInfo] = useState<any>({});
+  const [usersAssets, setUsersAssets] = useState<{
+    total_assets?: number;
+    participants?: number;
+    chance_of_winning?: number;
+  }>({});
   const { slug } = useParams();
   const [loading, setLoading] = useState(true);
+  const catnipPointCanvas = useRef<HTMLCanvasElement>(null);
+  const catnipBarCanvas = useRef<HTMLCanvasElement>(null);
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
   );
   const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
+
+  useEffect(() => {
+    if (
+      !catnipPointCanvas.current ||
+      loading ||
+      (!usersAssets?.chance_of_winning && usersAssets?.chance_of_winning !== 0)
+    ) {
+      return;
+    }
+    const canvas = catnipPointCanvas.current;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+    const image = new Image();
+    image.src = catnipTable.src;
+
+    const resizeCanvas = () => {
+      canvas.width = 600;
+      canvas.height = 600;
+      redraw();
+    };
+
+    const redraw = () => {
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      context.font = `bold 24px ${fontSans.style.fontFamily}`;
+      const text = 'You have';
+      const textWidth = context.measureText(text).width;
+      const x = (canvas.width - textWidth) / 2;
+      const y = (canvas.height + 24) / 2;
+      context.fillText(text, x, y);
+
+      context.font = `bold 60px ${fontSans.style.fontFamily}`;
+      const catnipPointText = `${usersAssets?.chance_of_winning || 0}%`;
+      const catnipPointTextWidth = context.measureText(catnipPointText).width;
+      const catnipPointTextX = (canvas.width - catnipPointTextWidth) / 2;
+      const catnipPointTextY = (canvas.height + 60 + 100) / 2;
+
+      if ((usersAssets?.chance_of_winning || 0) <= 15) {
+        context.fillStyle = '#ec5347';
+      } else if ((usersAssets?.chance_of_winning || 0) <= 60) {
+        context.fillStyle = '#F8A627';
+      } else {
+        context.fillStyle = '#18CF6A';
+      }
+      context.fillText(catnipPointText, catnipPointTextX, catnipPointTextY);
+
+      context.font = `bold 24px ${fontSans.style.fontFamily}`;
+      const chanceOfWinningText = 'chance of winning';
+      const chanceOfWinningTextWidth =
+        context.measureText(chanceOfWinningText).width;
+      const chanceOfWinningTextX =
+        (canvas.width - chanceOfWinningTextWidth) / 2;
+      const chanceOfWinningTextY = (canvas.height + 24 + 220) / 2;
+      context.fillStyle = '#31313a';
+      context.fillText(
+        chanceOfWinningText,
+        chanceOfWinningTextX,
+        chanceOfWinningTextY,
+      );
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+
+    image.onload = () => {
+      resizeCanvas();
+    };
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [loading, usersAssets?.chance_of_winning]);
 
   useEffect(() => {
     if (!isSolanaConnected) {
@@ -49,8 +140,8 @@ function ViewSnapshot({ data, usersAssets }: IViewSnapshotProps) {
           slug: slug as string,
         });
 
-        if (data?.data?.catnip_info) {
-          setCatnipInfo(data.data.catnip_info);
+        if (data?.data?.users_assets) {
+          setUsersAssets(data.data.users_assets);
         }
       }
     };
@@ -62,6 +153,39 @@ function ViewSnapshot({ data, usersAssets }: IViewSnapshotProps) {
     }
   }, [publicKey, slug]);
 
+  useEffect(() => {
+    if (
+      !catnipBarCanvas.current ||
+      loading ||
+      (!usersAssets?.chance_of_winning && usersAssets?.chance_of_winning !== 0)
+    ) {
+      return;
+    }
+
+    const canvas = catnipBarCanvas.current;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    context.fillStyle = '#EC5347';
+    context.fillRect(12, 20, 80, 8);
+
+    context.fillStyle = '#F8A627';
+    context.fillRect(92, 20, 205, 8);
+
+    context.fillStyle = '#18CF6A';
+    context.fillRect(297, 20, 205, 8);
+
+    const image = new Image();
+    image.src = down.src;
+
+    image.onload = () => {
+      const c = usersAssets?.chance_of_winning || 0;
+      const w = 490;
+      const position = (c * w) / 100;
+      context.drawImage(image, position, -4, 24, 24);
+    };
+  }, [loading, usersAssets?.chance_of_winning]);
+
   return (
     <>
       <div className="w-full max-w-8xl mx-auto px-4 lg:px-[60px] flex gap-4 pb-[210px] items-center justify-center flex-col lg:flex-row">
@@ -69,7 +193,7 @@ function ViewSnapshot({ data, usersAssets }: IViewSnapshotProps) {
           <Back />
           <div className="flex gap-5 items-center">
             <div>
-              <Image
+              <ImageNext
                 className="max-w-[100px] min-h-[100px] sm:min-h-[150px] sm:max-w-[150px] xl:max-w-[200px] rounded-full xl:min-h-[200px] border-2 border-kyu-color-4"
                 src={data?.logo}
                 width={200}
@@ -96,24 +220,44 @@ function ViewSnapshot({ data, usersAssets }: IViewSnapshotProps) {
 
           {loading ? (
             <Skeleton className="h-6" />
-          ) : catnipInfo?.is_snapshoting ? null : (
+          ) : !usersAssets?.chance_of_winning &&
+            usersAssets?.chance_of_winning !== 0 ? null : (
             <div className="flex items-center gap-5">
               <span className="text-2xl font-bold">
                 You have <span className="text-kyu-color-18">low</span> chance
                 of winning
               </span>
-              <span>
-                <Image src={infoIcon} alt="icon" />
-              </span>
+              <>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <ImageNext src={infoIcon} alt="icon" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[274px] px-5 py-4">
+                      <h3 className="font-bold text-xl">Chance of winning</h3>
+                      <p className="text-base font-medium text-justify">
+                        This chart shows real time data. Both percentages and
+                        your allocation size can change with the growth of
+                        participants.
+                      </p>
+                      <TooltipArrow fill="#8E8FA2" />
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </>
             </div>
           )}
 
           {loading ? (
             <Skeleton className="h-8 w-[75%]" />
-          ) : catnipInfo?.is_snapshoting ? null : (
-            <div>
-              <Image src={percentWining} alt="percent winning" />
-            </div>
+          ) : !usersAssets?.chance_of_winning &&
+            usersAssets?.chance_of_winning !== 0 ? null : (
+            <canvas
+              ref={catnipBarCanvas}
+              className="w-full max-w-[514px]"
+              width={514}
+              height={32}
+            />
           )}
 
           <div className="text-2xl font-bold">
@@ -139,18 +283,29 @@ function ViewSnapshot({ data, usersAssets }: IViewSnapshotProps) {
             </div>
           </div>
         </div>
-        <div className="w-full">
+        <div className="w-full flex justify-center">
           {loading ? (
             <Skeleton className="h-[600px] w-full" />
-          ) : catnipInfo?.is_snapshoting ? (
-            <Image src={snapshottingKyu} alt="cat" draggable={false} />
+          ) : !usersAssets?.chance_of_winning &&
+            usersAssets?.chance_of_winning !== 0 ? (
+            <ImageNext
+              src={snapshottingKyu}
+              alt="cat"
+              draggable={false}
+              className="w-full max-w-[600px]"
+            />
           ) : (
-            <Image src={winningCatTmp} alt="cat" draggable={false} />
+            <canvas
+              ref={catnipPointCanvas}
+              className="w-full max-w-[600px]"
+              width={600}
+              height={600}
+            />
           )}
         </div>
       </div>
 
-      <Image
+      <ImageNext
         src={viewRegistrationDeco}
         alt="decorator"
         className="mx-auto w-full absolute bottom-0 -z-[1]"

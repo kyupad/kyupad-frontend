@@ -40,9 +40,7 @@ function DetailController({
         />
       )}
 
-      {viewMode === 'snapshot' && (
-        <ViewSnapshot data={data} usersAssets={usersAssets} />
-      )}
+      {viewMode === 'snapshot' && <ViewSnapshot data={data} />}
     </div>
   );
 }
