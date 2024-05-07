@@ -35,10 +35,11 @@ function SeasonStatsClient({
     ).subscribe({
       next: ({ data }: any) => {
         if (
-          data?.subscribeToNftAction?.minted_wallet !== publicKey?.toBase58() &&
-          seasonMinted[seasonId] < total
+          (data?.subscribeToNftAction?.minted_wallet !==
+            publicKey?.toBase58() &&
+            (seasonMinted[seasonId] || 0)) < total
         ) {
-          updateSeasonMinted(seasonId, seasonMinted[seasonId] + 1);
+          updateSeasonMinted(seasonId, (seasonMinted[seasonId] || 0) + 1);
         }
       },
       error: (error: any) => console.error(error),
