@@ -144,6 +144,9 @@ function ViewRegistration({
               ) : !catnipInfo?.is_snapshoting ? (
                 <>
                   {catnipInfo?.assets_catnip_info?.map((info) => {
+                    if (!info.assets?.length) {
+                      return null;
+                    }
                     let name = '';
                     if (info.asset_type === 'nft') {
                       name = 'NFT';
@@ -172,13 +175,13 @@ function ViewRegistration({
                                 {asset?.multi_pier || 0}x
                               </span>
 
-                              <div className="rounded-[100px] w-[36px] h-[36px]">
+                              <div className="overflow-hidden rounded-[100px] w-[36px] h-[36px] relative">
                                 <Image
                                   src={asset.icon}
                                   alt={asset.name || ''}
-                                  width={36}
-                                  height={36}
                                   draggable={false}
+                                  fill
+                                  style={{ objectFit: 'cover' }}
                                 />
                               </div>
                               <span className="-ml-[2px]">{asset.symbol}</span>

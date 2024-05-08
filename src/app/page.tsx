@@ -24,7 +24,7 @@ const fontHeading = Knewave({
   weight: ['400'],
 });
 
-const Home = async () => {
+const Home = () => {
   return (
     <>
       <Image
