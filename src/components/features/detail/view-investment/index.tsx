@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 import Back from '../back';
+import InvestMorePopup from './invest-more-popup';
 import lossTicketDecor from '/public/images/detail/loss-ticket-decor.svg';
 import lossTicket from '/public/images/detail/loss-ticket.png';
 import wonTicketDecor from '/public/images/detail/won-ticket-decor.svg';
@@ -155,7 +156,11 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     }
 
     if ((investmentInfo?.total_owner_winning_tickets || 0) > 1) {
-      return <PrimaryButton block={false}>Invest More</PrimaryButton>;
+      return (
+        <InvestMorePopup amount={investmentInfo?.total_owner_winning_tickets}>
+          <PrimaryButton block={false}>Invest More</PrimaryButton>
+        </InvestMorePopup>
+      );
     }
 
     return <PrimaryButton block={false}>Invest</PrimaryButton>;
