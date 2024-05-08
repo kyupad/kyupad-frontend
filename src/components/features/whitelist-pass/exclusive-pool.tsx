@@ -663,13 +663,14 @@ function ExclusivePool({
   };
 
   const now = dayjs.utc();
+  const isEventEnded = dayjs.utc(currentPool?.end_time).isBefore(now);
 
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
   );
 
   const renderButtonMint = useCallback(() => {
-    if (dayjs.utc(currentPool?.end_time).isBefore(now)) {
+    if (isEventEnded) {
       return <PrimaryButton disabled>Event ended!</PrimaryButton>;
     }
 
@@ -719,13 +720,13 @@ function ExclusivePool({
       </TooltipProvider>
     );
   }, [
-    currentPool?.end_time,
     currentPool?.is_active,
     currentPool?.is_minted,
     currentPool?.minted_total,
     currentPool?.pool_supply,
     currentPool?.start_time,
     currentPool?.total_mint_per_wallet,
+    isEventEnded,
     isLoading,
     now,
     poolCounterKey,
@@ -911,7 +912,7 @@ function ExclusivePool({
             </div>
             {loadingPool || !poolId || !currentPool?.pool_id ? (
               <Skeleton className="h-[48px]" />
-            ) : isSolanaConnected ? (
+            ) : isSolanaConnected || isEventEnded ? (
               renderButtonMint()
             ) : (
               <WalletConnect
