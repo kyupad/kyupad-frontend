@@ -13,8 +13,8 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { SolanaSignInInput } from '@solana/wallet-standard-features';
 import bs58 from 'bs58';
 import { getCookie } from 'cookies-next';
-import { toast } from 'sonner';
 
+import { ShowAlert } from '../toast';
 import WalletConnected from './wallet-connected';
 import WalletNotConnect from './wallet-not-connect';
 
@@ -53,10 +53,7 @@ function WalletConnect({
       const input: { data: SolanaSignInInput } = await doGetSignInData();
 
       if (!input?.data) {
-        toast.error((input as any)?.message, {
-          position: 'top-right',
-          closeButton: true,
-        });
+        ShowAlert.error({ message: (input as any)?.message });
         return false;
       }
 
@@ -79,10 +76,7 @@ function WalletConnect({
       );
 
       if (!resultVerify?.data && resultVerify?.message) {
-        toast.error(resultVerify.message, {
-          position: 'top-right',
-          closeButton: true,
-        });
+        ShowAlert.error({ message: resultVerify.message });
         return false;
       }
 

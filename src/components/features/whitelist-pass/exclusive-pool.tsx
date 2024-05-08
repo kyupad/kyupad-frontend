@@ -14,6 +14,7 @@ import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
 import WalletConnect from '@/components/common/header/wallet-connect';
 import Skeleton from '@/components/common/loading/skeleton';
+import { ShowAlert } from '@/components/common/toast';
 import {
   Tooltip,
   TooltipArrow,
@@ -56,7 +57,6 @@ import jsonwebtoken from 'jsonwebtoken';
 import infoIcon from 'public/images/detail/info-icon.svg';
 import dropdown from 'public/images/whitelist/drop-down.svg';
 import moreArrow from 'public/images/whitelist/more-arrow.svg';
-import { toast } from 'sonner';
 import { decrypt } from '@utils/helpers';
 
 import UserPoolMinted from './user-pool-minted';
@@ -250,10 +250,7 @@ function ExclusivePool({
 
   const handleMint = async () => {
     if (!publicKey) {
-      toast.warning('Please connect to wallet first!', {
-        position: 'top-right',
-        closeButton: true,
-      });
+      ShowAlert.warning({ message: 'Please connect to wallet first!' });
       return;
     }
 
@@ -262,13 +259,14 @@ function ExclusivePool({
     const sub = token ? jsonwebtoken.decode(token)?.sub : '';
 
     if (sub !== publicKey?.toBase58()) {
-      toast.warning(
-        <div>{`Wrong wallet connected. <br /> Please change to wallet: ${sub}`}</div>,
-        {
-          position: 'top-right',
-          closeButton: true,
-        },
-      );
+      ShowAlert.warning({
+        message: (
+          <div>
+            <div>Wrong wallet connected.</div>
+            <div>Please change to wallet: {sub as string}</div>
+          </div>
+        ),
+      });
       return;
     }
 
@@ -582,24 +580,22 @@ function ExclusivePool({
       updateUserSeasonMinted((user_season_minted || 0) + 1);
       updateSeasonMinted(seasonId, (seasonMinted[seasonId] || 0) + 1);
 
-      toast.success(
-        <div className="text-xl">
-          Minted successfully. Please check the wallet!
-          <br />
-          <a
-            href={`https://explorer.solana.com/tx/${signatureEncode}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="underline"
-          >
-            View transaction
-          </a>
-        </div>,
-        {
-          position: 'top-right',
-          closeButton: true,
-        },
-      );
+      ShowAlert.success({
+        message: (
+          <div className="text-xl">
+            Minted successfully. Please check the wallet!
+            <br />
+            <a
+              href={`https://explorer.solana.com/tx/${signatureEncode}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="underline"
+            >
+              View transaction
+            </a>
+          </div>
+        ),
+      });
     } catch (error: any) {
       mint_error = error?.stack;
       mint_message = error?.message;
@@ -608,18 +604,12 @@ function ExclusivePool({
         THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
 
       if (msg) {
-        toast.error(msg, {
-          position: 'top-right',
-          closeButton: true,
-        });
+        ShowAlert.error({ message: msg });
         return;
       }
 
       if (error?.message !== THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
-        toast.error(THROW_EXCEPTION.UNKNOWN_TRANSACTION, {
-          position: 'top-right',
-          closeButton: true,
-        });
+        ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
       }
     } finally {
       if (mint_error) {
