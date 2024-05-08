@@ -689,14 +689,16 @@ function ExclusivePool({
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger>
-            <PrimaryButton
-              loading={isLoading}
-              disabled={isNotStart}
-              onClick={handleMint}
-              block
-            >
-              Mint &nbsp; {isNotStart && <Image src={infoIcon} alt="info" />}
-            </PrimaryButton>
+            <div>
+              <PrimaryButton
+                loading={isLoading}
+                disabled={isNotStart}
+                onClick={handleMint}
+                block
+              >
+                Mint &nbsp; {isNotStart && <Image src={infoIcon} alt="info" />}
+              </PrimaryButton>
+            </div>
           </TooltipTrigger>
           {isNotStart && (
             <TooltipContent className="max-w-[274px] px-5 py-4">
