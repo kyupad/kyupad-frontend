@@ -1,14 +1,12 @@
 import React, { Suspense } from 'react';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
 import PrimaryButton from '@/components/common/button/primary';
 import Skeleton from '@/components/common/loading/skeleton';
 import FurtureLaunch from '@/components/features/landing/furture-launch';
 import SuccessLaunch from '@/components/features/landing/success-launch';
 import UpcomingLaunch from '@/components/features/landing/upcoming-launch';
 import UpcomingLoading from '@/components/features/landing/upcoming-loading';
-import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 
 import catBanner from '/public/images/home/cat-banner.png';
@@ -27,8 +25,6 @@ const fontHeading = Knewave({
 });
 
 const Home = async () => {
-  redirect(WEB_ROUTES.WHITELIST_PASS);
-
   return (
     <>
       <Image
