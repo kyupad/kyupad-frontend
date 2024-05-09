@@ -324,6 +324,7 @@ function ExclusivePool({
     let mint_error = '';
     let mint_message = '';
     let mint_transaction = '';
+    const mint_wallet = wallet?.adapter?.name || '';
     try {
       const merkleProof = currentPool?.merkle_proof;
       const merkleProofDecoded = decrypt(
@@ -628,12 +629,13 @@ function ExclusivePool({
             minted,
             mint_error,
             mint_message,
-            id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+            id: publicKey?.toBase58() || '',
             mint_transaction,
+            mint_wallet,
           },
           {
             user: {
-              id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+              id: publicKey?.toBase58() || '',
             },
           },
         );
@@ -644,15 +646,13 @@ function ExclusivePool({
             minted,
             mint_error,
             mint_message,
-            id:
-              (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() || '',
+            id: publicKey?.toBase58() || '',
             mint_transaction,
+            mint_wallet,
           }),
           {
             user: {
-              id:
-                (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() ||
-                '',
+              id: publicKey?.toBase58() || '',
             },
           },
         );
