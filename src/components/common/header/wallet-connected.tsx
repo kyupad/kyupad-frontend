@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '../dropdown';
 
-function WalletConnected({ revalidatePath }: { revalidatePath: Function }) {
+function WalletConnected(_: { revalidatePath?: Function }) {
   const { publicKey, disconnect, wallet } = useWallet();
   const [open, setOpen] = useState<boolean>(false);
   const changeSolanaConnection = useGlobalStore(
@@ -28,6 +28,20 @@ function WalletConnected({ revalidatePath }: { revalidatePath: Function }) {
   const handleOpen = useCallback((value: boolean) => {
     setOpen(value);
   }, []);
+
+  const renderWalletAddress = useCallback(() => {
+    if (publicKey) {
+      return (
+        <>
+          {(publicKey?.toBase58()?.slice(0, 5) || '') +
+            '...' +
+            (publicKey?.toBase58()?.slice(-5) || '')}
+        </>
+      );
+    }
+
+    return 'Loading...';
+  }, [publicKey]);
 
   return (
     <>
@@ -50,11 +64,7 @@ function WalletConnected({ revalidatePath }: { revalidatePath: Function }) {
                     />
                   </div>
                 )}
-                <div>
-                  {(publicKey?.toBase58()?.slice(0, 5) || '') +
-                    '...' +
-                    (publicKey?.toBase58()?.slice(-5) || '')}
-                </div>
+                <div>{renderWalletAddress()}</div>
               </div>
             </PrimaryButton>
           </div>
@@ -72,9 +82,10 @@ function WalletConnected({ revalidatePath }: { revalidatePath: Function }) {
                 REFRESH_TOKEN_COOKIE_CONFIG,
               );
               sessionStorage.clear();
+              localStorage.clear();
               await disconnect();
               changeSolanaConnection(false);
-              revalidatePath(window.location.pathname);
+              window.location.reload();
             }}
           >
             <span className="text-xl">Disconnect</span>

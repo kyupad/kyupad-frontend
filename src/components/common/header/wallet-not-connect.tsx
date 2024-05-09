@@ -31,7 +31,7 @@ function WalletNotConnect({
   block?: boolean;
 }) {
   const [open, setOpen] = useState<boolean>(false);
-  const { wallets, select } = useWallet();
+  const { wallets } = useWallet();
 
   const handleOpen = useCallback((value: boolean) => {
     setOpen(value);
@@ -104,10 +104,36 @@ function WalletNotConnect({
                             return;
                           }
 
-                          select(wl.adapter.name);
-                          await signin(wl.adapter);
+                          const w = window as any;
+                          localStorage.setItem(
+                            'walletName',
+                            JSON.stringify(wl.adapter.name),
+                          );
+                          switch (wl.adapter.name) {
+                            case 'Backpack': {
+                              const isConnected = w?.xnft?.solana?.isConnected;
+                              if (!isConnected) {
+                                await w?.solana?.connect({
+                                  onlyIfTrusted: true,
+                                });
+                              }
+                              await signin(wl.adapter);
+                              break;
+                            }
+                            case 'Phantom': {
+                              const isConnected = w?.solana?.isConnected;
+                              if (!isConnected) {
+                                await w?.solana?.connect({
+                                  onlyIfTrusted: true,
+                                });
+                              }
+                              await signin(wl.adapter);
+                              break;
+                            }
+                            default:
+                          }
                         } catch (e) {
-                          setLoading && setLoading(false);
+                          console.error(e);
                         } finally {
                           setLoading && setLoading(false);
                         }

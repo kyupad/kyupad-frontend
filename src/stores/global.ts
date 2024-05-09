@@ -50,9 +50,9 @@ const createGlobalStore = createStore<IGlobalStore>()(
   persist(
     (set) => ({
       ...initialState,
-      agreeTerms: () => set((state) => ({ ...state, is_agree_terms: true })),
+      agreeTerms: () => set(() => ({ is_agree_terms: true })),
       changeSolanaConnection: (value: boolean) =>
-        set((state) => ({ ...state, is_solana_connected: value })),
+        set({ is_solana_connected: value }),
     }),
     {
       name: 'global-storage',
