@@ -59,6 +59,7 @@ import dropdown from 'public/images/whitelist/drop-down.svg';
 import moreArrow from 'public/images/whitelist/more-arrow.svg';
 import { decrypt } from '@utils/helpers';
 
+import MintedSuccess from './minted-success';
 import UserPoolMinted from './user-pool-minted';
 
 dayjs.extend(utc);
@@ -96,6 +97,8 @@ function ExclusivePool({
   const [creators, setCreators] = useState<any[]>([]);
   const [priorityFees, setPriorityFees] = useState<number>();
   const [seasonId, setSeasonId] = useState<string>();
+  const [visibleMintedSuccess, setVisibleMintedSuccess] =
+    useState<boolean>(false);
 
   const activePoolWrapper = useRef<HTMLDivElement>(null);
   const moreArrowRef = useRef<HTMLImageElement>(null);
@@ -136,6 +139,10 @@ function ExclusivePool({
 
   const handleSetIsLoading = useCallback((value: boolean) => {
     setIsLoading(value);
+  }, []);
+
+  const handleSetVisibleMintedSuccess = useCallback((value: boolean) => {
+    setVisibleMintedSuccess(value);
   }, []);
 
   useEffect(() => {
@@ -596,6 +603,8 @@ function ExclusivePool({
           </div>
         ),
       });
+
+      handleSetVisibleMintedSuccess(true);
     } catch (error: any) {
       mint_error = error?.stack;
       mint_message = error?.message;
@@ -727,216 +736,227 @@ function ExclusivePool({
   ]);
 
   return (
-    <div className="w-full flex flex-col gap-6">
-      <div className="flex items-center gap-5 justify-between w-full flex-wrap">
-        <h2 className="font-heading text-3xl sm:text-4xl xl:text-5xl">
-          Mint Pools
-        </h2>
-        <button
-          onClick={() => handleSetOpen(open)}
-          className="rounded-[8px] py-3 px-10 border-2 text-2xl font-bold bg-kyu-color-2 border-kyu-color-11 flex items-center gap-5"
-        >
-          <span>How to be eligible</span>
-          <Image
-            src={dropdown}
-            alt="dropdown"
-            className={cn('transition-transform', open ? 'rotate-180' : '')}
-          />
-        </button>
-      </div>
+    <>
+      <div className="w-full flex flex-col gap-6">
+        <div className="flex items-center gap-5 justify-between w-full flex-wrap">
+          <h2 className="font-heading text-3xl sm:text-4xl xl:text-5xl">
+            Mint Pools
+          </h2>
+          <button
+            onClick={() => handleSetOpen(open)}
+            className="rounded-[8px] py-3 px-10 border-2 text-2xl font-bold bg-kyu-color-2 border-kyu-color-11 flex items-center gap-5"
+          >
+            <span>How to be eligible</span>
+            <Image
+              src={dropdown}
+              alt="dropdown"
+              className={cn('transition-transform', open ? 'rotate-180' : '')}
+            />
+          </button>
+        </div>
 
-      <div
-        className={cn(
-          'overflow-hidden transition-all',
-          open ? 'max-h-screen' : 'max-h-0',
-        )}
-      >
         <div
           className={cn(
-            'py-5 px-10 border-2 rounded-[8px] bg-kyu-color-16 border-kyu-color-10 text-xl text-justify',
+            'overflow-hidden transition-all',
+            open ? 'max-h-screen' : 'max-h-0',
           )}
         >
-          <ul className="list-disc pl-7">
-            <li>
-              {'To be eligible for the NFT Minting, you need to become'}{' '}
-              <b>a member of our partnered communities on Solana</b> {'or'}{' '}
-              <b>join our events on X & Discord to be KyuPad contributors</b>.
-            </li>
-            <li>
-              {" Details on partnered communities & each round's"}{' '}
-              <b>eligibility mechanism</b> {'will be publicly '}
-              <b>announced before mint date</b>.
-            </li>
-            <li>
-              {'Each wallet can mint'} <b>up to 2 NFTs</b>,{' '}
-              {
-                'regardless of eligibility for additional minting rounds or membership in more than 2 partnered communities.'
-              }
-            </li>
-          </ul>
+          <div
+            className={cn(
+              'py-5 px-10 border-2 rounded-[8px] bg-kyu-color-16 border-kyu-color-10 text-xl text-justify',
+            )}
+          >
+            <ul className="list-disc pl-7">
+              <li>
+                {'To be eligible for the NFT Minting, you need to become'}{' '}
+                <b>a member of our partnered communities on Solana</b> {'or'}{' '}
+                <b>join our events on X & Discord to be KyuPad contributors</b>.
+              </li>
+              <li>
+                {" Details on partnered communities & each round's"}{' '}
+                <b>eligibility mechanism</b> {'will be publicly '}
+                <b>announced before mint date</b>.
+              </li>
+              <li>
+                {'Each wallet can mint'} <b>up to 2 NFTs</b>,{' '}
+                {
+                  'regardless of eligibility for additional minting rounds or membership in more than 2 partnered communities.'
+                }
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <div className="relative" ref={activePoolWrapper}>
-        <div className="flex gap-3 overflow-x-auto scrollbar pb-4 pr-4">
-          {activePool?.map((pool, index) => {
-            if (!pool?.pool_id) {
+        <div className="relative" ref={activePoolWrapper}>
+          <div className="flex gap-3 overflow-x-auto scrollbar pb-4 pr-4">
+            {activePool?.map((pool, index) => {
+              if (!pool?.pool_id) {
+                return (
+                  <span
+                    className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400 active-pool-item"
+                    key={index}
+                  >
+                    {pool?.pool_name}
+                  </span>
+                );
+              }
+
               return (
-                <span
-                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400 active-pool-item"
-                  key={index}
+                <button
+                  onClick={() => {
+                    handleChangePoolId(pool?.pool_id);
+                  }}
+                  className={cn(
+                    'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap active-pool-item',
+                    (currentPoolId || currentPool?.pool_id) === pool?.pool_id
+                      ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
+                      : 'text-[#8E8FA2]',
+                  )}
+                  key={pool?.pool_id}
                 >
                   {pool?.pool_name}
-                </span>
+                </button>
               );
-            }
+            })}
 
-            return (
-              <button
-                onClick={() => {
-                  handleChangePoolId(pool?.pool_id);
-                }}
-                className={cn(
-                  'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap active-pool-item',
-                  (currentPoolId || currentPool?.pool_id) === pool?.pool_id
-                    ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
-                    : 'text-[#8E8FA2]',
-                )}
-                key={pool?.pool_id}
-              >
-                {pool?.pool_name}
-              </button>
-            );
-          })}
-
-          {!activePool ||
-            (activePool.length === 0 && (
-              <>
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-              </>
-            ))}
-        </div>
-        <Image
-          src={moreArrow}
-          alt="more"
-          className="absolute right-0 top-0 hidden"
-          ref={moreArrowRef}
-        />
-      </div>
-
-      <div
-        className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10"
-        id="mint-pool"
-      >
-        <div className="flex justify-center gap-10 items-center flex-col lg:flex-row">
-          <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
-            {loadingPool || !currentPool?.pool_image ? (
-              <Skeleton className="h-full w-full" />
-            ) : (
-              <Image
-                src={currentPool?.pool_image || ''}
-                alt={currentPool?.pool_image || ''}
-                fill
-                style={{ objectFit: 'cover' }}
-                draggable={false}
-              />
-            )}
+            {!activePool ||
+              (activePool.length === 0 && (
+                <>
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                </>
+              ))}
           </div>
-          <div className="w-full lg:w-1/2 flex flex-col gap-5">
-            {loadingPool ||
-            !currentPool?.pool_name ||
-            !currentPool?.start_time ? (
-              <Skeleton className="h-5 w-1/2" />
-            ) : (
-              <span className="text-xl font-bold">
-                {currentPool?.pool_name || ''}{' '}
-                {dayjs.utc(currentPool?.start_time).isBefore(now)
-                  ? 'ends in:'
-                  : 'starts in:'}
-              </span>
-            )}
-            <div className="-mt-4">
-              {loadingPool ||
-              !currentPool?.start_time ||
-              !currentPool?.end_time ? (
-                <Skeleton className="h-[116px]" />
+          <Image
+            src={moreArrow}
+            alt="more"
+            className="absolute right-0 top-0 hidden"
+            ref={moreArrowRef}
+          />
+        </div>
+
+        <div
+          className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10"
+          id="mint-pool"
+        >
+          <div className="flex justify-center gap-10 items-center flex-col lg:flex-row">
+            <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
+              {loadingPool || !currentPool?.pool_image ? (
+                <Skeleton className="h-full w-full" />
               ) : (
-                <CalendarCountdown
-                  time={dayjs
-                    .utc(
-                      dayjs.utc(currentPool?.start_time).isBefore(now)
-                        ? currentPool?.end_time?.valueOf()
-                        : currentPool?.start_time?.valueOf(),
-                    )
-                    .valueOf()}
-                  fullWidth
-                  revalidatePath={revalidatePath}
+                <Image
+                  src={currentPool?.pool_image || ''}
+                  alt={currentPool?.pool_image || ''}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  draggable={false}
                 />
               )}
             </div>
-
-            <div className="relative mt-6">
-              <UserPoolMinted
-                currentPoolId={currentPool?.pool_id}
-                poolId={poolId}
-                currentUserPoolMintedTotal={currentPool?.user_pool_minted_total}
-                loading={loadingPool || !poolId || !currentPool?.pool_id}
-                currentMintedTotal={currentPool?.minted_total}
-                currentPoolSupply={currentPool?.pool_supply}
-                seasonId={seasonId}
-              />
+            <div className="w-full lg:w-1/2 flex flex-col gap-5">
               {loadingPool ||
-              (!currentPool?.pool_supply && currentPool?.pool_supply !== 0) ? (
-                <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
+              !currentPool?.pool_name ||
+              !currentPool?.start_time ? (
+                <Skeleton className="h-5 w-1/2" />
               ) : (
-                <span className="absolute right-0 -top-8">
-                  <span className="text-kyu-color-14 font-medium">Total:</span>{' '}
-                  <span className="font-bold text-kyu-color-11">
-                    {currentPool?.pool_supply || 0}
-                  </span>
+                <span className="text-xl font-bold">
+                  {currentPool?.pool_name || ''}{' '}
+                  {dayjs.utc(currentPool?.start_time).isBefore(now)
+                    ? 'ends in:'
+                    : 'starts in:'}
                 </span>
               )}
+              <div className="-mt-4">
+                {loadingPool ||
+                !currentPool?.start_time ||
+                !currentPool?.end_time ? (
+                  <Skeleton className="h-[116px]" />
+                ) : (
+                  <CalendarCountdown
+                    time={dayjs
+                      .utc(
+                        dayjs.utc(currentPool?.start_time).isBefore(now)
+                          ? currentPool?.end_time?.valueOf()
+                          : currentPool?.start_time?.valueOf(),
+                      )
+                      .valueOf()}
+                    fullWidth
+                    revalidatePath={revalidatePath}
+                  />
+                )}
+              </div>
+
+              <div className="relative mt-6">
+                <UserPoolMinted
+                  currentPoolId={currentPool?.pool_id}
+                  poolId={poolId}
+                  currentUserPoolMintedTotal={
+                    currentPool?.user_pool_minted_total
+                  }
+                  loading={loadingPool || !poolId || !currentPool?.pool_id}
+                  currentMintedTotal={currentPool?.minted_total}
+                  currentPoolSupply={currentPool?.pool_supply}
+                  seasonId={seasonId}
+                />
+                {loadingPool ||
+                (!currentPool?.pool_supply &&
+                  currentPool?.pool_supply !== 0) ? (
+                  <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
+                ) : (
+                  <span className="absolute right-0 -top-8">
+                    <span className="text-kyu-color-14 font-medium">
+                      Total:
+                    </span>{' '}
+                    <span className="font-bold text-kyu-color-11">
+                      {currentPool?.pool_supply || 0}
+                    </span>
+                  </span>
+                )}
+              </div>
+              {loadingPool || !poolId || !currentPool?.pool_id ? (
+                <Skeleton className="h-[48px]" />
+              ) : isSolanaConnected || isEventEnded ? (
+                renderButtonMint()
+              ) : (
+                <WalletConnect
+                  doGetSignInData={doGetSignInData}
+                  doVerifySignInWithSolana={doVerifySignInWithSolana}
+                  setCookie={setCookie}
+                  revalidatePath={revalidatePath}
+                  block
+                />
+              )}
             </div>
-            {loadingPool || !poolId || !currentPool?.pool_id ? (
-              <Skeleton className="h-[48px]" />
-            ) : isSolanaConnected || isEventEnded ? (
-              renderButtonMint()
-            ) : (
-              <WalletConnect
-                doGetSignInData={doGetSignInData}
-                doVerifySignInWithSolana={doVerifySignInWithSolana}
-                setCookie={setCookie}
-                revalidatePath={revalidatePath}
-                block
-              />
-            )}
+          </div>
+
+          <div className="w-full">
+            <p className="font-bold text-xl mb-4">Note: </p>
+            <ol className="list-disc pl-4 flex flex-col gap-2 text-xl">
+              <li>Minimum balance: 0.015 SOL.</li>
+              <li>
+                Phantom wallet is highly recommended for optimal minting
+                experience.
+              </li>
+              <li>
+                Due to Solana network congestion & multiple users accessing the
+                website at the same time, the minting experience might be a bit
+                slower than expected.
+              </li>
+              <li>Participants can retry as many times as you want.</li>
+            </ol>
+            <p className="font-bold mt-5 text-xl"> Happy minting! </p>
           </div>
         </div>
-
-        <div className="w-full">
-          <p className="font-bold text-xl mb-4">Note: </p>
-          <ol className="list-disc pl-4 flex flex-col gap-2 text-xl">
-            <li>Minimum balance: 0.015 SOL.</li>
-            <li>
-              Phantom wallet is highly recommended for optimal minting
-              experience.
-            </li>
-            <li>
-              Due to Solana network congestion & multiple users accessing the
-              website at the same time, the minting experience might be a bit
-              slower than expected.
-            </li>
-            <li>Participants can retry as many times as you want.</li>
-          </ol>
-          <p className="font-bold mt-5 text-xl"> Happy minting! </p>
-        </div>
       </div>
-    </div>
+      <MintedSuccess
+        visible={visibleMintedSuccess}
+        setVisible={handleSetVisibleMintedSuccess}
+      />
+    </>
   );
 }
 
