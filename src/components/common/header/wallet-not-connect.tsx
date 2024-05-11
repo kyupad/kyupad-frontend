@@ -113,9 +113,7 @@ function WalletNotConnect({
                             case 'Backpack': {
                               const isConnected = w?.xnft?.solana?.isConnected;
                               if (!isConnected) {
-                                await w?.solana?.connect({
-                                  onlyIfTrusted: true,
-                                });
+                                await w?.solana?.connect();
                               }
                               await signin(wl.adapter);
                               break;
@@ -123,9 +121,7 @@ function WalletNotConnect({
                             case 'Phantom': {
                               const isConnected = w?.solana?.isConnected;
                               if (!isConnected) {
-                                await w?.solana?.connect({
-                                  onlyIfTrusted: true,
-                                });
+                                await w?.solana?.connect();
                               }
                               await signin(wl.adapter);
                               break;
