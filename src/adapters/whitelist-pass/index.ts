@@ -33,6 +33,7 @@ const doGenerateMetadata = async (body: {
   description?: string;
   seller_fee_basis_points: number;
   creators?: string[];
+  prefer_code?: string;
 }) => {
   const data = await request('POST', API_ROUTES.GENERATE_CFNT_METADATA, body);
   return data;
@@ -47,4 +48,14 @@ const doSyncNftbySignature = async (body: {
   return data;
 };
 
-export { doGetMintingPool, doGenerateMetadata, doSyncNftbySignature };
+const doGeneraRefererLink = async () => {
+  const data = await request('GET', API_ROUTES.GENERATE_REFER_LINK);
+  return data;
+};
+
+export {
+  doGetMintingPool,
+  doGenerateMetadata,
+  doSyncNftbySignature,
+  doGeneraRefererLink,
+};

@@ -103,6 +103,26 @@ function ExclusivePool({
   const activePoolWrapper = useRef<HTMLDivElement>(null);
   const moreArrowRef = useRef<HTMLImageElement>(null);
   const router = useRouter();
+  const preferCode = searchParams.get('prefer_code');
+
+  useEffect(() => {
+    if (preferCode) {
+      Sentry.captureMessage(
+        JSON.stringify({
+          preferCode,
+          user: 'anonymous',
+        }),
+        {
+          user: {
+            id: 'anonymous',
+          },
+          tags: {
+            prefer_code: preferCode,
+          },
+        },
+      );
+    }
+  }, [preferCode]);
 
   const {
     poolsCounter,
@@ -400,6 +420,7 @@ function ExclusivePool({
         symbol: nftArgs.symbol as string,
         seller_fee_basis_points: nftArgs.sellerFeeBasisPoints,
         id: poolId,
+        ...(preferCode ? { prefer_code: preferCode } : {}),
       });
 
       nftArgs.uri = cnftMetadata.data?.url;
@@ -632,10 +653,17 @@ function ExclusivePool({
             id: publicKey?.toBase58() || '',
             mint_transaction,
             mint_wallet,
+            prefer_code: preferCode,
           },
           {
             user: {
               id: publicKey?.toBase58() || '',
+            },
+            tags: {
+              mint_error: true,
+              mint_error_with_prefer_code: !!preferCode,
+              prefer_code: preferCode,
+              mint_with_prefer_code: !!preferCode,
             },
           },
         );
@@ -653,6 +681,12 @@ function ExclusivePool({
           {
             user: {
               id: publicKey?.toBase58() || '',
+            },
+            tags: {
+              mint_success: true,
+              mint_success_with_prefer_code: !!preferCode,
+              prefer_code: preferCode,
+              mint_with_prefer_code: !!preferCode,
             },
           },
         );

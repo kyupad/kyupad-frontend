@@ -9,6 +9,7 @@ const API_ROUTES = {
   GET_SEASON_ACTIVE: '/v1/seasons/active',
   SYNC_NFT_BY_SIGNATURE: '/v1/nft/sync-nft-by-signature',
   REFRESH: '/v1/auth/refresh',
+  GENERATE_REFER_LINK: '/v1/nft/generate-prefer-code',
 };
 
 const WEB_ROUTES = {
