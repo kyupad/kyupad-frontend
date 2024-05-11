@@ -108,7 +108,7 @@ const sentryNextConfig = withSentryConfig(
     // Suppresses source map uploading logs during build
     silent: true,
     org: 'kyupad',
-    project: 'kyupad-beta',
+    project: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
   },
   {
     // For all available options, see:
