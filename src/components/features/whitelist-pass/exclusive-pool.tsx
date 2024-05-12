@@ -104,6 +104,7 @@ function ExclusivePool({
   const moreArrowRef = useRef<HTMLImageElement>(null);
   const router = useRouter();
   const refCode = searchParams.get('ref_code');
+  const [isOpenMintTooltip, setOpenMintTooltip] = useState<boolean>(false);
 
   useEffect(() => {
     if (refCode) {
@@ -719,16 +720,16 @@ function ExclusivePool({
       return <PrimaryButton disabled>Event ended!</PrimaryButton>;
     }
 
-    if (!currentPool?.is_active) {
-      return <PrimaryButton disabled>Not eligible</PrimaryButton>;
-    }
-
     if (
       (poolsCounter[poolCounterKey] &&
         poolsCounter[poolCounterKey] >= currentPool?.total_mint_per_wallet) ||
       currentPool?.is_minted
     ) {
       return <PrimaryButton disabled>Minted</PrimaryButton>;
+    }
+
+    if (!currentPool?.is_active) {
+      return <PrimaryButton disabled>Not eligible</PrimaryButton>;
     }
 
     if (
@@ -742,7 +743,7 @@ function ExclusivePool({
 
     return (
       <TooltipProvider delayDuration={0}>
-        <Tooltip>
+        <Tooltip open={isOpenMintTooltip}>
           <TooltipTrigger asChild>
             <div>
               <PrimaryButton
@@ -750,8 +751,26 @@ function ExclusivePool({
                 disabled={isNotStart}
                 onClick={handleMint}
                 block
+                onTouchStart={() => {
+                  if (isNotStart) {
+                    setOpenMintTooltip(!isOpenMintTooltip);
+                  }
+                }}
+                onMouseOver={() => {
+                  if (isNotStart) {
+                    setOpenMintTooltip(true);
+                  }
+                }}
+                onMouseOut={() => {
+                  if (isNotStart) {
+                    setOpenMintTooltip(false);
+                  }
+                }}
               >
-                Mint &nbsp; {isNotStart && <Image src={infoIcon} alt="info" />}
+                Mint &nbsp;{' '}
+                {isNotStart && (
+                  <Image src={infoIcon} alt="info" draggable={false} />
+                )}
               </PrimaryButton>
             </div>
           </TooltipTrigger>
@@ -775,6 +794,7 @@ function ExclusivePool({
     currentPool?.total_mint_per_wallet,
     isEventEnded,
     isLoading,
+    isOpenMintTooltip,
     now,
     poolCounterKey,
     poolId,
@@ -979,22 +999,59 @@ function ExclusivePool({
             </div>
           </div>
 
+          {currentPool?.pool_name === 'KyuPad - MonkeDAO Mint Round' && (
+            <div className="w-full">
+              <p className="font-bold text-xl mb-4">Eligibility: </p>
+              <ol className="list-disc pl-8 flex flex-col gap-2 text-xl">
+                <li>
+                  This round is only for SMB Gen 2 & Gen 3 Holders. We
+                  snapshotted the wallet list on May 12, 2024 12:00:00 UTC.
+                </li>
+                <li>
+                  If you bought an SMB after that, kindly contact our team via X
+                  so that we can add your wallet to the whitelist.
+                </li>
+              </ol>
+            </div>
+          )}
+
+          {currentPool?.pool_name === 'KyuPad - MonkeDAO Mint Round' && (
+            <div className="w-full">
+              <p className="font-bold text-xl mb-4">Prize for Monkes: </p>
+              <ol className="list-disc pl-8 flex flex-col gap-2 text-xl">
+                <li>
+                  <b>1 SMB Gen 3 for 1 lucky winner</b> that holds both{' '}
+                  <b>an SMB and our NFT Pass</b>.
+                </li>
+                <li>
+                  Top referrer: <b>Top 1 - $300, Top 2 - $200, Top 3 - $100</b>.
+                  Leaderboard will be updated daily on our X, until this pool is
+                  sold out.
+                </li>
+              </ol>
+            </div>
+          )}
+
           <div className="w-full">
             <p className="font-bold text-xl mb-4">Note: </p>
-            <ol className="list-disc pl-4 flex flex-col gap-2 text-xl">
-              <li>Minimum balance: 0.015 SOL.</li>
+            <ol className="list-disc pl-8 flex flex-col gap-2 text-xl">
               <li>
-                Phantom wallet is highly recommended for optimal minting
+                Minimum balance: <b>0.015 SOL</b>.
+              </li>
+              <li>
+                <b>Phantom wallet</b> is highly recommended for optimal minting
                 experience.
               </li>
               <li>
-                Due to Solana network congestion & multiple users accessing the
-                website at the same time, the minting experience might be a bit
-                slower than expected.
+                Due to <b>Solana network congestion</b> & multiple users
+                accessing the website at the same time, the minting experience
+                <b> might be a bit slower than expected</b>.
               </li>
-              <li>Participants can retry as many times as you want.</li>
+              {currentPool?.pool_name !== 'KyuPad - MonkeDAO Mint Round' && (
+                <li>Participants can retry as many times as you want.</li>
+              )}
             </ol>
-            <p className="font-bold mt-5 text-xl"> Happy minting! </p>
+            <p className="font-bold mt-5 text-xl">Happy minting!</p>
           </div>
         </div>
       </div>

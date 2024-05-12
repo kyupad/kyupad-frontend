@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useEffect } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { doGeneraRefererLink } from '@/adapters/whitelist-pass';
 import PrimaryButton from '@/components/common/button/primary';
@@ -26,6 +26,7 @@ function InviteFriends() {
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
   );
+  const [openTooltip, setOpenTooltip] = React.useState<boolean>(false);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -42,16 +43,38 @@ function InviteFriends() {
 
   const renderReferIcon = () => {
     if (!isSolanaConnected) {
-      return <Image src={infoIcon} alt="info" width={20} height={20} />;
+      return (
+        <Image
+          src={infoIcon}
+          alt="info"
+          width={20}
+          height={20}
+          draggable={false}
+        />
+      );
     }
 
     if (copySuccess) {
       return (
-        <Image src={checkedIcon} width={20} height={20} alt="copy success" />
+        <Image
+          src={checkedIcon}
+          width={20}
+          height={20}
+          alt="copy success"
+          draggable={false}
+        />
       );
     }
 
-    return <Image src={copyIcon} width={20} height={20} alt="copy" />;
+    return (
+      <Image
+        src={copyIcon}
+        width={20}
+        height={20}
+        alt="copy"
+        draggable={false}
+      />
+    );
   };
 
   const handleRefer = async () => {
@@ -82,12 +105,31 @@ function InviteFriends() {
       setLoading(false);
     }
   };
+
+  const handleOpenTooltip = useCallback((value: boolean) => {
+    setOpenTooltip(value);
+  }, []);
   return (
     <TooltipProvider delayDuration={0}>
-      <Tooltip>
+      <Tooltip open={openTooltip}>
         <TooltipTrigger asChild>
           <div>
             <PrimaryButton
+              onTouchStart={() => {
+                if (!isSolanaConnected) {
+                  handleOpenTooltip(!openTooltip);
+                }
+              }}
+              onMouseOver={() => {
+                if (!isSolanaConnected) {
+                  handleOpenTooltip(true);
+                }
+              }}
+              onMouseOut={() => {
+                if (!isSolanaConnected) {
+                  handleOpenTooltip(false);
+                }
+              }}
               disabled={!isSolanaConnected}
               loading={loading}
               onClick={handleRefer}

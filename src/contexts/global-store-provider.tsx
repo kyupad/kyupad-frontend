@@ -201,6 +201,10 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
       try {
         const data = await doRefreshToken({ refresh_token: refreshToken });
 
+        if (data?.statusCode !== 200) {
+          throw new Error('Failed to refresh token');
+        }
+
         if (data?.data?.access_token) {
           setCookie(
             ACCESS_TOKEN_STORAGE_KEY,
