@@ -7,6 +7,7 @@ import { revalidateCurrentPath } from '@/actions/common';
 import { setCookie } from '@/actions/jwt';
 import Skeleton from '@/components/common/loading/skeleton';
 import ExclusivePool from '@/components/features/whitelist-pass/exclusive-pool';
+import InviteFriends from '@/components/features/whitelist-pass/invite-friends';
 // import MyTotalNftMinted from '@/components/features/whitelist-pass/my-total-nft-minted';
 import SeasonStats from '@/components/features/whitelist-pass/season-stats';
 // import FcfsPool from '@/components/features/whitelist-pass/fcfs-pool';
@@ -107,6 +108,7 @@ async function Whitelist() {
               <SeasonStats />
             </Suspense>
 
+            <InviteFriends />
             {/* <Suspense fallback={<Skeleton className="h-2 w-8/12 -mt-10" />}>
               <MyTotalNftMinted />
             </Suspense> */}

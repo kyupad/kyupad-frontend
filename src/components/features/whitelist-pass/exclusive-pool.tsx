@@ -14,6 +14,7 @@ import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
 import WalletConnect from '@/components/common/header/wallet-connect';
 import Skeleton from '@/components/common/loading/skeleton';
+import { ShowAlert } from '@/components/common/toast';
 import {
   Tooltip,
   TooltipArrow,
@@ -56,9 +57,9 @@ import jsonwebtoken from 'jsonwebtoken';
 import infoIcon from 'public/images/detail/info-icon.svg';
 import dropdown from 'public/images/whitelist/drop-down.svg';
 import moreArrow from 'public/images/whitelist/more-arrow.svg';
-import { toast } from 'sonner';
 import { decrypt } from '@utils/helpers';
 
+import MintedSuccess from './minted-success';
 import UserPoolMinted from './user-pool-minted';
 
 dayjs.extend(utc);
@@ -96,10 +97,32 @@ function ExclusivePool({
   const [creators, setCreators] = useState<any[]>([]);
   const [priorityFees, setPriorityFees] = useState<number>();
   const [seasonId, setSeasonId] = useState<string>();
+  const [visibleMintedSuccess, setVisibleMintedSuccess] =
+    useState<boolean>(false);
 
   const activePoolWrapper = useRef<HTMLDivElement>(null);
   const moreArrowRef = useRef<HTMLImageElement>(null);
   const router = useRouter();
+  const refCode = searchParams.get('ref_code');
+
+  useEffect(() => {
+    if (refCode) {
+      Sentry.captureMessage(
+        JSON.stringify({
+          refCode,
+          user: 'anonymous',
+        }),
+        {
+          user: {
+            id: 'anonymous',
+          },
+          tags: {
+            ref_code: refCode,
+          },
+        },
+      );
+    }
+  }, [refCode]);
 
   const {
     poolsCounter,
@@ -127,15 +150,22 @@ function ExclusivePool({
   const handleChangePoolId = useCallback(
     (poolId: string) => {
       setCurrentPoolId(poolId);
-      router.push(`${WEB_ROUTES.WHITELIST_PASS}?id=${poolId}`, {
-        scroll: false,
-      });
+      router.push(
+        `${WEB_ROUTES.WHITELIST_PASS}?id=${poolId}${refCode ? `&ref_code=${refCode}` : ''}`,
+        {
+          scroll: false,
+        },
+      );
     },
-    [router],
+    [refCode, router],
   );
 
   const handleSetIsLoading = useCallback((value: boolean) => {
     setIsLoading(value);
+  }, []);
+
+  const handleSetVisibleMintedSuccess = useCallback((value: boolean) => {
+    setVisibleMintedSuccess(value);
   }, []);
 
   useEffect(() => {
@@ -156,7 +186,10 @@ function ExclusivePool({
           !data?.data?.community_round?.current_pool?.pool_id)
       ) {
         setCurrentPoolId('');
-        router.replace(WEB_ROUTES.WHITELIST_PASS, { scroll: false });
+        router.replace(
+          `${WEB_ROUTES.WHITELIST_PASS}${refCode ? `?ref_code=${refCode}` : ''}`,
+          { scroll: false },
+        );
         return;
       }
 
@@ -250,10 +283,7 @@ function ExclusivePool({
 
   const handleMint = async () => {
     if (!publicKey) {
-      toast.warning('Please connect to wallet first!', {
-        position: 'top-right',
-        closeButton: true,
-      });
+      ShowAlert.warning({ message: 'Please connect to wallet first!' });
       return;
     }
 
@@ -262,13 +292,14 @@ function ExclusivePool({
     const sub = token ? jsonwebtoken.decode(token)?.sub : '';
 
     if (sub !== publicKey?.toBase58()) {
-      toast.warning(
-        <div>{`Wrong wallet connected. <br /> Please change to wallet: ${sub}`}</div>,
-        {
-          position: 'top-right',
-          closeButton: true,
-        },
-      );
+      ShowAlert.warning({
+        message: (
+          <div>
+            <div>Wrong wallet connected.</div>
+            <div>Please change to wallet: {sub as string}</div>
+          </div>
+        ),
+      });
       return;
     }
 
@@ -319,6 +350,7 @@ function ExclusivePool({
     let mint_error = '';
     let mint_message = '';
     let mint_transaction = '';
+    const mint_wallet = wallet?.adapter?.name || '';
     try {
       const merkleProof = currentPool?.merkle_proof;
       const merkleProofDecoded = decrypt(
@@ -394,6 +426,7 @@ function ExclusivePool({
         symbol: nftArgs.symbol as string,
         seller_fee_basis_points: nftArgs.sellerFeeBasisPoints,
         id: poolId,
+        ...(refCode ? { ref_code: refCode } : {}),
       });
 
       nftArgs.uri = cnftMetadata.data?.url;
@@ -582,24 +615,24 @@ function ExclusivePool({
       updateUserSeasonMinted((user_season_minted || 0) + 1);
       updateSeasonMinted(seasonId, (seasonMinted[seasonId] || 0) + 1);
 
-      toast.success(
-        <div className="text-xl">
-          Minted successfully. Please check the wallet!
-          <br />
-          <a
-            href={`https://explorer.solana.com/tx/${signatureEncode}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="underline"
-          >
-            View transaction
-          </a>
-        </div>,
-        {
-          position: 'top-right',
-          closeButton: true,
-        },
-      );
+      ShowAlert.success({
+        message: (
+          <div className="text-xl">
+            Minted successfully. Please check the wallet!
+            <br />
+            <a
+              href={`https://explorer.solana.com/tx/${signatureEncode}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="underline"
+            >
+              View transaction
+            </a>
+          </div>
+        ),
+      });
+
+      handleSetVisibleMintedSuccess(true);
     } catch (error: any) {
       mint_error = error?.stack;
       mint_message = error?.message;
@@ -608,18 +641,12 @@ function ExclusivePool({
         THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
 
       if (msg) {
-        toast.error(msg, {
-          position: 'top-right',
-          closeButton: true,
-        });
+        ShowAlert.error({ message: msg });
         return;
       }
 
       if (error?.message !== THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
-        toast.error(THROW_EXCEPTION.UNKNOWN_TRANSACTION, {
-          position: 'top-right',
-          closeButton: true,
-        });
+        ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
       }
     } finally {
       if (mint_error) {
@@ -629,12 +656,23 @@ function ExclusivePool({
             minted,
             mint_error,
             mint_message,
-            id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+            id: publicKey?.toBase58() || '',
             mint_transaction,
+            mint_wallet,
+            ref_code: refCode,
+            pool_id: currentPoolId,
+            pool_name: currentPool?.pool_name,
           },
           {
             user: {
-              id: (wallet?.adapter?.name || '') + publicKey?.toBase58() || '',
+              id: publicKey?.toBase58() || '',
+            },
+            tags: {
+              mint_error: true,
+              mint_error_with_ref_code: !!refCode,
+              ref_code: refCode,
+              mint_with_ref_code: !!refCode,
+              pool_id: currentPoolId,
             },
           },
         );
@@ -645,15 +683,22 @@ function ExclusivePool({
             minted,
             mint_error,
             mint_message,
-            id:
-              (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() || '',
+            id: publicKey?.toBase58() || '',
             mint_transaction,
+            mint_wallet,
+            pool_id: currentPoolId,
+            pool_name: currentPool?.pool_name,
           }),
           {
             user: {
-              id:
-                (wallet?.adapter?.name || '') + ':' + publicKey?.toBase58() ||
-                '',
+              id: publicKey?.toBase58() || '',
+            },
+            tags: {
+              mint_success: true,
+              mint_success_with_ref_code: !!refCode,
+              ref_code: refCode,
+              mint_with_ref_code: !!refCode,
+              pool_id: currentPoolId,
             },
           },
         );
@@ -663,13 +708,14 @@ function ExclusivePool({
   };
 
   const now = dayjs.utc();
+  const isEventEnded = dayjs.utc(currentPool?.end_time).isBefore(now);
 
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
   );
 
   const renderButtonMint = useCallback(() => {
-    if (dayjs.utc(currentPool?.end_time).isBefore(now)) {
+    if (isEventEnded) {
       return <PrimaryButton disabled>Event ended!</PrimaryButton>;
     }
 
@@ -697,15 +743,17 @@ function ExclusivePool({
     return (
       <TooltipProvider delayDuration={0}>
         <Tooltip>
-          <TooltipTrigger>
-            <PrimaryButton
-              loading={isLoading}
-              disabled={isNotStart}
-              onClick={handleMint}
-              block
-            >
-              Mint &nbsp; {isNotStart && <Image src={infoIcon} alt="info" />}
-            </PrimaryButton>
+          <TooltipTrigger asChild>
+            <div>
+              <PrimaryButton
+                loading={isLoading}
+                disabled={isNotStart}
+                onClick={handleMint}
+                block
+              >
+                Mint &nbsp; {isNotStart && <Image src={infoIcon} alt="info" />}
+              </PrimaryButton>
+            </div>
           </TooltipTrigger>
           {isNotStart && (
             <TooltipContent className="max-w-[274px] px-5 py-4">
@@ -719,13 +767,13 @@ function ExclusivePool({
       </TooltipProvider>
     );
   }, [
-    currentPool?.end_time,
     currentPool?.is_active,
     currentPool?.is_minted,
     currentPool?.minted_total,
     currentPool?.pool_supply,
     currentPool?.start_time,
     currentPool?.total_mint_per_wallet,
+    isEventEnded,
     isLoading,
     now,
     poolCounterKey,
@@ -734,216 +782,227 @@ function ExclusivePool({
   ]);
 
   return (
-    <div className="w-full flex flex-col gap-6">
-      <div className="flex items-center gap-5 justify-between w-full flex-wrap">
-        <h2 className="font-heading text-3xl sm:text-4xl xl:text-5xl">
-          Mint Pools
-        </h2>
-        <button
-          onClick={() => handleSetOpen(open)}
-          className="rounded-[8px] py-3 px-10 border-2 text-2xl font-bold bg-kyu-color-2 border-kyu-color-11 flex items-center gap-5"
-        >
-          <span>How to be eligible</span>
-          <Image
-            src={dropdown}
-            alt="dropdown"
-            className={cn('transition-transform', open ? 'rotate-180' : '')}
-          />
-        </button>
-      </div>
+    <>
+      <div className="w-full flex flex-col gap-6">
+        <div className="flex items-center gap-5 justify-between w-full flex-wrap">
+          <h2 className="font-heading text-3xl sm:text-4xl xl:text-5xl">
+            Mint Pools
+          </h2>
+          <button
+            onClick={() => handleSetOpen(open)}
+            className="rounded-[8px] py-3 px-10 border-2 text-2xl font-bold bg-kyu-color-2 border-kyu-color-11 flex items-center gap-5"
+          >
+            <span>How to be eligible</span>
+            <Image
+              src={dropdown}
+              alt="dropdown"
+              className={cn('transition-transform', open ? 'rotate-180' : '')}
+            />
+          </button>
+        </div>
 
-      <div
-        className={cn(
-          'overflow-hidden transition-all',
-          open ? 'max-h-screen' : 'max-h-0',
-        )}
-      >
         <div
           className={cn(
-            'py-5 px-10 border-2 rounded-[8px] bg-kyu-color-16 border-kyu-color-10 text-xl text-justify',
+            'overflow-hidden transition-all',
+            open ? 'max-h-screen' : 'max-h-0',
           )}
         >
-          <ul className="list-disc pl-7">
-            <li>
-              {'To be eligible for the NFT Minting, you need to become'}{' '}
-              <b>a member of our partnered communities on Solana</b> {'or'}{' '}
-              <b>join our events on X & Discord to be KyuPad contributors</b>.
-            </li>
-            <li>
-              {" Details on partnered communities & each round's"}{' '}
-              <b>eligibility mechanism</b> {'will be publicly '}
-              <b>announced before mint date</b>.
-            </li>
-            <li>
-              {'Each wallet can mint'} <b>up to 2 NFTs</b>,{' '}
-              {
-                'regardless of eligibility for additional minting rounds or membership in more than 2 partnered communities.'
-              }
-            </li>
-          </ul>
+          <div
+            className={cn(
+              'py-5 px-10 border-2 rounded-[8px] bg-kyu-color-16 border-kyu-color-10 text-xl text-justify',
+            )}
+          >
+            <ul className="list-disc pl-7">
+              <li>
+                {'To be eligible for the NFT Minting, you need to become'}{' '}
+                <b>a member of our partnered communities on Solana</b> {'or'}{' '}
+                <b>join our events on X & Discord to be KyuPad contributors</b>.
+              </li>
+              <li>
+                {" Details on partnered communities & each round's"}{' '}
+                <b>eligibility mechanism</b> {'will be publicly '}
+                <b>announced before mint date</b>.
+              </li>
+              <li>
+                {'Each wallet can mint'} <b>up to 2 NFTs</b>,{' '}
+                {
+                  'regardless of eligibility for additional minting rounds or membership in more than 2 partnered communities.'
+                }
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <div className="relative" ref={activePoolWrapper}>
-        <div className="flex gap-3 overflow-x-auto scrollbar pb-4 pr-4">
-          {activePool?.map((pool, index) => {
-            if (!pool?.pool_id) {
+        <div className="relative" ref={activePoolWrapper}>
+          <div className="flex gap-3 overflow-x-auto scrollbar pb-4 pr-4">
+            {activePool?.map((pool, index) => {
+              if (!pool?.pool_id) {
+                return (
+                  <span
+                    className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400 active-pool-item"
+                    key={index}
+                  >
+                    {pool?.pool_name}
+                  </span>
+                );
+              }
+
               return (
-                <span
-                  className="py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap last:text-gray-400 active-pool-item"
-                  key={index}
+                <button
+                  onClick={() => {
+                    handleChangePoolId(pool?.pool_id);
+                  }}
+                  className={cn(
+                    'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap active-pool-item',
+                    (currentPoolId || currentPool?.pool_id) === pool?.pool_id
+                      ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
+                      : 'text-[#8E8FA2]',
+                  )}
+                  key={pool?.pool_id}
                 >
                   {pool?.pool_name}
-                </span>
+                </button>
               );
-            }
+            })}
 
-            return (
-              <button
-                onClick={() => {
-                  handleChangePoolId(pool?.pool_id);
-                }}
-                className={cn(
-                  'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap active-pool-item',
-                  (currentPoolId || currentPool?.pool_id) === pool?.pool_id
-                    ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
-                    : 'text-[#8E8FA2]',
-                )}
-                key={pool?.pool_id}
-              >
-                {pool?.pool_name}
-              </button>
-            );
-          })}
-
-          {!activePool ||
-            (activePool.length === 0 && (
-              <>
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-                <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
-              </>
-            ))}
-        </div>
-        <Image
-          src={moreArrow}
-          alt="more"
-          className="absolute right-0 top-0 hidden"
-          ref={moreArrowRef}
-        />
-      </div>
-
-      <div
-        className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10"
-        id="mint-pool"
-      >
-        <div className="flex justify-center gap-10 items-center flex-col lg:flex-row">
-          <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
-            {loadingPool || !currentPool?.pool_image ? (
-              <Skeleton className="h-full w-full" />
-            ) : (
-              <Image
-                src={currentPool?.pool_image || ''}
-                alt={currentPool?.pool_image || ''}
-                fill
-                style={{ objectFit: 'cover' }}
-                draggable={false}
-              />
-            )}
+            {!activePool ||
+              (activePool.length === 0 && (
+                <>
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                  <Skeleton className="w-[200px] h-[52px] py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap" />
+                </>
+              ))}
           </div>
-          <div className="w-full lg:w-1/2 flex flex-col gap-5">
-            {loadingPool ||
-            !currentPool?.pool_name ||
-            !currentPool?.start_time ? (
-              <Skeleton className="h-5 w-1/2" />
-            ) : (
-              <span className="text-xl font-bold">
-                {currentPool?.pool_name || ''}{' '}
-                {dayjs.utc(currentPool?.start_time).isBefore(now)
-                  ? 'ends in:'
-                  : 'starts in:'}
-              </span>
-            )}
-            <div className="-mt-4">
-              {loadingPool ||
-              !currentPool?.start_time ||
-              !currentPool?.end_time ? (
-                <Skeleton className="h-[116px]" />
+          <Image
+            src={moreArrow}
+            alt="more"
+            className="absolute right-0 top-0 hidden"
+            ref={moreArrowRef}
+          />
+        </div>
+
+        <div
+          className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10"
+          id="mint-pool"
+        >
+          <div className="flex justify-center gap-10 items-center flex-col lg:flex-row">
+            <div className="w-full lg:w-1/2 h-[263px] relative rounded-[24px] overflow-hidden border-2 border-kyu-color-4">
+              {loadingPool || !currentPool?.pool_image ? (
+                <Skeleton className="h-full w-full" />
               ) : (
-                <CalendarCountdown
-                  time={dayjs
-                    .utc(
-                      dayjs.utc(currentPool?.start_time).isBefore(now)
-                        ? currentPool?.end_time?.valueOf()
-                        : currentPool?.start_time?.valueOf(),
-                    )
-                    .valueOf()}
-                  fullWidth
-                  revalidatePath={revalidatePath}
+                <Image
+                  src={currentPool?.pool_image || ''}
+                  alt={currentPool?.pool_image || ''}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  draggable={false}
                 />
               )}
             </div>
-
-            <div className="relative mt-6">
-              <UserPoolMinted
-                currentPoolId={currentPool?.pool_id}
-                poolId={poolId}
-                currentUserPoolMintedTotal={currentPool?.user_pool_minted_total}
-                loading={loadingPool || !poolId || !currentPool?.pool_id}
-                currentMintedTotal={currentPool?.minted_total}
-                currentPoolSupply={currentPool?.pool_supply}
-                seasonId={seasonId}
-              />
+            <div className="w-full lg:w-1/2 flex flex-col gap-5">
               {loadingPool ||
-              (!currentPool?.pool_supply && currentPool?.pool_supply !== 0) ? (
-                <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
+              !currentPool?.pool_name ||
+              !currentPool?.start_time ? (
+                <Skeleton className="h-5 w-1/2" />
               ) : (
-                <span className="absolute right-0 -top-8">
-                  <span className="text-kyu-color-14 font-medium">Total:</span>{' '}
-                  <span className="font-bold text-kyu-color-11">
-                    {currentPool?.pool_supply || 0}
-                  </span>
+                <span className="text-xl font-bold">
+                  {currentPool?.pool_name || ''}{' '}
+                  {dayjs.utc(currentPool?.start_time).isBefore(now)
+                    ? 'ends in:'
+                    : 'starts in:'}
                 </span>
               )}
+              <div className="-mt-4">
+                {loadingPool ||
+                !currentPool?.start_time ||
+                !currentPool?.end_time ? (
+                  <Skeleton className="h-[116px]" />
+                ) : (
+                  <CalendarCountdown
+                    time={dayjs
+                      .utc(
+                        dayjs.utc(currentPool?.start_time).isBefore(now)
+                          ? currentPool?.end_time?.valueOf()
+                          : currentPool?.start_time?.valueOf(),
+                      )
+                      .valueOf()}
+                    fullWidth
+                    revalidatePath={revalidatePath}
+                  />
+                )}
+              </div>
+
+              <div className="relative mt-6">
+                <UserPoolMinted
+                  currentPoolId={currentPool?.pool_id}
+                  poolId={poolId}
+                  currentUserPoolMintedTotal={
+                    currentPool?.user_pool_minted_total
+                  }
+                  loading={loadingPool || !poolId || !currentPool?.pool_id}
+                  currentMintedTotal={currentPool?.minted_total}
+                  currentPoolSupply={currentPool?.pool_supply}
+                  seasonId={seasonId}
+                />
+                {loadingPool ||
+                (!currentPool?.pool_supply &&
+                  currentPool?.pool_supply !== 0) ? (
+                  <Skeleton className="h-4 w-2/12 absolute right-0 -top-6" />
+                ) : (
+                  <span className="absolute right-0 -top-8">
+                    <span className="text-kyu-color-14 font-medium">
+                      Total:
+                    </span>{' '}
+                    <span className="font-bold text-kyu-color-11">
+                      {currentPool?.pool_supply || 0}
+                    </span>
+                  </span>
+                )}
+              </div>
+              {loadingPool || !poolId || !currentPool?.pool_id ? (
+                <Skeleton className="h-[48px]" />
+              ) : isSolanaConnected || isEventEnded ? (
+                renderButtonMint()
+              ) : (
+                <WalletConnect
+                  doGetSignInData={doGetSignInData}
+                  doVerifySignInWithSolana={doVerifySignInWithSolana}
+                  setCookie={setCookie}
+                  revalidatePath={revalidatePath}
+                  block
+                />
+              )}
             </div>
-            {loadingPool || !poolId || !currentPool?.pool_id ? (
-              <Skeleton className="h-[48px]" />
-            ) : isSolanaConnected ? (
-              renderButtonMint()
-            ) : (
-              <WalletConnect
-                doGetSignInData={doGetSignInData}
-                doVerifySignInWithSolana={doVerifySignInWithSolana}
-                setCookie={setCookie}
-                revalidatePath={revalidatePath}
-                block
-              />
-            )}
+          </div>
+
+          <div className="w-full">
+            <p className="font-bold text-xl mb-4">Note: </p>
+            <ol className="list-disc pl-4 flex flex-col gap-2 text-xl">
+              <li>Minimum balance: 0.015 SOL.</li>
+              <li>
+                Phantom wallet is highly recommended for optimal minting
+                experience.
+              </li>
+              <li>
+                Due to Solana network congestion & multiple users accessing the
+                website at the same time, the minting experience might be a bit
+                slower than expected.
+              </li>
+              <li>Participants can retry as many times as you want.</li>
+            </ol>
+            <p className="font-bold mt-5 text-xl"> Happy minting! </p>
           </div>
         </div>
-
-        <div className="w-full">
-          <p className="font-bold text-xl mb-4">Note: </p>
-          <ol className="list-disc pl-4 flex flex-col gap-2 text-xl">
-            <li>Minimum balance: 0.015 SOL.</li>
-            <li>
-              Phantom wallet is highly recommended for optimal minting
-              experience.
-            </li>
-            <li>
-              Due to Solana network congestion & multiple users accessing the
-              website at the same time, the minting experience might be a bit
-              slower than expected.
-            </li>
-            <li>Participants can retry as many times as you want.</li>
-          </ol>
-          <p className="font-bold mt-5 text-xl"> Happy minting! </p>
-        </div>
       </div>
-    </div>
+      <MintedSuccess
+        visible={visibleMintedSuccess}
+        setVisible={handleSetVisibleMintedSuccess}
+      />
+    </>
   );
 }
 

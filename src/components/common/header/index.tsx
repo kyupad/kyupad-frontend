@@ -51,7 +51,7 @@ const Header = () => {
             <Image src={discord} alt="Discord" />
           </a>
           <a
-            href="https://twitter.com/Kyupad_"
+            href="https://twitter.com/Kyupad_xyz"
             rel="noopener noreferrer"
             target="_blank"
           >

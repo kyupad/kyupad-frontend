@@ -5,7 +5,7 @@ const META_DATA_DEFAULT: Metadata = {
   applicationName: 'Kyupad',
   authors: {
     name: 'Kyu Gang',
-    url: 'https://twitter.com/Kyupad_',
+    url: 'https://twitter.com/Kyupad_xyz',
   },
   creator: 'Kyu Team',
   description:

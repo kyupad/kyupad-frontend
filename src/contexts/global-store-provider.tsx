@@ -33,10 +33,7 @@ interface GlobalStoreProviderProps {
   revalidatePath: Function;
 }
 
-const GlobalStoreProvider = ({
-  children,
-  revalidatePath,
-}: GlobalStoreProviderProps) => {
+const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
   const pathName = usePathname();
   const storeRef = useRef<StoreApi<IGlobalStore>>();
   if (!storeRef.current) {
@@ -75,7 +72,7 @@ const GlobalStoreProvider = ({
     }
   }, []);
 
-  const { disconnect, connected, wallet } = useWallet();
+  const { disconnect, connected, wallet, connecting, publicKey } = useWallet();
 
   useEffect(() => {
     storeRef.current?.setState((state) => ({
@@ -84,49 +81,60 @@ const GlobalStoreProvider = ({
     }));
   }, [connected]);
 
+  const handleAccountChange = async () => {
+    logoutProcess();
+  };
+
   useEffect(() => {
-    let valildateLoginPolling: any;
-    const startValidateLogin = setTimeout(() => {
-      valildateLoginPolling = setInterval(async () => {
-        const walletName = wallet?.adapter.name;
-        const accessToken = getCookie(ACCESS_TOKEN_STORAGE_KEY);
-        let isConnected = true;
-        let incomingWallet;
-        switch (walletName) {
-          case EWalletName.Backpack:
-            incomingWallet = (window as any)?.backpack?.publicKey?.toBase58();
-            isConnected = (window as any)?.backpack?.isConnected;
-            break;
-          case EWalletName.Phantom:
-            incomingWallet = window?.solana?.publicKey?.toBase58();
-            isConnected = window?.solana?.isConnected;
-            break;
-          default:
-            break;
-        }
+    if (!publicKey || !wallet || connecting) return;
+    const w = window as any;
+    let walletName = '';
 
-        if (incomingWallet && accessToken) {
-          const tokenDecoded = jsonwebtoken.decode(accessToken);
+    switch (wallet.adapter.name) {
+      case EWalletName.Backpack:
+        walletName = EWalletName.Backpack;
+        break;
+      case EWalletName.Phantom:
+        walletName = EWalletName.Phantom;
+        break;
+      default:
+        break;
+    }
 
-          if (tokenDecoded?.sub && tokenDecoded?.sub !== incomingWallet) {
-            await logoutProcess();
-            window.location.reload();
-          }
+    if (w?.xnft?.solana) {
+      w?.xnft?.solana.on('disconnect', handleAccountChange);
+    }
 
-          return;
-        }
+    if (w?.solana) {
+      w?.solana.on('disconnect', handleAccountChange);
+    }
 
-        if (!isConnected && hasCookie(REFRESH_TOKEN_STORAGE_KEY)) {
-          await logoutProcess();
-        }
-      }, 1000);
-    }, 3000);
+    if (walletName === EWalletName.Phantom) {
+      w?.phantom?.solana?.on('accountChanged', handleAccountChange);
+    }
+
+    if (walletName === EWalletName.Backpack) {
+      w?.backpack?.on('accountChanged', handleAccountChange);
+    }
 
     return () => {
-      clearInterval(valildateLoginPolling);
-      clearTimeout(startValidateLogin);
+      if (walletName === EWalletName.Phantom) {
+        w?.phantom?.solana?.off('accountChanged', handleAccountChange);
+      }
+
+      if (walletName === EWalletName.Backpack) {
+        w?.backpack?.off('accountChanged', handleAccountChange);
+      }
+
+      if (w?.xnft?.solana) {
+        w?.xnft?.solana.off('disconnect', handleAccountChange);
+      }
+
+      if (w?.solana) {
+        w?.solana.off('disconnect', handleAccountChange);
+      }
     };
-  }, [wallet?.adapter.name]);
+  }, [connecting, publicKey, wallet]);
 
   useEffect(() => {
     withStorageDOMEvents(createGlobalStore);
@@ -150,32 +158,43 @@ const GlobalStoreProvider = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [publicKey]);
 
   useEffect(() => {
     if (pathName) {
       checkTokenExpiration();
     }
-  }, [pathName]);
+  }, [pathName, publicKey]);
 
   const logoutProcess = async () => {
     deleteCookie(ACCESS_TOKEN_STORAGE_KEY, ACCESS_TOKEN_COOKIE_CONFIG);
     deleteCookie(REFRESH_TOKEN_STORAGE_KEY, REFRESH_TOKEN_COOKIE_CONFIG);
     sessionStorage.clear();
+    localStorage.clear();
     await disconnect();
     storeRef.current?.setState((state) => ({
       ...state,
       is_solana_connected: false,
     }));
-    revalidatePath(pathName);
+    window.location.reload();
   };
 
   const checkTokenExpiration = async () => {
     const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
     const refreshToken = getCookie(REFRESH_TOKEN_STORAGE_KEY);
 
+    if (token && publicKey) {
+      const sub = token ? jsonwebtoken.decode(token)?.sub : '';
+
+      if (sub !== publicKey.toBase58()) {
+        await logoutProcess();
+        return;
+      }
+    }
+
     if (!token && !refreshToken && connected) {
       await logoutProcess();
+      return;
     }
 
     if (!token && refreshToken) {

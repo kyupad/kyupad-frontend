@@ -6,13 +6,13 @@ import { doApplyProject } from '@/adapters/projects';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
+import { ShowAlert } from '@/components/common/toast';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
 import { UTC_FORMAT_STRING } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import incomingStep from 'public/images/detail/incoming-step.svg';
-import { toast } from 'sonner';
 
 import currentStep from '/public/images/detail/current-step.svg';
 import stepDone from '/public/images/detail/step-done.svg';
@@ -210,10 +210,7 @@ function RegistrationStep({
                 });
 
                 if (!result?.data) {
-                  toast.error(result?.message, {
-                    position: 'top-right',
-                    closeButton: true,
-                  });
+                  ShowAlert.error({ message: result?.message || '' });
                   return;
                 }
 

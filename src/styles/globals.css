@@ -142,3 +142,7 @@
 .accordion-button[data-state='open'] #arrow-down {
   transform: rotate(180deg);
 }
+
+.toast-close-btn svg {
+  stroke: #fff;
+}
