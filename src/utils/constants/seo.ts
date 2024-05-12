@@ -26,7 +26,7 @@ const META_DATA_DEFAULT: Metadata = {
     locale: 'en_US',
     images: [
       {
-        url: `https://kyupad-prod-common.s3.ap-southeast-1.amazonaws.com/public/og.png'`,
+        url: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/og.png'`,
         width: 1200,
         height: 630,
         alt: 'Kyupad',
@@ -38,10 +38,8 @@ const META_DATA_DEFAULT: Metadata = {
     title: 'Kyupad | The Whisker-Winning',
     description:
       'Whisker Winning Launchpad built on Solana endeavors to seek Midas-touch Alpha for Degens',
-    creator: '@Kyupad_',
-    images: [
-      'https://kyupad-prod-common.s3.ap-southeast-1.amazonaws.com/public/og.png',
-    ],
+    creator: '@Kyupad_xyz',
+    images: [`${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/og.png`],
   },
 };
 
