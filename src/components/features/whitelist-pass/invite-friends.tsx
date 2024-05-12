@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { doGeneraRefererLink } from '@/adapters/whitelist-pass';
 import PrimaryButton from '@/components/common/button/primary';
 import { ShowAlert } from '@/components/common/toast';
+import { useGlobalStore } from '@/contexts/global-store-provider';
 import checkedIcon from 'public/images/my-space/check.svg';
 import copyIcon from 'public/images/my-space/copy.svg';
 import { useCopyToClipboard } from 'usehooks-ts';
@@ -14,6 +15,9 @@ function InviteFriends() {
   const [_, copy] = useCopyToClipboard();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [copySuccess, setCopySuccess] = React.useState<boolean>(false);
+  const isSolanaConnected = useGlobalStore(
+    (state) => state.is_solana_connected,
+  );
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -57,14 +61,16 @@ function InviteFriends() {
     }
   };
   return (
-    <PrimaryButton loading={loading} onClick={handleRefer}>
-      {loading ? 'Generating...' : `Invite Friends`}&nbsp;
-      {copySuccess ? (
-        <Image src={checkedIcon} width={20} height={20} alt="copy success" />
-      ) : (
-        <Image src={copyIcon} width={20} height={20} alt="copy" />
-      )}
-    </PrimaryButton>
+    isSolanaConnected && (
+      <PrimaryButton loading={loading} onClick={handleRefer}>
+        {loading ? 'Generating...' : `Invite Friends`}&nbsp;
+        {copySuccess ? (
+          <Image src={checkedIcon} width={20} height={20} alt="copy success" />
+        ) : (
+          <Image src={copyIcon} width={20} height={20} alt="copy" />
+        )}
+      </PrimaryButton>
+    )
   );
 }
 

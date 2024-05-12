@@ -150,11 +150,14 @@ function ExclusivePool({
   const handleChangePoolId = useCallback(
     (poolId: string) => {
       setCurrentPoolId(poolId);
-      router.push(`${WEB_ROUTES.WHITELIST_PASS}?id=${poolId}`, {
-        scroll: false,
-      });
+      router.push(
+        `${WEB_ROUTES.WHITELIST_PASS}?id=${poolId}${preferCode ? `&prefer_code=${preferCode}` : ''}`,
+        {
+          scroll: false,
+        },
+      );
     },
-    [router],
+    [preferCode, router],
   );
 
   const handleSetIsLoading = useCallback((value: boolean) => {
@@ -183,7 +186,10 @@ function ExclusivePool({
           !data?.data?.community_round?.current_pool?.pool_id)
       ) {
         setCurrentPoolId('');
-        router.replace(WEB_ROUTES.WHITELIST_PASS, { scroll: false });
+        router.replace(
+          `${WEB_ROUTES.WHITELIST_PASS}${preferCode ? `?prefer_code=${preferCode}` : ''}`,
+          { scroll: false },
+        );
         return;
       }
 
@@ -731,7 +737,7 @@ function ExclusivePool({
     return (
       <TooltipProvider delayDuration={0}>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <div>
               <PrimaryButton
                 loading={isLoading}
