@@ -16,6 +16,7 @@ import { useGlobalStore } from '@/contexts/global-store-provider';
 import infoIcon from 'public/images/detail/info-icon.svg';
 import checkedIcon from 'public/images/my-space/check.svg';
 import copyIcon from 'public/images/my-space/copy.svg';
+import { useReward } from 'react-rewards';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 function InviteFriends() {
@@ -27,6 +28,9 @@ function InviteFriends() {
     (state) => state.is_solana_connected,
   );
   const [openTooltip, setOpenTooltip] = React.useState<boolean>(false);
+  const { reward, isAnimating } = useReward('invite-friends', 'confetti', {
+    position: 'absolute',
+  });
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -91,6 +95,7 @@ function InviteFriends() {
         ShowAlert.success({
           message: 'Refer link copied to clipboard!',
         });
+        reward();
         return;
       }
 
@@ -113,7 +118,11 @@ function InviteFriends() {
     <TooltipProvider delayDuration={0}>
       <Tooltip open={openTooltip}>
         <TooltipTrigger asChild>
-          <div>
+          <div className="relative">
+            <span
+              id="invite-friends"
+              className="left-1/2 absolute -translate-x-1/2 top-1/2 -translate-y-1/2"
+            />
             <PrimaryButton
               onTouchStart={() => {
                 if (!isSolanaConnected) {
@@ -130,7 +139,7 @@ function InviteFriends() {
                   handleOpenTooltip(false);
                 }
               }}
-              disabled={!isSolanaConnected}
+              disabled={!isSolanaConnected || isAnimating}
               loading={loading}
               onClick={handleRefer}
               block
