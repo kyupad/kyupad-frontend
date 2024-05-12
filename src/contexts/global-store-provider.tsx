@@ -22,6 +22,7 @@ import * as Sentry from '@sentry/nextjs';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { deleteCookie, getCookie, hasCookie, setCookie } from 'cookies-next';
 import { env } from 'env.mjs';
+import jsonwebtoken from 'jsonwebtoken';
 import { useStore, type StoreApi } from 'zustand';
 import { EWalletName } from '@utils/enums/solana';
 
@@ -157,13 +158,13 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [publicKey]);
 
   useEffect(() => {
     if (pathName) {
       checkTokenExpiration();
     }
-  }, [pathName]);
+  }, [pathName, publicKey]);
 
   const logoutProcess = async () => {
     deleteCookie(ACCESS_TOKEN_STORAGE_KEY, ACCESS_TOKEN_COOKIE_CONFIG);
@@ -182,8 +183,18 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
     const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
     const refreshToken = getCookie(REFRESH_TOKEN_STORAGE_KEY);
 
+    if (token && publicKey) {
+      const sub = token ? jsonwebtoken.decode(token)?.sub : '';
+
+      if (sub !== publicKey.toBase58()) {
+        await logoutProcess();
+        return;
+      }
+    }
+
     if (!token && !refreshToken && connected) {
       await logoutProcess();
+      return;
     }
 
     if (!token && refreshToken) {

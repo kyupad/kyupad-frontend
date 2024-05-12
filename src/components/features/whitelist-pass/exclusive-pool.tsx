@@ -103,13 +103,13 @@ function ExclusivePool({
   const activePoolWrapper = useRef<HTMLDivElement>(null);
   const moreArrowRef = useRef<HTMLImageElement>(null);
   const router = useRouter();
-  const preferCode = searchParams.get('prefer_code');
+  const refCode = searchParams.get('ref_code');
 
   useEffect(() => {
-    if (preferCode) {
+    if (refCode) {
       Sentry.captureMessage(
         JSON.stringify({
-          preferCode,
+          refCode,
           user: 'anonymous',
         }),
         {
@@ -117,12 +117,12 @@ function ExclusivePool({
             id: 'anonymous',
           },
           tags: {
-            prefer_code: preferCode,
+            ref_code: refCode,
           },
         },
       );
     }
-  }, [preferCode]);
+  }, [refCode]);
 
   const {
     poolsCounter,
@@ -151,13 +151,13 @@ function ExclusivePool({
     (poolId: string) => {
       setCurrentPoolId(poolId);
       router.push(
-        `${WEB_ROUTES.WHITELIST_PASS}?id=${poolId}${preferCode ? `&prefer_code=${preferCode}` : ''}`,
+        `${WEB_ROUTES.WHITELIST_PASS}?id=${poolId}${refCode ? `&ref_code=${refCode}` : ''}`,
         {
           scroll: false,
         },
       );
     },
-    [preferCode, router],
+    [refCode, router],
   );
 
   const handleSetIsLoading = useCallback((value: boolean) => {
@@ -187,7 +187,7 @@ function ExclusivePool({
       ) {
         setCurrentPoolId('');
         router.replace(
-          `${WEB_ROUTES.WHITELIST_PASS}${preferCode ? `?prefer_code=${preferCode}` : ''}`,
+          `${WEB_ROUTES.WHITELIST_PASS}${refCode ? `?ref_code=${refCode}` : ''}`,
           { scroll: false },
         );
         return;
@@ -426,7 +426,7 @@ function ExclusivePool({
         symbol: nftArgs.symbol as string,
         seller_fee_basis_points: nftArgs.sellerFeeBasisPoints,
         id: poolId,
-        ...(preferCode ? { prefer_code: preferCode } : {}),
+        ...(refCode ? { ref_code: refCode } : {}),
       });
 
       nftArgs.uri = cnftMetadata.data?.url;
@@ -659,7 +659,9 @@ function ExclusivePool({
             id: publicKey?.toBase58() || '',
             mint_transaction,
             mint_wallet,
-            prefer_code: preferCode,
+            ref_code: refCode,
+            pool_id: currentPoolId,
+            pool_name: currentPool?.pool_name,
           },
           {
             user: {
@@ -667,9 +669,10 @@ function ExclusivePool({
             },
             tags: {
               mint_error: true,
-              mint_error_with_prefer_code: !!preferCode,
-              prefer_code: preferCode,
-              mint_with_prefer_code: !!preferCode,
+              mint_error_with_ref_code: !!refCode,
+              ref_code: refCode,
+              mint_with_ref_code: !!refCode,
+              pool_id: currentPoolId,
             },
           },
         );
@@ -683,6 +686,8 @@ function ExclusivePool({
             id: publicKey?.toBase58() || '',
             mint_transaction,
             mint_wallet,
+            pool_id: currentPoolId,
+            pool_name: currentPool?.pool_name,
           }),
           {
             user: {
@@ -690,9 +695,10 @@ function ExclusivePool({
             },
             tags: {
               mint_success: true,
-              mint_success_with_prefer_code: !!preferCode,
-              prefer_code: preferCode,
-              mint_with_prefer_code: !!preferCode,
+              mint_success_with_ref_code: !!refCode,
+              ref_code: refCode,
+              mint_with_ref_code: !!refCode,
+              pool_id: currentPoolId,
             },
           },
         );

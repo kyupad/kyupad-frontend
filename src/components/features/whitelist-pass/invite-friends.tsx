@@ -5,7 +5,15 @@ import Image from 'next/image';
 import { doGeneraRefererLink } from '@/adapters/whitelist-pass';
 import PrimaryButton from '@/components/common/button/primary';
 import { ShowAlert } from '@/components/common/toast';
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/common/tooltip';
 import { useGlobalStore } from '@/contexts/global-store-provider';
+import infoIcon from 'public/images/detail/info-icon.svg';
 import checkedIcon from 'public/images/my-space/check.svg';
 import copyIcon from 'public/images/my-space/copy.svg';
 import { useCopyToClipboard } from 'usehooks-ts';
@@ -32,6 +40,20 @@ function InviteFriends() {
     };
   }, [copySuccess]);
 
+  const renderReferIcon = () => {
+    if (!isSolanaConnected) {
+      return <Image src={infoIcon} alt="info" width={20} height={20} />;
+    }
+
+    if (copySuccess) {
+      return (
+        <Image src={checkedIcon} width={20} height={20} alt="copy success" />
+      );
+    }
+
+    return <Image src={copyIcon} width={20} height={20} alt="copy" />;
+  };
+
   const handleRefer = async () => {
     const waitToCall = () =>
       new Promise((resolve) => setTimeout(resolve, 2000));
@@ -40,8 +62,8 @@ function InviteFriends() {
       await waitToCall();
       const referLink = await doGeneraRefererLink();
 
-      if (referLink?.data?.prefer_url) {
-        await copy(referLink.data?.prefer_url);
+      if (referLink?.data?.ref_url) {
+        await copy(referLink.data?.ref_url);
         setCopySuccess(true);
         ShowAlert.success({
           message: 'Refer link copied to clipboard!',
@@ -61,16 +83,31 @@ function InviteFriends() {
     }
   };
   return (
-    isSolanaConnected && (
-      <PrimaryButton loading={loading} onClick={handleRefer}>
-        {loading ? 'Generating...' : `Invite Friends`}&nbsp;
-        {copySuccess ? (
-          <Image src={checkedIcon} width={20} height={20} alt="copy success" />
-        ) : (
-          <Image src={copyIcon} width={20} height={20} alt="copy" />
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div>
+            <PrimaryButton
+              disabled={!isSolanaConnected}
+              loading={loading}
+              onClick={handleRefer}
+              block
+            >
+              {loading ? 'Generating...' : `Invite Friends`}&nbsp;
+              {renderReferIcon()}
+            </PrimaryButton>
+          </div>
+        </TooltipTrigger>
+        {!isSolanaConnected && (
+          <TooltipContent className="max-w-[274px] px-5 py-4">
+            <p className="text-base font-medium text-justify">
+              Please connect wallet to invite friends!
+            </p>
+            <TooltipArrow fill="#8E8FA2" />
+          </TooltipContent>
         )}
-      </PrimaryButton>
-    )
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 

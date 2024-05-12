@@ -33,7 +33,7 @@ const doGenerateMetadata = async (body: {
   description?: string;
   seller_fee_basis_points: number;
   creators?: string[];
-  prefer_code?: string;
+  ref_code?: string;
 }) => {
   const data = await request('POST', API_ROUTES.GENERATE_CFNT_METADATA, body);
   return data;
