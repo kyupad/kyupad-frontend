@@ -192,11 +192,6 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
       }
     }
 
-    if (!token && !refreshToken && connected) {
-      await logoutProcess();
-      return;
-    }
-
     if (!token && refreshToken) {
       try {
         const data = await doRefreshToken({ refresh_token: refreshToken });
