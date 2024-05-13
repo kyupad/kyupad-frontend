@@ -30,7 +30,7 @@ import {
   WEB_ROUTES,
 } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
-import { Program } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import {
   getMetadataArgsSerializer,
   MetadataArgsArgs,
@@ -374,10 +374,12 @@ function ExclusivePool({
         (item: any) => Array.from(item.data),
       );
 
+      const provider = new AnchorProvider(connection, anchorWallet);
+
       // Mint a compressed NFT
       const program = new Program<KyupadSmartContract>(
         IDL as KyupadSmartContract,
-        anchorWallet as any,
+        provider,
       );
 
       const [poolsPDA] = PublicKey.findProgramAddressSync(
