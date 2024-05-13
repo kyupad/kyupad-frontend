@@ -16,7 +16,7 @@ import {
   WEB_ROUTES,
 } from '@/utils/constants';
 import { decrypt } from '@/utils/helpers';
-import { IdlTypes, Program } from '@coral-xyz/anchor';
+import { AnchorProvider, IdlTypes, Program } from '@coral-xyz/anchor';
 import { getAssociatedTokenAddressSync } from '@solana/spl-token';
 import {
   useAnchorWallet,
@@ -209,10 +209,9 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
         merkleProof: merkleProofDecodedParsedArray,
       };
 
-      const program = new Program<KyupadIdo>(
-        IDL as KyupadIdo,
-        anchorWallet as any,
-      );
+      const provider = new AnchorProvider(connection, anchorWallet);
+
+      const program = new Program<KyupadIdo>(IDL as KyupadIdo, provider);
 
       const investIns = await program.methods
         .invest(investArgs)
