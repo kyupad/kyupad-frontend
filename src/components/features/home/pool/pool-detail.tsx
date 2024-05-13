@@ -227,25 +227,6 @@ const PoolDetail = ({
         </div>
       </div>
 
-      {mode === 'success' && (
-        <div
-          className={cn(
-            'lg:w-7/12 relative rounded-tl-[8px] border-b-4 rounded-tr-[8px] lg:rounded-[8px] overflow-hidden border-[#25252C] order-1 lg:order-2 pb-[56.25%] lg:pb-0 lg:border-2',
-            direction === 'column'
-              ? '!order-1 !w-full !pb-[56.25%] !rounded-bl-none !rounded-br-none !border-b-4 !border-r-0 !border-l-0 !border-t-0'
-              : '',
-          )}
-        >
-          <Image
-            src={data?.thumbnail}
-            fill
-            alt="cover"
-            draggable={false}
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
-            sizes="100vw"
-          />
-        </div>
-      )}
       {mode !== 'success' && (
         <div
           className={cn(
