@@ -67,10 +67,11 @@ const Registation = ({
                 <span className="text-xl">Total raise</span>
                 <span className="text-xl md:text-2xl font-bold text-end">
                   {data?.info?.total_raise
-                    ? currencyFormatter.format(
-                        Big(data?.info?.total_raise).toNumber(),
-                      )
-                    : '0'}
+                    ? Big(data?.info?.total_raise)
+                        .toNumber()
+                        .toLocaleString('en-US')
+                    : '0'}{' '}
+                  {data?.price?.currency?.toUpperCase() || ''}
                 </span>
               </div>
               <div className="flex w-full justify-between items-center gap-4">
@@ -82,7 +83,7 @@ const Registation = ({
                         .toNumber()
                         .toLocaleString('en-US')
                     : '0'}{' '}
-                  {data?.price?.currency || ''}
+                  {data?.price?.currency?.toUpperCase() || ''}
                 </span>
               </div>
             </div>
@@ -106,7 +107,7 @@ const Registation = ({
                         .toNumber()
                         .toLocaleString('en-US')
                     : '0'}{' '}
-                  USDT
+                  {data?.price?.currency?.toUpperCase() || ''}
                 </span>
               </div>
             </div>
