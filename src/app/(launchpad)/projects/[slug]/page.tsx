@@ -14,6 +14,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
   const data = await doGetProjectDetail(slug);
 
   const detail = data?.data?.project;
+
   const is_applied = data?.data?.is_applied;
   const usersAssets = data?.data?.users_assets;
 

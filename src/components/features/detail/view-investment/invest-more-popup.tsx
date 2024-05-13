@@ -1,4 +1,4 @@
-import React, { memo, ReactNode } from 'react';
+import React, { memo, ReactNode, useCallback, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,10 +14,20 @@ import PrimaryButton from '@components/common/button/primary';
 function InvestMorePopup({
   children,
   amount,
+  handleInvest,
+  loading,
 }: {
   children: ReactNode;
   amount?: number;
+  handleInvest: (numberTicket: number) => void;
+  loading?: boolean;
 }) {
+  const [numberTicket, setNumberTicket] = useState<number>(1);
+
+  const handleChangeNumberTicket = useCallback((e: any) => {
+    const value = e.target.value || 1;
+    setNumberTicket(value);
+  }, []);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -43,11 +53,19 @@ function InvestMorePopup({
             max={amount || 1}
             min={1}
             placeholder="1"
-            defaultValue={1}
+            defaultValue={numberTicket}
+            onChange={handleChangeNumberTicket}
           />
         </div>
         <DialogFooter className="-mt-3">
-          <PrimaryButton block>Invest</PrimaryButton>
+          <PrimaryButton
+            disabled={loading}
+            loading={loading}
+            block
+            onClick={() => handleInvest(numberTicket)}
+          >
+            Invest
+          </PrimaryButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

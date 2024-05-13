@@ -8,7 +8,6 @@ import SecondaryButton from '@/components/common/button/secondary';
 import CountdownTime from '@/components/common/coutdown/simple';
 import { ENDED_AT_FORMAT_STRING, WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
-import { currencyFormatter } from '@/utils/helpers/currency';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import utc from 'dayjs/plugin/utc';
@@ -155,7 +154,8 @@ const PoolDetail = ({
               Total raise
             </span>
             <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-              {currencyFormatter.format(data?.info?.total_raise)}
+              {data?.info?.total_raise?.toLocaleString('en-US') || 0}{' '}
+              {data?.price?.currency?.toUpperCase() || ''}
             </span>
           </div>
 
@@ -188,7 +188,8 @@ const PoolDetail = ({
                   Ticket Size
                 </span>
                 <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-                  {currencyFormatter.format(data?.info?.ticket_size)}
+                  {data?.info?.ticket_size?.toLocaleString('en-US') || 0}{' '}
+                  {data?.price?.currency?.toUpperCase() || ''}
                 </span>
               </div>
 

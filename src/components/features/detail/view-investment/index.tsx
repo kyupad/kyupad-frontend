@@ -116,7 +116,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
   const isNotWinner = (investmentInfo?.total_owner_winning_tickets || 0) <= 0;
   const isEnded = dayjs.utc(data?.timeline?.investment_end_at).isBefore(now);
 
-  const handleInvest = async () => {
+  const handleInvest = async (numberTicket?: number) => {
     if (!publicKey || !wallet || !anchorWallet || !connection) {
       ShowAlert.warning({ message: 'Please connect to wallet first!' });
       return;
@@ -204,7 +204,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       }
       const investArgs: InvestArgs = {
         projectId: projectId,
-        ticketAmount: 1,
+        ticketAmount: numberTicket || 1,
         maxTicketAmount: totalWinningTicket,
         merkleProof: merkleProofDecodedParsedArray,
       };
@@ -369,14 +369,16 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     if (isNotWinner) {
       return (
         <Link href={WEB_ROUTES.HOME}>
-          <PrimaryButton block={false}>Explorer other IDO</PrimaryButton>
+          <PrimaryButton block={false} className="min-w-[200px]">
+            Explorer other IDO
+          </PrimaryButton>
         </Link>
       );
     }
 
     if (isEnded) {
       return (
-        <PrimaryButton block={false} disabled>
+        <PrimaryButton block={false} disabled className="min-w-[200px]">
           Investment Ended
         </PrimaryButton>
       );
@@ -384,8 +386,19 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
 
     if ((investmentInfo?.total_owner_winning_tickets || 0) > 1) {
       return (
-        <InvestMorePopup amount={investmentInfo?.total_owner_winning_tickets}>
-          <PrimaryButton block={false}>Invest More</PrimaryButton>
+        <InvestMorePopup
+          amount={investmentInfo?.total_owner_winning_tickets}
+          handleInvest={handleInvest}
+          loading={isInVesting}
+        >
+          <PrimaryButton
+            disabled={isInVesting}
+            loading={isInVesting}
+            block={false}
+            className="min-w-[200px]"
+          >
+            Invest More
+          </PrimaryButton>
         </InvestMorePopup>
       );
     }
@@ -396,6 +409,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
         loading={isInVesting}
         onClick={handleInvest}
         block={false}
+        className="min-w-[200px]"
       >
         Invest
       </PrimaryButton>
@@ -467,7 +481,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
                 <span className="text-xl">Ticket size</span>
                 <span className="text-2xl font-bold text-kyu-color-13">
                   {investmentInfo?.ticket_size || 0}{' '}
-                  {investmentInfo?.currency || 'USDT'}
+                  {investmentInfo?.currency?.toUpperCase() || ''}
                 </span>
               </div>
 

@@ -16,6 +16,7 @@ const doGetProjectDetail = async (slug: string) => {
       headers: {
         Cookie: cookieStr,
       },
+      cache: 'no-store',
     },
   );
 
