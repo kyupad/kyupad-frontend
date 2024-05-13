@@ -3,15 +3,34 @@ import ImageNext from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { doViewRegistration } from '@/adapters/projects';
+import { KyupadIdo } from '@/anchor/kyupad_ido';
 import PrimaryButton from '@/components/common/button/primary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
 import Skeleton from '@/components/common/loading/skeleton';
+import { ShowAlert } from '@/components/common/toast';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
-import { WEB_ROUTES } from '@/utils/constants';
-import { useWallet } from '@solana/wallet-adapter-react';
+import {
+  ACCESS_TOKEN_STORAGE_KEY,
+  THROW_EXCEPTION,
+  WEB_ROUTES,
+} from '@/utils/constants';
+import { decrypt } from '@/utils/helpers';
+import { IdlTypes, Program } from '@coral-xyz/anchor';
+import { getAssociatedTokenAddressSync } from '@solana/spl-token';
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from '@solana/wallet-adapter-react';
+import { ComputeBudgetProgram, PublicKey, Transaction } from '@solana/web3.js';
+import base58 from 'bs58';
+import { getCookie } from 'cookies-next';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { env } from 'env.mjs';
+import jsonwebtoken from 'jsonwebtoken';
+import IDL from 'src/anchor/kyupad_ido.json';
 
 import Back from '../back';
 import InvestMorePopup from './invest-more-popup';
@@ -20,6 +39,8 @@ import lossTicket from '/public/images/detail/loss-ticket.png';
 import wonTicketDecor from '/public/images/detail/won-ticket-decor.svg';
 import wonTicket from '/public/images/detail/won-ticket.png';
 
+type InvestArgs = IdlTypes<KyupadIdo>['investArgs'];
+
 dayjs.extend(utc);
 
 interface IViewSnapshotProps {
@@ -27,17 +48,28 @@ interface IViewSnapshotProps {
 }
 
 function ViewInvestment({ data }: IViewSnapshotProps) {
-  const { publicKey } = useWallet();
+  const { publicKey, wallet } = useWallet();
   const [investmentInfo, setInvestmentInfo] = useState<{
     total_owner_winning_tickets?: number;
     tickets_used?: number;
     total_winner?: number;
     ticket_size?: number;
     currency?: string;
+    currency_address?: string;
     token_offered?: number;
+    destination_wallet?: string;
+    merkle_proof?: string;
   }>({});
+  const [projectInfo, setProjectInfo] = useState<{
+    _id: string;
+    investment_start_at?: string;
+    investment_end_at?: string;
+  } | null>(null);
   const { slug } = useParams();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { connection } = useConnection();
+  const anchorWallet = useAnchorWallet();
+  const [isInVesting, setIsInVesting] = useState<boolean>(false);
 
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
@@ -60,6 +92,10 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
         if (data?.data?.investment_info) {
           setInvestmentInfo(data.data.investment_info);
         }
+
+        if (data?.data?.project_info) {
+          setProjectInfo(data.data.project_info);
+        }
       }
     };
 
@@ -72,9 +108,200 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     }
   }, [publicKey, slug]);
 
+  const handleSetIsInvesting = useCallback((value: boolean) => {
+    setIsInVesting(value);
+  }, []);
+
   const now = dayjs.utc();
   const isNotWinner = (investmentInfo?.total_owner_winning_tickets || 0) <= 0;
   const isEnded = dayjs.utc(data?.timeline?.investment_end_at).isBefore(now);
+
+  const handleInvest = async () => {
+    if (!publicKey || !wallet || !anchorWallet || !connection) {
+      ShowAlert.warning({ message: 'Please connect to wallet first!' });
+      return;
+    }
+
+    if (!investmentInfo?.destination_wallet) {
+      console.error({ message: 'No destination wallet found!' });
+      return;
+    }
+
+    if (!investmentInfo?.merkle_proof) {
+      console.error({ message: 'No merkle root found!' });
+      return;
+    }
+
+    if (!projectInfo?._id) {
+      console.error({ message: 'No project id found!' });
+      return;
+    }
+
+    if (!investmentInfo?.currency) {
+      console.error({ message: 'No currency found!' });
+      return;
+    }
+
+    if (!investmentInfo?.total_owner_winning_tickets) {
+      console.error({ message: 'No total owner winning tickets found!' });
+      return;
+    }
+
+    const token = getCookie(ACCESS_TOKEN_STORAGE_KEY);
+    const sub = token ? jsonwebtoken.decode(token)?.sub : '';
+
+    if (sub !== publicKey?.toBase58()) {
+      ShowAlert.warning({
+        message: (
+          <div>
+            <div>Wrong wallet connected.</div>
+            <div>Please change to wallet: {sub as string}</div>
+          </div>
+        ),
+      });
+      return;
+    }
+
+    handleSetIsInvesting(true);
+
+    try {
+      let vaultAddress = new PublicKey(investmentInfo?.destination_wallet);
+      const merkleProof = investmentInfo?.merkle_proof;
+
+      const merkleProofDecoded = decrypt(
+        merkleProof,
+        env.NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN,
+        true,
+      );
+
+      const merkleProofDecodedParsed = JSON.parse(merkleProofDecoded).map(
+        (info: any) => {
+          return {
+            ...info,
+            data: Buffer.from(info.data, 'hex'),
+          };
+        },
+      );
+
+      const merkleProofDecodedParsedArray = merkleProofDecodedParsed.map(
+        (item: any) => Array.from(item.data),
+      );
+
+      const projectId = projectInfo?._id;
+      const currency = investmentInfo.currency;
+      const totalWinningTicket = investmentInfo.total_owner_winning_tickets;
+
+      if (currency?.toLowerCase() !== 'sol') {
+        if (!investmentInfo.currency_address) {
+          console.error({ message: 'No currency address found!' });
+          return;
+        }
+        const tokenAddress = new PublicKey(investmentInfo.currency_address);
+        vaultAddress = getAssociatedTokenAddressSync(
+          tokenAddress,
+          vaultAddress,
+        );
+      }
+      const investArgs: InvestArgs = {
+        projectId: projectId,
+        ticketAmount: 1,
+        maxTicketAmount: totalWinningTicket,
+        merkleProof: merkleProofDecodedParsedArray,
+      };
+
+      const program = new Program<KyupadIdo>(
+        IDL as KyupadIdo,
+        anchorWallet as any,
+      );
+
+      const investIns = await program.methods
+        .invest(investArgs)
+        .accounts({
+          investor: publicKey,
+          vaultAddress: vaultAddress,
+        })
+        .instruction();
+
+      const setComputeUnitPriceIx = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 100000, // FIXME: set to 100000
+      });
+
+      const tx = new Transaction().add(setComputeUnitPriceIx).add(investIns);
+      tx.feePayer = publicKey;
+      tx.recentBlockhash = (
+        await connection.getLatestBlockhash('confirmed')
+      ).blockhash;
+
+      const signature = await (wallet?.adapter as any)?.signTransaction(tx);
+      const signatureEncode = base58.encode(signature?.signature);
+
+      const blockhash =
+        await connection.getLatestBlockhashAndContext('confirmed');
+      const blockHeight = await connection.getBlockHeight({
+        commitment: 'confirmed',
+        minContextSlot: blockhash.context.slot,
+      });
+
+      const transactionTTL = blockHeight + 151;
+      const waitToConfirm = () =>
+        new Promise((resolve) => setTimeout(resolve, 5000));
+      const waitToRetry = () =>
+        new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const numTry = 30;
+
+      for (let i = 0; i < numTry; i++) {
+        // check transaction TTL
+        const blockHeight = await connection.getBlockHeight('confirmed');
+        if (blockHeight >= transactionTTL) {
+          throw new Error('ONCHAIN_TIMEOUT');
+        }
+
+        await connection?.sendRawTransaction(signature.serialize(), {
+          skipPreflight: process.env.NODE_ENV === 'development',
+          maxRetries: 0,
+        });
+
+        await waitToConfirm();
+
+        const sigStatus = await connection.getSignatureStatus(signatureEncode);
+
+        if (sigStatus.value?.err) {
+          throw new Error('UNKNOWN_TRANSACTION');
+        }
+
+        if (sigStatus.value?.confirmationStatus === 'confirmed') {
+          break;
+        }
+
+        await waitToRetry();
+      }
+
+      ShowAlert.success({
+        message: (
+          <div className="text-xl">
+            Invest successfully!
+            <br />
+            <a
+              href={`https://explorer.solana.com/tx/${signatureEncode}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="underline"
+            >
+              View transaction
+            </a>
+          </div>
+        ),
+      });
+    } catch (e) {
+      const error = e as Error;
+      if (error?.message !== THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
+        ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
+      }
+    } finally {
+      handleSetIsInvesting(false);
+    }
+  };
 
   const renderInvestTitle = useCallback(() => {
     if (loading) {
@@ -163,10 +390,20 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       );
     }
 
-    return <PrimaryButton block={false}>Invest</PrimaryButton>;
+    return (
+      <PrimaryButton
+        disabled={isInVesting}
+        loading={isInVesting}
+        onClick={handleInvest}
+        block={false}
+      >
+        Invest
+      </PrimaryButton>
+    );
   }, [
     investmentInfo?.total_owner_winning_tickets,
     isEnded,
+    isInVesting,
     isNotWinner,
     loading,
   ]);
