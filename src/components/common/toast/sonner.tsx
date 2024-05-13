@@ -5,6 +5,7 @@ import Image from 'next/image';
 import errorToast from 'public/images/common/error-toast.svg';
 import spin from 'public/images/common/spin.svg';
 import successToast from 'public/images/common/sussess-toast.svg';
+import warningToast from 'public/images/common/warning-toast.svg';
 import { Toaster as Sonner, toast } from 'sonner';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
@@ -52,7 +53,7 @@ const ShowAlert = {
       <div className="flex flex-col gap-6">
         <div className="flex gap-3 flex-col items-center">
           <div>
-            <Image src={errorToast} alt="error" />
+            <Image src={errorToast} alt="error" draggable={false} />
           </div>
           <h2 className="text-2xl font-bold text-[#F44646]">
             {props?.title || 'Error'}
@@ -73,7 +74,7 @@ const ShowAlert = {
       <div className="flex flex-col gap-6">
         <div className="flex gap-3 flex-col items-center">
           <div>
-            <Image src={successToast} alt="success" />
+            <Image src={successToast} alt="success" draggable={false} />
           </div>
           <h2 className="text-2xl font-bold text-[#18CF6A]">
             {props?.title || 'Successful'}
@@ -94,10 +95,10 @@ const ShowAlert = {
       <div className="flex flex-col gap-6">
         <div className="flex gap-3 flex-col items-center">
           <div>
-            <Image src={errorToast} alt="error" />
+            <Image src={warningToast} alt="warning" draggable={false} />
           </div>
-          <h2 className="text-2xl font-bold text-[#F44646]">
-            {props?.title || 'Error'}
+          <h2 className="text-2xl font-bold text-[#F8A627]">
+            {props?.title || 'Warning'}
           </h2>
         </div>
 

@@ -22,11 +22,11 @@ const env = createEnv({
     NEXT_PUBLIC_ALLOWED_RESOURCES: z.string().nullish(),
     NEXT_PUBLIC_ALLOWED_COOKIE_DOMAIN: z.string().min(1),
     NEXT_PUBLIC_NFT_PROGRAM_ID: z.string().min(1),
+    NEXT_PUBLIC_IDO_PROGRAM_ID: z.string().min(1),
     NEXT_PUBLIC_RPC_URL: z.string().min(1).includes('http'),
     NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID: z.string().min(1),
     NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN: z.string().min(1),
     NEXT_PUBLIC_MPL_BUBBLEGUM_PROGRAM_ID: z.string().min(1),
-    NEXT_PUBLIC_MAX_RETRIES_ONCHAIN: z.string().nullish(),
     NEXT_PUBLIC_DOCS_URL: z.string().min(1).includes('http'),
     NEXT_PUBLIC_PRIORITY_FEES: z.string().min(1),
     NEXT_PUBLIC_SENTRY_DSN: z.string().min(1).includes('http').nullish(),
@@ -54,8 +54,6 @@ const env = createEnv({
       process.env.NEXT_PUBLIC_CRYPTO_ENCRYPT_TOKEN,
     NEXT_PUBLIC_MPL_BUBBLEGUM_PROGRAM_ID:
       process.env.NEXT_PUBLIC_MPL_BUBBLEGUM_PROGRAM_ID,
-    NEXT_PUBLIC_MAX_RETRIES_ONCHAIN:
-      process.env.NEXT_PUBLIC_MAX_RETRIES_ONCHAIN,
     NEXT_PUBLIC_DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL,
     NEXT_PUBLIC_PRIORITY_FEES: process.env.NEXT_PUBLIC_PRIORITY_FEES,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -67,6 +65,7 @@ const env = createEnv({
     NEXT_PUBLIC_SENTRY_PROJECT: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
     NEXT_PUBLIC_AWS_S3_BUCKET_URL: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL,
     NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG,
+    NEXT_PUBLIC_IDO_PROGRAM_ID: process.env.NEXT_PUBLIC_IDO_PROGRAM_ID,
   },
 });
 

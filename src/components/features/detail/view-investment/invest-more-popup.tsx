@@ -20,7 +20,7 @@ function InvestMorePopup({
 }) {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <div>{children}</div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

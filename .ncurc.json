@@ -1,4 +1,4 @@
 {
   "upgrade": true,
-  "reject": ["sharp", "eslint", "@coral-xyz/anchor"]
+  "reject": ["sharp", "eslint"]
 }
