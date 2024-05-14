@@ -7,12 +7,12 @@ import {
   ACCESS_TOKEN_STORAGE_KEY,
   REFRESH_TOKEN_COOKIE_CONFIG,
   REFRESH_TOKEN_STORAGE_KEY,
+  THROW_EXCEPTION,
 } from '@/utils/constants';
-import { EWalletName } from '@/utils/enums/solana';
+import { ENETWORK_ID } from '@/utils/enums/common';
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes';
 import { Adapter } from '@solana/wallet-adapter-base';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { SolanaSignInInput } from '@solana/wallet-standard-features';
-import bs58 from 'bs58';
 import { getCookie } from 'cookies-next';
 
 import { ShowAlert } from '../toast';
@@ -34,7 +34,9 @@ function WalletConnect({
   revalidatePath,
   block,
 }: IWalletConnectProps) {
-  const { connecting, disconnecting } = useWallet();
+  const { connecting, disconnecting, signMessage, select, connect, publicKey } =
+    useWallet();
+
   const accessToken = getCookie(ACCESS_TOKEN_STORAGE_KEY);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,52 +50,29 @@ function WalletConnect({
 
   const signInWithSolana = useCallback(
     async (adapter: Adapter) => {
-      if (!('signIn' in adapter)) return true;
       setLoading(true);
+      select(adapter.name);
 
-      const input: { data: SolanaSignInInput } = await doGetSignInData();
+      await connect();
 
-      if (!input?.data) {
-        ShowAlert.error({ message: (input as any)?.message });
+      const signinData = await doGetSignInData({
+        publicKey: publicKey?.toBase58(),
+      });
+      if (!signinData?.data) {
+        console.error(signinData?.message);
+        ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
         return false;
       }
+      const encodedMessage = new TextEncoder().encode(signinData.data?.message);
+      if (!signMessage) return true;
+      const signature = await signMessage(encodedMessage);
 
-      let output: any = {};
-      let outputParse: any = {};
-      const w = window as any;
-
-      switch (adapter.name) {
-        case EWalletName.Phantom:
-          output = await window?.solana?.signIn({ ...input?.data });
-          outputParse = {
-            account: {
-              publicKey: bs58.encode(
-                new Uint8Array(output?.address?.toBuffer()),
-              ),
-              address: output?.address?.toBase58(),
-            },
-            signature: bs58.encode(output.signature),
-            signedMessage: bs58.encode(output.signedMessage),
-          };
-          break;
-        case EWalletName.Backpack:
-          output = await w?.xnft?.solana?.signIn({ ...input?.data });
-          outputParse = {
-            account: {
-              publicKey: bs58.encode(output?.account?.publicKey),
-              address: output?.account?.address,
-            },
-            signature: bs58.encode(output.signature),
-            signedMessage: bs58.encode(output.signedMessage),
-          };
-          break;
-        default:
-      }
-
-      const resultVerify = await doVerifySignInWithSolana(
-        input?.data,
-        outputParse,
-      );
+      const resultVerify = await doVerifySignInWithSolana({
+        message: signinData.data?.message,
+        signature: bs58.encode(signature),
+        publicKey: publicKey?.toBase58(),
+        network: ENETWORK_ID.solana,
+      });
 
       if (!resultVerify?.data && resultVerify?.message) {
         ShowAlert.error({ message: resultVerify.message });
@@ -116,9 +95,8 @@ function WalletConnect({
       ]);
 
       changeSolanaConnection(true);
-      window.location.reload();
     },
-    [doGetSignInData, doVerifySignInWithSolana, setCookie],
+    [connect, publicKey, select, signMessage],
   );
 
   return (

@@ -170,13 +170,11 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
     deleteCookie(ACCESS_TOKEN_STORAGE_KEY, ACCESS_TOKEN_COOKIE_CONFIG);
     deleteCookie(REFRESH_TOKEN_STORAGE_KEY, REFRESH_TOKEN_COOKIE_CONFIG);
     sessionStorage.clear();
-    localStorage.clear();
     await disconnect();
     storeRef.current?.setState((state) => ({
       ...state,
       is_solana_connected: false,
     }));
-    window.location.reload();
   };
 
   const checkTokenExpiration = async () => {

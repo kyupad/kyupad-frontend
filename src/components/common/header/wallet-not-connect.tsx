@@ -85,11 +85,7 @@ function WalletNotConnect({
             <div className="flex flex-col">
               {wallets
                 .filter((wl) =>
-                  [
-                    'Phantom',
-                    'Backpack',
-                    // 'Solflare'
-                  ].includes(wl.adapter.name),
+                  ['Phantom', 'Backpack', 'Solflare'].includes(wl.adapter.name),
                 )
                 .map((wl) => {
                   return (
@@ -103,31 +99,7 @@ function WalletNotConnect({
                             window.open(wl.adapter.url, '_blank');
                             return;
                           }
-
-                          const w = window as any;
-                          localStorage.setItem(
-                            'walletName',
-                            JSON.stringify(wl.adapter.name),
-                          );
-                          switch (wl.adapter.name) {
-                            case 'Backpack': {
-                              const isConnected = w?.xnft?.solana?.isConnected;
-                              if (!isConnected) {
-                                await w?.solana?.connect();
-                              }
-                              await signin(wl.adapter);
-                              break;
-                            }
-                            case 'Phantom': {
-                              const isConnected = w?.solana?.isConnected;
-                              if (!isConnected) {
-                                await w?.solana?.connect();
-                              }
-                              await signin(wl.adapter);
-                              break;
-                            }
-                            default:
-                          }
+                          await signin(wl.adapter);
                         } catch (e) {
                           console.error(e);
                         } finally {
