@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import {
   ACCESS_TOKEN_COOKIE_CONFIG,
@@ -34,12 +34,81 @@ function WalletConnect({
   revalidatePath,
   block,
 }: IWalletConnectProps) {
-  const { connecting, disconnecting, signMessage, select, connect, publicKey } =
-    useWallet();
+  const {
+    connecting,
+    disconnecting,
+    signMessage,
+    select,
+    connect,
+    publicKey,
+    autoConnect,
+    connected,
+  } = useWallet();
+  const [isClickLogin, setIsClickLogin] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (autoConnect && !connected) {
+      connect();
+    }
+  }, [autoConnect, connect, connected]);
 
   const accessToken = getCookie(ACCESS_TOKEN_STORAGE_KEY);
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (connected && isClickLogin) {
+      setLoading(true);
+      const autoSignin = async () => {
+        try {
+          const signinData = await doGetSignInData({
+            publicKey: publicKey?.toBase58(),
+          });
+          if (!signinData?.data) {
+            console.error(signinData?.message);
+            ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
+            return false;
+          }
+          const encodedMessage = new TextEncoder().encode(
+            signinData.data?.message,
+          );
+          if (!signMessage) return true;
+          const signature = await signMessage(encodedMessage);
+          const resultVerify = await doVerifySignInWithSolana({
+            message: signinData.data?.message,
+            signature: bs58.encode(signature),
+            publicKey: publicKey?.toBase58(),
+            network: ENETWORK_ID.solana,
+          });
+          if (!resultVerify?.data && resultVerify?.message) {
+            ShowAlert.error({ message: resultVerify.message });
+            return false;
+          }
+          const { access_token, refresh_token } = resultVerify.data;
+          await Promise.all([
+            setCookie(
+              ACCESS_TOKEN_STORAGE_KEY,
+              access_token,
+              ACCESS_TOKEN_COOKIE_CONFIG,
+            ),
+            setCookie(
+              REFRESH_TOKEN_STORAGE_KEY,
+              refresh_token,
+              REFRESH_TOKEN_COOKIE_CONFIG,
+            ),
+          ]);
+          changeSolanaConnection(true);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsClickLogin(false);
+          setLoading(false);
+        }
+      };
+
+      autoSignin();
+    }
+  }, [connected, publicKey, signMessage, isClickLogin]);
 
   const handleLoading = useCallback((value: boolean) => {
     setLoading(value);
@@ -52,51 +121,9 @@ function WalletConnect({
     async (adapter: Adapter) => {
       setLoading(true);
       select(adapter.name);
-
-      await connect();
-
-      const signinData = await doGetSignInData({
-        publicKey: publicKey?.toBase58(),
-      });
-      if (!signinData?.data) {
-        console.error(signinData?.message);
-        ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
-        return false;
-      }
-      const encodedMessage = new TextEncoder().encode(signinData.data?.message);
-      if (!signMessage) return true;
-      const signature = await signMessage(encodedMessage);
-
-      const resultVerify = await doVerifySignInWithSolana({
-        message: signinData.data?.message,
-        signature: bs58.encode(signature),
-        publicKey: publicKey?.toBase58(),
-        network: ENETWORK_ID.solana,
-      });
-
-      if (!resultVerify?.data && resultVerify?.message) {
-        ShowAlert.error({ message: resultVerify.message });
-        return false;
-      }
-
-      const { access_token, refresh_token } = resultVerify.data;
-
-      await Promise.all([
-        setCookie(
-          ACCESS_TOKEN_STORAGE_KEY,
-          access_token,
-          ACCESS_TOKEN_COOKIE_CONFIG,
-        ),
-        setCookie(
-          REFRESH_TOKEN_STORAGE_KEY,
-          refresh_token,
-          REFRESH_TOKEN_COOKIE_CONFIG,
-        ),
-      ]);
-
-      changeSolanaConnection(true);
+      setIsClickLogin(true);
     },
-    [connect, publicKey, select, signMessage],
+    [select],
   );
 
   return (
