@@ -5129,7 +5129,7 @@
     "@solana/wallet-standard-features" "^1.2.0"
     "@solana/wallet-standard-util" "^1.1.1"
 
-"@solana/wallet-standard-features@^1.1.0", "@solana/wallet-standard-features@^1.2.0", "@solana/wallet-standard-features@1.2.0":
+"@solana/wallet-standard-features@^1.1.0", "@solana/wallet-standard-features@^1.2.0":
   version "1.2.0"
   resolved "https://registry.npmjs.org/@solana/wallet-standard-features/-/wallet-standard-features-1.2.0.tgz"
   integrity sha512-tUd9srDLkRpe1BYg7we+c4UhRQkq+XQWswsr/L1xfGmoRDF47BPSXf4zE7ZU2GRBGvxtGt7lwJVAufQyQYhxTQ==

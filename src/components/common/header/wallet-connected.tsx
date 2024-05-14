@@ -82,10 +82,8 @@ function WalletConnected(_: { revalidatePath?: Function }) {
                 REFRESH_TOKEN_COOKIE_CONFIG,
               );
               sessionStorage.clear();
-              localStorage.clear();
               await disconnect();
               changeSolanaConnection(false);
-              window.location.reload();
             }}
           >
             <span className="text-xl">Disconnect</span>
