@@ -95,10 +95,7 @@ function WalletNotConnect({
                       onClick={async () => {
                         try {
                           handleOpen(false);
-                          if (wl.readyState !== WalletReadyState.Installed) {
-                            window.open(wl.adapter.url, '_blank');
-                            return;
-                          }
+                          setLoading && setLoading(true);
                           await signin(wl.adapter);
                         } catch (e) {
                           console.error(e);
