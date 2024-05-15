@@ -434,6 +434,33 @@ function ExclusivePool({
       nftArgs.name = cnftMetadata.data?.name;
       nftArgs.symbol = cnftMetadata.data?.symbol;
 
+      if (
+        !cnftMetadata?.data?.uri ||
+        !cnftMetadata?.data?.name ||
+        !cnftMetadata?.data?.symbol
+      ) {
+        const retryCnftMetadata = await doGenerateMetadata({
+          name: nftArgs.name,
+          symbol: nftArgs.symbol as string,
+          seller_fee_basis_points: nftArgs.sellerFeeBasisPoints,
+          id: poolId,
+          ...(refCode ? { ref_code: refCode } : {}),
+        });
+
+        nftArgs.uri = retryCnftMetadata.data?.url;
+        nftArgs.name = retryCnftMetadata.data?.name;
+        nftArgs.symbol = retryCnftMetadata.data?.symbol;
+      }
+
+      if (
+        !cnftMetadata?.data?.uri ||
+        !cnftMetadata?.data?.name ||
+        !cnftMetadata?.data?.symbol
+      ) {
+        ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
+        return;
+      }
+
       const serializer = getMetadataArgsSerializer();
       const data = serializer.serialize(nftArgs);
       const merkleTreeAccount = new PublicKey(merkleTree);
