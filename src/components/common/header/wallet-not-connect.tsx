@@ -4,12 +4,12 @@ import { useGlobalStore } from '@/contexts/global-store-provider';
 import { WalletReadyState } from '@solana/wallet-adapter-base';
 import { useWallet } from '@solana/wallet-adapter-react';
 
-// import {
-//   Accordion,
-//   AccordionContent,
-//   AccordionItem,
-//   AccordionTrigger,
-// } from '../accordion';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../accordion';
 import PrimaryButton from '../button/primary';
 import {
   Dialog,
@@ -84,9 +84,7 @@ function WalletNotConnect({
           ) : (
             <div className="flex flex-col">
               {wallets
-                .filter((wl) =>
-                  ['Phantom', 'Backpack', 'Solflare'].includes(wl.adapter.name),
-                )
+                .filter((wl) => ['Phantom'].includes(wl.adapter.name))
                 .map((wl) => {
                   return (
                     <button
@@ -116,21 +114,36 @@ function WalletNotConnect({
                           </div>
                           {wl.adapter.name}
                         </div>
-                        {wl.readyState === WalletReadyState.Installed ? (
-                          wl.adapter.connected ? (
-                            <span className="text-green-500">Connected</span>
-                          ) : (
-                            <span className="text-orange-500">Detected</span>
-                          )
-                        ) : (
-                          <span className="text-red-500">Not Installed</span>
-                        )}
+
+                        <div className="flex gap-4">
+                          <div className="bg-green-500 rounded-[100px] px-4 text-white">
+                            Recommended
+                          </div>
+
+                          <div className="hidden sm:block">
+                            {wl.readyState === WalletReadyState.Installed ? (
+                              wl.adapter.connected ? (
+                                <span className="text-green-500">
+                                  Connected
+                                </span>
+                              ) : (
+                                <span className="text-orange-500">
+                                  Detected
+                                </span>
+                              )
+                            ) : (
+                              <span className="text-red-500">
+                                Not Installed
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </button>
                   );
                 })}
 
-              {/* <div className="mt-4">
+              <div className="mt-4">
                 <div className="h-0.5 w-full bg-kyu-color-6" />
               </div>
 
@@ -139,24 +152,14 @@ function WalletNotConnect({
                   <AccordionTrigger
                     className="text-2xl font-bold hover:no-underline"
                     icon={wallets
-                      .filter(
-                        (wl) =>
-                          !['Phantom', 'Backpack', 'Solflare'].includes(
-                            wl.adapter.name,
-                          ),
-                      )
+                      .filter((wl) => !['Phantom'].includes(wl.adapter.name))
                       .slice(0, 3)}
                   >
                     <div>Other Wallets</div>
                   </AccordionTrigger>
                   <AccordionContent className="flex flex-col text-xl">
                     {wallets
-                      .filter(
-                        (wl) =>
-                          !['Phantom', 'Backpack', 'Solflare'].includes(
-                            wl.adapter.name,
-                          ),
-                      )
+                      .filter((wl) => !['Phantom'].includes(wl.adapter.name))
                       .map((wl) => {
                         return (
                           <button
@@ -165,19 +168,10 @@ function WalletNotConnect({
                             onClick={async () => {
                               try {
                                 handleOpen(false);
-                                if (
-                                  wl.readyState !== WalletReadyState.Installed
-                                ) {
-                                  window.open(wl.adapter.url, '_blank');
-                                  return;
-                                }
-
-                                select(wl.adapter.name);
+                                setLoading && setLoading(true);
                                 await signin(wl.adapter);
                               } catch (e) {
-                                setLoading && setLoading(false);
-
-                                return false;
+                                console.error(e);
                               } finally {
                                 setLoading && setLoading(false);
                               }
@@ -216,7 +210,7 @@ function WalletNotConnect({
                       })}
                   </AccordionContent>
                 </AccordionItem>
-              </Accordion> */}
+              </Accordion>
             </div>
           )}
         </div>
