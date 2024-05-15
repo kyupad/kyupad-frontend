@@ -35,6 +35,7 @@ const env = createEnv({
     NEXT_PUBLIC_AWS_REGION: z.string().min(1),
     NEXT_PUBLIC_SENTRY_PROJECT: z.string().min(1).nullish(),
     NEXT_PUBLIC_AWS_S3_BUCKET_URL: z.string().min(1).includes('http').nullish(),
+    NEXT_PUBLIC_DEBUG: z.string().nullish(),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -65,6 +66,7 @@ const env = createEnv({
     NEXT_PUBLIC_AWS_REGION: process.env.NEXT_PUBLIC_AWS_REGION,
     NEXT_PUBLIC_SENTRY_PROJECT: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
     NEXT_PUBLIC_AWS_S3_BUCKET_URL: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL,
+    NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG,
   },
 });
 

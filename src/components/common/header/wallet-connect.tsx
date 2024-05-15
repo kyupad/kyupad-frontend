@@ -47,10 +47,17 @@ function WalletConnect({
   const [isClickLogin, setIsClickLogin] = useState<boolean>(false);
 
   useEffect(() => {
-    if (autoConnect && !connected) {
-      connect();
+    if (autoConnect && !connected && isClickLogin) {
+      setLoading(true);
+      connect()
+        .catch((e) => {
+          console.error(e);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
-  }, [autoConnect, connect, connected]);
+  }, [autoConnect, connect, connected, isClickLogin]);
 
   const accessToken = getCookie(ACCESS_TOKEN_STORAGE_KEY);
 
@@ -120,8 +127,8 @@ function WalletConnect({
   const signInWithSolana = useCallback(
     async (adapter: Adapter) => {
       setLoading(true);
-      select(adapter.name);
       setIsClickLogin(true);
+      select(adapter.name);
     },
     [select],
   );
@@ -132,7 +139,7 @@ function WalletConnect({
         <WalletConnected revalidatePath={revalidatePath} />
       ) : (
         <WalletNotConnect
-          loading={loading || connecting || disconnecting}
+          loading={loading || connecting || disconnecting || isClickLogin}
           setLoading={handleLoading}
           signin={signInWithSolana}
           block={block}
