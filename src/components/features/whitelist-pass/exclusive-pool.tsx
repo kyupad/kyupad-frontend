@@ -728,15 +728,15 @@ function ExclusivePool({
       return <PrimaryButton disabled>Minted</PrimaryButton>;
     }
 
-    if (!currentPool?.is_active) {
-      return <PrimaryButton disabled>Not eligible</PrimaryButton>;
-    }
-
     if (
       poolsCounter[poolId] >= currentPool?.pool_supply ||
       currentPool?.minted_total >= currentPool?.pool_supply
     ) {
       return <PrimaryButton disabled>Sold Out</PrimaryButton>;
+    }
+
+    if (!currentPool?.is_active) {
+      return <PrimaryButton disabled>Not eligible</PrimaryButton>;
     }
 
     const isNotStart = dayjs.utc(currentPool?.start_time).isAfter(now);
