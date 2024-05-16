@@ -435,7 +435,7 @@ function ExclusivePool({
       nftArgs.symbol = cnftMetadata.data?.symbol;
 
       if (
-        !cnftMetadata?.data?.uri ||
+        !cnftMetadata?.data?.url ||
         !cnftMetadata?.data?.name ||
         !cnftMetadata?.data?.symbol
       ) {
@@ -453,7 +453,7 @@ function ExclusivePool({
       }
 
       if (
-        !cnftMetadata?.data?.uri ||
+        !cnftMetadata?.data?.url ||
         !cnftMetadata?.data?.name ||
         !cnftMetadata?.data?.symbol
       ) {
