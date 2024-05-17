@@ -4,7 +4,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { doGetSuccessProjects } from '@/adapters/projects';
 
 import Pool from './pool';
-import UpcomingLoading from './upcoming-loading';
+import SuccessLoading from './success-loading';
 
 function SuccessLaunch() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,7 +46,9 @@ function SuccessLaunch() {
 
     const debounceFunction = setTimeout(() => {
       try {
-        fetchData().finally(() => {
+        setLoading(true);
+        fetchData().finally(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 200));
           setLoading(false);
         });
       } catch (error) {
@@ -63,7 +65,7 @@ function SuccessLaunch() {
   return (
     <>
       {loading ? (
-        <UpcomingLoading />
+        <SuccessLoading />
       ) : (
         <Pool
           pagination={{

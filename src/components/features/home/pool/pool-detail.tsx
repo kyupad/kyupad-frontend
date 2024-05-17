@@ -40,13 +40,15 @@ const PoolDetail = ({
   return (
     <div
       className={cn(
-        'flex bg-[#FFF9EB] border-4 lg:p-10 border-button-primary-border rounded-[12px] shadow-[19px_18px_0px_0px_rgba(42,_39,_58,_0.1)] md:w-full lg:gap-10 flex-col lg:flex-row relative',
-        direction === 'column' ? '!flex-col !p-0 !gap-0 max-w-[410px]' : '',
+        'flex bg-[#FFF9EB] border-4 lg:p-10 border-button-primary-border rounded-[12px] shadow-[19px_18px_0px_0px_rgba(42,_39,_58,_0.1)] w-full lg:gap-10 flex-col lg:flex-row relative',
+        direction === 'column'
+          ? '!flex-col !p-0 !gap-0 max-w-[410px]'
+          : 'max-w-[410px] lg:max-w-[100%]',
       )}
     >
       <div
         className={cn(
-          'w-full lg:w-5/12 px-6 pb-6 pt-3 lg:p-0 flex gap-6 flex-col order-2 lg:order-1',
+          'w-full lg:w-5/12 px-6 pb-6 pt-3 lg:p-0 flex gap-6 flex-col order-2 lg:order-1 h-full justify-between',
           direction === 'column' ? '!order-2 !w-full !pb-6 !pt-3 !px-6' : '',
         )}
       >
