@@ -2,10 +2,36 @@ import { API_ROUTES } from '@/utils/constants';
 
 import { request } from '../xhr';
 
-const doGetUpcomingProjects = async (params: {
-  limit?: number;
-  page?: number;
-}) => {
+const doGetFurtureProjects = async (
+  params: {
+    limit?: number;
+    page?: number;
+  },
+  signal?: AbortSignal,
+) => {
+  const data = await request(
+    'GET',
+    API_ROUTES.GET_PROJECTS,
+    {
+      type: 'furture',
+      ...(params?.limit ? { limit: params.limit } : {}),
+      ...(params?.page ? { page: params.page } : {}),
+    },
+    {
+      cache: 'no-store',
+      signal,
+    },
+  );
+  return data;
+};
+
+const doGetUpcomingProjects = async (
+  params: {
+    limit?: number;
+    page?: number;
+  },
+  signal?: AbortSignal,
+) => {
   const data = await request(
     'GET',
     API_ROUTES.GET_PROJECTS,
@@ -16,6 +42,7 @@ const doGetUpcomingProjects = async (params: {
     },
     {
       cache: 'no-store',
+      signal,
     },
   );
   return data;
@@ -64,4 +91,5 @@ export {
   doGetSuccessProjects,
   doApplyProject,
   doViewRegistration,
+  doGetFurtureProjects,
 };
