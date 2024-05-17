@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo, useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import {
   ACCESS_TOKEN_COOKIE_CONFIG,
@@ -11,8 +12,9 @@ import {
 } from '@/utils/constants';
 import { ENETWORK_ID } from '@/utils/enums/common';
 import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes';
+import * as Sentry from '@sentry/nextjs';
 import { Adapter } from '@solana/wallet-adapter-base';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useLocalStorage, useWallet } from '@solana/wallet-adapter-react';
 import { getCookie } from 'cookies-next';
 
 import { ShowAlert } from '../toast';
@@ -45,6 +47,9 @@ function WalletConnect({
     connected,
   } = useWallet();
   const [isClickLogin, setIsClickLogin] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get('ref_code');
+  const [walletName] = useLocalStorage('walletName', '');
 
   useEffect(() => {
     if (autoConnect && !connected && isClickLogin) {
@@ -105,6 +110,25 @@ function WalletConnect({
             ),
           ]);
           changeSolanaConnection(true);
+
+          if (refCode) {
+            Sentry.captureMessage(
+              JSON.stringify({
+                refCode,
+                address: publicKey?.toBase58(),
+                wallet: walletName,
+              }),
+              {
+                user: {
+                  id: publicKey?.toBase58(),
+                },
+                tags: {
+                  ref_code: refCode,
+                  connect_with_ref_code: true,
+                },
+              },
+            );
+          }
         } catch (e) {
           console.error(e);
         } finally {
@@ -115,7 +139,7 @@ function WalletConnect({
 
       autoSignin();
     }
-  }, [connected, publicKey, signMessage, isClickLogin]);
+  }, [connected, publicKey, signMessage, isClickLogin, refCode, walletName]);
 
   const handleLoading = useCallback((value: boolean) => {
     setLoading(value);
