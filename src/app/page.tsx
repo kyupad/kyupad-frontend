@@ -1,12 +1,11 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
+import { revalidateCurrentPath } from '@/actions/common';
 import PrimaryButton from '@/components/common/button/primary';
-import Skeleton from '@/components/common/loading/skeleton';
 import FurtureLaunch from '@/components/features/landing/furture-launch';
 import SuccessLaunch from '@/components/features/landing/success-launch';
 import UpcomingLaunch from '@/components/features/landing/upcoming-launch';
-import UpcomingLoading from '@/components/features/landing/upcoming-loading';
 import { cn } from '@/utils/helpers';
 
 import catBanner from '/public/images/home/cat-banner.png';
@@ -71,31 +70,7 @@ const Home = () => {
           </h3>
 
           <div className="py-5">
-            <Suspense
-              fallback={
-                <div className="w-full">
-                  <div className="pb-10">
-                    <Skeleton className="h-[14px] sm:h-6 md:h-[30px] lg:h-9 w-1/3 mx-auto" />
-                  </div>
-                  <div className="flex bg-[#FFF9EB] border-4 lg:p-10 border-button-primary-border rounded-[12px] shadow-[19px_18px_0px_0px_rgba(42,_39,_58,_0.1)] md:w-full lg:gap-10 flex-col lg:flex-row relative">
-                    <div className="w-full lg:w-5/12 px-6 pb-6 pt-3 lg:p-0 flex gap-6 flex-col order-2 lg:order-1">
-                      <Skeleton className="h-5" />
-                      <Skeleton className="h-[180px] rounded-[24px]" />
-                      <Skeleton className="h-5 rounded-[24px]" />
-                      <Skeleton className="h-5 rounded-[24px]" />
-                      <Skeleton className="h-5 rounded-[24px]" />
-                      <Skeleton className="h-5 rounded-[24px]" />
-                      <Skeleton className="h-[48px] rounded-[8px]" />
-                    </div>
-                    <div className="lg:w-7/12 relative rounded-tl-[8px] rounded-tr-[8px] lg:rounded-[8px] overflow-hidden order-1 lg:order-2 pb-[56.25%] lg:pb-0">
-                      <Skeleton className="h-full" />
-                    </div>
-                  </div>
-                </div>
-              }
-            >
-              <FurtureLaunch />
-            </Suspense>
+            <FurtureLaunch revalidatePath={revalidateCurrentPath} />
           </div>
         </div>
 
@@ -109,9 +84,7 @@ const Home = () => {
             draggable="false"
             className="top-[-40px] left-[40px] max-w-[100px] sm:max-w-[180px] sm:top-[-120px] sm:left-[80px] md:left-[30px] lg:max-w-[237px] lg:top-[-130px] lg:left-[-50px] xl:left-[120px] 2xl:left-[-80px] 2xl:top-[-140px] absolute -translate-x-1/2"
           />
-          <Suspense fallback={<UpcomingLoading />}>
-            <UpcomingLaunch />
-          </Suspense>
+          <UpcomingLaunch revalidatePath={revalidateCurrentPath} />
         </div>
 
         <div className="relative w-full">

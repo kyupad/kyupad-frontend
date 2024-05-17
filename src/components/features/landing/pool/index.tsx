@@ -25,9 +25,11 @@ const Pool = ({
 }: IPoolProps) => {
   return (
     <div className="w-full">
-      <h4 className="text-sm sm:text-2xl md:text-3xl lg:text-4xl font-heading text-center text-button-primary-border pb-10">
-        {title}
-      </h4>
+      {data && data?.length !== 0 && (
+        <h4 className="text-sm sm:text-2xl md:text-3xl lg:text-4xl font-heading text-center text-button-primary-border pb-10">
+          {title}
+        </h4>
+      )}
 
       <div className="flex gap-[45px] flex-col xl:flex-row justify-center items-center xl:items-stretch">
         {data?.map((item: any) => (
@@ -42,19 +44,20 @@ const Pool = ({
         {mode === 'upcoming' &&
           data &&
           data?.length > 0 &&
-          data?.length < 3 && <UpcomingPool />}
+          data?.length < 3 &&
+          pagination?.total === 1 && <UpcomingPool />}
       </div>
 
       {pagination?.total > 1 && (
         <div className="flex justify-center items-center gap-12 pt-8">
           <button
             disabled={pagination?.page === 1}
-            className="p-4"
+            className="p-4 min-w-[57px]"
             onClick={() => {
-              pagination?.handleNext && pagination.handleNext();
+              pagination?.handlePrevious && pagination.handlePrevious();
             }}
           >
-            <Image src={arrowLeft} alt="Previous" />
+            {pagination?.page > 1 && <Image src={arrowLeft} alt="Previous" />}
           </button>
           <div className="font-bold text-2xl">
             {pagination?.page}/{pagination?.total}
@@ -63,10 +66,12 @@ const Pool = ({
             disabled={pagination?.page === pagination?.total}
             className="p-4"
             onClick={() => {
-              pagination?.handlePrevious && pagination.handlePrevious();
+              pagination?.handleNext && pagination.handleNext();
             }}
           >
-            <Image src={arrowRight} alt="Next" />
+            {pagination?.page < pagination?.total && (
+              <Image src={arrowRight} alt="Next" />
+            )}
           </button>
         </div>
       )}
