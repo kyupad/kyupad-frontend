@@ -22,30 +22,45 @@ dayjs.extend(utc);
 
 const getActiveStep = (data: any[]) => {
   const now = dayjs.utc();
-  const step = data.find((item) => {
-    return (
-      ((dayjs.utc(item.start).isBefore(now) ||
-        dayjs.utc(item.start).isSame(now)) &&
-        dayjs.utc(item.end).isAfter(now)) ||
-      dayjs.utc(item.end).isSame(now)
-    );
-  });
 
-  if (step) {
-    return step.step;
+  if (
+    dayjs.utc(data?.[0]?.start).isBefore(now) &&
+    dayjs.utc(data?.[0]?.end).isAfter(now)
+  ) {
+    return 1;
   }
 
-  if (!step) {
-    if (dayjs.utc(data[data.length - 1].end).isBefore(now)) {
-      return data.length;
-    }
-
-    const nextStep = data.find((item) => {
-      return dayjs.utc(item.start).isAfter(now);
-    });
-
-    return nextStep?.step || 1;
+  if (
+    dayjs.utc(data?.[1]?.start).isBefore(now) &&
+    dayjs.utc(data?.[1]?.end).isAfter(now)
+  ) {
+    return 2;
   }
+
+  if (
+    dayjs.utc(data?.[2]?.start).isBefore(now) &&
+    dayjs.utc(data?.[2]?.end).isAfter(now)
+  ) {
+    return 3;
+  }
+
+  if (dayjs.utc(data?.[3]?.start).isBefore(now)) {
+    return 4;
+  }
+
+  if (dayjs.utc(data?.[0]?.start).isAfter(now)) {
+    return 1;
+  }
+
+  if (dayjs.utc(data?.[1]?.start).isAfter(now)) {
+    return 2;
+  }
+
+  if (dayjs.utc(data?.[2]?.start).isAfter(now)) {
+    return 3;
+  }
+
+  return 4;
 };
 
 function RegistrationStep({
