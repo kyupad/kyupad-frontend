@@ -570,10 +570,12 @@ function ExclusivePool({
         microLamports: Number(priorityFees),
       });
 
+      const blockhash =
+        await connection.getLatestBlockhashAndContext('confirmed');
+
       const messageV0 = new TransactionMessage({
         payerKey: publicKey,
-        recentBlockhash: (await connection.getLatestBlockhash('confirmed'))
-          .blockhash,
+        recentBlockhash: blockhash.value.blockhash,
         instructions: [setComputeUnitPriceIx, mintCnftInstruction],
       }).compileToV0Message([lookupTableAccount!]);
 
@@ -584,8 +586,6 @@ function ExclusivePool({
       const signatureEncode = base58.encode(signature?.signatures?.[0]);
       mint_transaction = signatureEncode;
 
-      const blockhash =
-        await connection.getLatestBlockhashAndContext('confirmed');
       const blockHeight = await connection.getBlockHeight({
         commitment: 'confirmed',
         minContextSlot: blockhash.context.slot,
