@@ -44,7 +44,6 @@ const Registation = ({
       step: 4,
       title: 'Claim',
       start: data?.timeline?.claim_start_at,
-      end: data?.timeline?.claim_end_at,
     },
   ];
 
