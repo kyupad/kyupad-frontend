@@ -54,7 +54,7 @@ function Timeline({ data }: { data: any }) {
         <div className="absolute top-0 -left-[22px] h-full flex flex-col justify-between gap-[60px]">
           {timeline.map((item, index) => (
             <div
-              className="size-[44px] rounded-[16px] bg-kyu-color-11 text-kyu-color-4 text-2xl font-bold flex justify-center items-center"
+              className="size-[44px] min-h-[44px] rounded-[16px] bg-kyu-color-11 text-kyu-color-4 text-2xl font-bold flex justify-center items-center"
               key={item.step}
             >
               {index + 1}
