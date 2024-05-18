@@ -12,7 +12,10 @@ interface IRegistrationProps {
   data: any;
   isApplied: boolean;
   usersAssets?: { total_assets?: number; participants?: number };
-  revalidatePath?: Function;
+  revalidatePath: Function;
+  doGetSignInData: Function;
+  doVerifySignInWithSolana: Function;
+  setCookie: Function;
 }
 
 const Registation = ({
@@ -20,6 +23,9 @@ const Registation = ({
   data,
   usersAssets,
   revalidatePath,
+  doGetSignInData,
+  doVerifySignInWithSolana,
+  setCookie,
 }: IRegistrationProps) => {
   const dataStep = [
     {
@@ -57,6 +63,9 @@ const Registation = ({
           projectId={data?.id}
           isApplied={isApplied}
           revalidatePath={revalidatePath}
+          doGetSignInData={doGetSignInData}
+          doVerifySignInWithSolana={doVerifySignInWithSolana}
+          setCookie={setCookie}
         />
 
         <div className="p-4 lg:p-10 border-2 border-kyu-color-11 rounded-[16px] bg-kyu-color-2 mt-5 flex flex-col gap-6">

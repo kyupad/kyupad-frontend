@@ -12,7 +12,10 @@ interface IDetailControllerProps {
   data: any;
   isApplied: boolean;
   usersAssets?: { total_assets?: number; participants?: number };
-  revalidatePath?: Function;
+  revalidatePath: Function;
+  doGetSignInData: Function;
+  doVerifySignInWithSolana: Function;
+  setCookie: Function;
 }
 
 function DetailController({
@@ -20,6 +23,9 @@ function DetailController({
   isApplied,
   usersAssets,
   revalidatePath,
+  doGetSignInData,
+  doVerifySignInWithSolana,
+  setCookie,
 }: IDetailControllerProps) {
   const viewMode = useProjectDetailStore((state) => state.viewMode);
 
@@ -31,6 +37,9 @@ function DetailController({
           isApplied={isApplied}
           usersAssets={usersAssets}
           revalidatePath={revalidatePath}
+          doGetSignInData={doGetSignInData}
+          doVerifySignInWithSolana={doVerifySignInWithSolana}
+          setCookie={setCookie}
         />
       )}
       {viewMode === 'registration' && (

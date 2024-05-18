@@ -1,5 +1,7 @@
 import React from 'react';
+import { doGetSignInData, doVerifySignInWithSolana } from '@/actions/auth';
 import { revalidateCurrentPath } from '@/actions/common';
+import { setCookie } from '@/actions/jwt';
 import { doGetProjectDetail } from '@/actions/project';
 import DetailController from '@/components/features/detail';
 import ProjectDetailHeader from '@/components/features/detail/header';
@@ -26,6 +28,9 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
         isApplied={is_applied}
         usersAssets={usersAssets}
         revalidatePath={revalidateCurrentPath}
+        doGetSignInData={doGetSignInData}
+        doVerifySignInWithSolana={doVerifySignInWithSolana}
+        setCookie={setCookie}
       />
     </div>
   );
