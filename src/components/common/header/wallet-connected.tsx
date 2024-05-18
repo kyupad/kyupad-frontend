@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '../dropdown';
 
-function WalletConnected(_: { revalidatePath?: Function }) {
+function WalletConnected({ revalidatePath }: { revalidatePath?: Function }) {
   const { publicKey, disconnect, wallet } = useWallet();
   const [open, setOpen] = useState<boolean>(false);
   const changeSolanaConnection = useGlobalStore(
@@ -84,6 +84,7 @@ function WalletConnected(_: { revalidatePath?: Function }) {
               sessionStorage.clear();
               await disconnect();
               changeSolanaConnection(false);
+              revalidatePath && revalidatePath(window.location.pathname);
             }}
           >
             <span className="text-xl">Disconnect</span>

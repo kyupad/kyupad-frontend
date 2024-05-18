@@ -33,7 +33,10 @@ interface GlobalStoreProviderProps {
   revalidatePath: Function;
 }
 
-const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
+const GlobalStoreProvider = ({
+  children,
+  revalidatePath,
+}: GlobalStoreProviderProps) => {
   const pathName = usePathname();
   const storeRef = useRef<StoreApi<IGlobalStore>>();
   if (!storeRef.current) {
@@ -175,6 +178,7 @@ const GlobalStoreProvider = ({ children }: GlobalStoreProviderProps) => {
       ...state,
       is_solana_connected: false,
     }));
+    revalidatePath && revalidatePath(window.location.pathname);
   };
 
   const checkTokenExpiration = async () => {
