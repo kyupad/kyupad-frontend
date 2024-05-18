@@ -6,9 +6,11 @@ import { doApplyProject } from '@/adapters/projects';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
+import WalletConnect from '@/components/common/header/wallet-connect';
 import { ShowAlert } from '@/components/common/toast';
+import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
-import { UTC_FORMAT_STRING } from '@/utils/constants';
+import { THROW_EXCEPTION, UTC_FORMAT_STRING } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -68,15 +70,24 @@ function RegistrationStep({
   projectId,
   isApplied,
   revalidatePath,
+  doGetSignInData,
+  doVerifySignInWithSolana,
+  setCookie,
 }: {
   data: any[];
   projectId: string;
   isApplied: boolean;
-  revalidatePath?: Function;
+  revalidatePath: Function;
+  doGetSignInData: Function;
+  doVerifySignInWithSolana: Function;
+  setCookie: Function;
 }) {
   const [activeStep] = useState<number>(getActiveStep(data));
   const [loading, setLoading] = useState<boolean>(false);
   const now = dayjs.utc();
+  const isSolanaConnected = useGlobalStore(
+    (state) => state.is_solana_connected,
+  );
 
   const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
 
@@ -102,6 +113,92 @@ function RegistrationStep({
       progress = 'w-0';
       break;
   }
+
+  const renderStepButton = useCallback(() => {
+    if (activeStep > 1 && !isApplied) {
+      return <SecondaryButton disabled>Registration Ended</SecondaryButton>;
+    }
+
+    if (!isSolanaConnected) {
+      return (
+        <WalletConnect
+          doGetSignInData={doGetSignInData}
+          doVerifySignInWithSolana={doVerifySignInWithSolana}
+          setCookie={setCookie}
+          revalidatePath={revalidatePath}
+        />
+      );
+    }
+
+    if (activeStep === 1 && !isApplied) {
+      return (
+        <PrimaryButton
+          loading={loading}
+          loadingText="Registering..."
+          className="min-w-[200px]"
+          disabled={
+            dayjs.utc(data?.[0]?.start).isAfter(now) ||
+            dayjs.utc(data?.[0]?.end).isBefore(now)
+          }
+          onClick={async () => {
+            handleChangeLoading(true);
+            try {
+              const result = await doApplyProject({
+                project_id: projectId,
+              });
+
+              if (!result?.data) {
+                ShowAlert.error({ message: result?.message || '' });
+                return;
+              }
+
+              changeViewMode('registration');
+              revalidatePath && revalidatePath(window.location.pathname);
+            } catch (e) {
+              console.error(e);
+              ShowAlert.error({
+                message: THROW_EXCEPTION.UNKNOWN_TRANSACTION,
+              });
+            } finally {
+              handleChangeLoading(false);
+            }
+          }}
+        >
+          Register Now
+        </PrimaryButton>
+      );
+    }
+
+    if (isApplied) {
+      return (
+        <div className="flex gap-4 flex-wrap">
+          <SecondaryButton disabled>Registered</SecondaryButton>
+          <PrimaryButton
+            onClick={() => {
+              if (activeStep === 1) {
+                changeViewMode('registration');
+              } else if (activeStep === 2) {
+                changeViewMode('snapshot');
+              } else if (activeStep === 3) {
+                changeViewMode('investment');
+              }
+            }}
+          >
+            {activeStep === 3 ? 'Invest Now' : 'View Registration'}
+          </PrimaryButton>
+        </div>
+      );
+    }
+  }, [
+    activeStep,
+    data,
+    isApplied,
+    isSolanaConnected,
+    loading,
+    now,
+    projectId,
+    revalidatePath,
+  ]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -201,62 +298,8 @@ function RegistrationStep({
             <span className="font-bold text-2xl text-kyu-color-18">Ended</span>
           )}
         </div>
-        {isApplied && (
-          <div className="flex gap-4 flex-wrap">
-            <SecondaryButton disabled>Registered</SecondaryButton>
-            <PrimaryButton
-              onClick={() => {
-                if (activeStep === 1) {
-                  changeViewMode('registration');
-                } else if (activeStep === 2) {
-                  changeViewMode('snapshot');
-                } else if (activeStep === 3) {
-                  changeViewMode('investment');
-                }
-              }}
-            >
-              {activeStep === 3 ? 'Invest Now' : 'View Registration'}
-            </PrimaryButton>
-          </div>
-        )}
 
-        {activeStep === 1 && !isApplied && (
-          <PrimaryButton
-            loading={loading}
-            loadingText="Registering..."
-            className="min-w-[200px]"
-            disabled={
-              dayjs.utc(data?.[0]?.start).isAfter(now) ||
-              dayjs.utc(data?.[0]?.end).isBefore(now)
-            }
-            onClick={async () => {
-              handleChangeLoading(true);
-              try {
-                const result = await doApplyProject({
-                  project_id: projectId,
-                });
-
-                if (!result?.data) {
-                  ShowAlert.error({ message: result?.message || '' });
-                  return;
-                }
-
-                changeViewMode('registration');
-                revalidatePath && revalidatePath(window.location.pathname);
-              } catch {
-                //
-              } finally {
-                handleChangeLoading(false);
-              }
-            }}
-          >
-            Register Now
-          </PrimaryButton>
-        )}
-
-        {activeStep > 1 && !isApplied && (
-          <SecondaryButton disabled>Registration Ended</SecondaryButton>
-        )}
+        {renderStepButton()}
       </div>
     </div>
   );
