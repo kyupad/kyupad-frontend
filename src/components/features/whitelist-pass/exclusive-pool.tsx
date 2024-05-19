@@ -606,9 +606,15 @@ function ExclusivePool({
           throw new Error('ONCHAIN_TIMEOUT');
         }
 
+        await connection.simulateTransaction(transactionV0, {
+          replaceRecentBlockhash: true,
+          commitment: 'confirmed',
+        });
+
         await connection?.sendRawTransaction(signature.serialize(), {
           skipPreflight: !!env.NEXT_PUBLIC_DEBUG,
           maxRetries: 0,
+          preflightCommitment: 'confirmed',
         });
 
         await waitToConfirm();
