@@ -4,6 +4,7 @@ import './env.mjs';
 
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 import million from 'million/compiler';
 
 const millionConfig = {
@@ -65,9 +66,15 @@ const nextConfig = runWithBundleAnalyzer({
   },
   swcMinify: true,
   webpack: (config, { webpack }) => {
+    config.devtool = 'source-map';
     config.plugins.push(
       new webpack.DefinePlugin({
         'globalThis.__DEV__': false,
+      }),
+      sentryWebpackPlugin({
+        org: 'kyupad',
+        project: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
+        authToken: process.env.NEXT_PUBLIC_SENTRY_AUTH_TOKEN,
       }),
     );
 
