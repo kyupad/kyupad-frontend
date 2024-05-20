@@ -11,6 +11,7 @@ const API_ROUTES = {
   REFRESH: '/v1/auth/refresh',
   GENERATE_REFER_LINK: '/v1/nft/generate-prefer-code',
   VIEW_REGISTRATION: '/v1/projects/[slug]/registration-detail',
+  DO_INVESTING_SUCCESS: '/v1/projects/sync-investing-by-signature',
 };
 
 const WEB_ROUTES = {

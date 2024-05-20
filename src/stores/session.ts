@@ -8,6 +8,8 @@ interface ISessionStore {
   updateUserSeasonMinted: (value: number) => void;
   seasonMinted: any;
   updateSeasonMinted: (key: string, value: number) => void;
+  investedTickets: any;
+  updateInvestedTickets: (key: string, value: number) => void;
 }
 
 type StoreWithPersist = Mutate<
@@ -53,6 +55,8 @@ const initialState: ISessionStore = {
   updateUserSeasonMinted: () => {},
   seasonMinted: {},
   updateSeasonMinted: () => {},
+  investedTickets: {},
+  updateInvestedTickets: () => {},
 };
 
 const createSessionStore = createStore<ISessionStore>()(
@@ -73,6 +77,13 @@ const createSessionStore = createStore<ISessionStore>()(
         set((state) => ({
           seasonMinted: {
             ...state.seasonMinted,
+            [`${key}`]: value,
+          },
+        })),
+      updateInvestedTickets: (key: string, value: number) =>
+        set((state) => ({
+          investedTickets: {
+            ...state.investedTickets,
             [`${key}`]: value,
           },
         })),

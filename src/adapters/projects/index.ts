@@ -77,12 +77,27 @@ const doApplyProject = async (payload: { project_id: string }) => {
   return data;
 };
 
-const doViewRegistration = async (params: { wallet: string; slug: string }) => {
+const doViewRegistration = async (
+  params: { wallet: string; slug: string },
+  signal?: AbortSignal,
+) => {
   const data = await request(
     'GET',
     API_ROUTES.VIEW_REGISTRATION.replace('[slug]', params.slug),
     { wallet: params.wallet },
+    {
+      signal,
+    },
   );
+  return data;
+};
+
+const doInvestingSuccess = async (payload: {
+  project__id: string;
+  total: number;
+  signature: string;
+}) => {
+  const data = await request('POST', API_ROUTES.DO_INVESTING_SUCCESS, payload);
   return data;
 };
 
@@ -92,4 +107,5 @@ export {
   doApplyProject,
   doViewRegistration,
   doGetFurtureProjects,
+  doInvestingSuccess,
 };
