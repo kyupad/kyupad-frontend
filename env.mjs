@@ -34,6 +34,7 @@ const env = createEnv({
     NEXT_PUBLIC_AWS_APPSYNC_API_KEY: z.string().min(1),
     NEXT_PUBLIC_AWS_REGION: z.string().min(1),
     NEXT_PUBLIC_SENTRY_PROJECT: z.string().min(1).nullish(),
+    NEXT_PUBLIC_SENTRY_AUTH_TOKEN: z.string().min(1).nullish(),
     NEXT_PUBLIC_AWS_S3_BUCKET_URL: z.string().min(1).includes('http').nullish(),
     NEXT_PUBLIC_DEBUG: z.string().nullish(),
   },
@@ -66,7 +67,7 @@ const env = createEnv({
     NEXT_PUBLIC_AWS_S3_BUCKET_URL: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL,
     NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG,
     NEXT_PUBLIC_IDO_PROGRAM_ID: process.env.NEXT_PUBLIC_IDO_PROGRAM_ID,
-    NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG,
+    NEXT_PUBLIC_SENTRY_AUTH_TOKEN: process.env.NEXT_PUBLIC_SENTRY_AUTH_TOKEN,
   },
 });
 
