@@ -29,6 +29,7 @@ const SessionStoreProvider = ({ children }: SessionStoreProviderProps) => {
       ...state,
       poolsCounter: {},
       seasonMinted: {},
+      investedTickets: {},
     }));
   }, []);
 

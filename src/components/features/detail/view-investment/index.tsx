@@ -2,7 +2,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import ImageNext from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { doViewRegistration } from '@/adapters/projects';
+import { doInvestingSuccess, doViewRegistration } from '@/adapters/projects';
 import { KyupadIdo } from '@/anchor/kyupad_ido';
 import PrimaryButton from '@/components/common/button/primary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
@@ -10,6 +10,7 @@ import Skeleton from '@/components/common/loading/skeleton';
 import { ShowAlert } from '@/components/common/toast';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
+import { useSessionStore } from '@/contexts/session-store-provider';
 import {
   ACCESS_TOKEN_STORAGE_KEY,
   THROW_EXCEPTION,
@@ -59,6 +60,8 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     token_offered?: number;
     destination_wallet?: string;
     merkle_proof?: string;
+    is_active?: boolean;
+    is_invested?: boolean;
   }>({});
   const [projectInfo, setProjectInfo] = useState<{
     _id: string;
@@ -70,6 +73,27 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const [isInVesting, setIsInVesting] = useState<boolean>(false);
+  const investedTickets = useSessionStore((state) => state.investedTickets);
+  const updateInvestedTickets = useSessionStore(
+    (state) => state.updateInvestedTickets,
+  );
+  const investedTicketsKey =
+    projectInfo?._id && publicKey?.toBase58()
+      ? `${projectInfo._id}_${publicKey?.toBase58()}`
+      : '';
+
+  useEffect(() => {
+    if (
+      investedTicketsKey &&
+      (investmentInfo?.tickets_used || 0) >
+        (investedTickets[investedTicketsKey] || 0)
+    ) {
+      updateInvestedTickets(
+        investedTicketsKey,
+        investmentInfo?.tickets_used || 0,
+      );
+    }
+  }, [investedTickets, investedTicketsKey, investmentInfo?.tickets_used]);
 
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
@@ -82,12 +106,16 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
   }, [isSolanaConnected]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchData = async () => {
       if (publicKey && slug) {
-        const data = await doViewRegistration({
-          wallet: publicKey?.toBase58(),
-          slug: slug as string,
-        });
+        const data = await doViewRegistration(
+          {
+            wallet: publicKey?.toBase58(),
+            slug: slug as string,
+          },
+          controller.signal,
+        );
 
         if (data?.data?.investment_info) {
           setInvestmentInfo(data.data.investment_info);
@@ -106,6 +134,10 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     } catch (e) {
       console.error(e);
     }
+
+    return () => {
+      controller.abort();
+    };
   }, [publicKey, slug]);
 
   const handleSetIsInvesting = useCallback((value: boolean) => {
@@ -116,7 +148,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
   const isNotWinner = (investmentInfo?.total_owner_winning_tickets || 0) <= 0;
   const isEnded = dayjs.utc(data?.timeline?.investment_end_at).isBefore(now);
 
-  const handleInvest = async (numberTicket?: number) => {
+  const handleInvest = async (_: any, numberTicket?: number) => {
     if (!publicKey || !wallet || !anchorWallet || !connection) {
       ShowAlert.warning({ message: 'Please connect to wallet first!' });
       return;
@@ -210,7 +242,6 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       };
 
       const provider = new AnchorProvider(connection, anchorWallet);
-
       const program = new Program<KyupadIdo>(IDL as KyupadIdo, provider);
 
       const investIns = await program.methods
@@ -227,15 +258,13 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
 
       const tx = new Transaction().add(setComputeUnitPriceIx).add(investIns);
       tx.feePayer = publicKey;
-      tx.recentBlockhash = (
-        await connection.getLatestBlockhash('confirmed')
-      ).blockhash;
+      const blockhash =
+        await connection.getLatestBlockhashAndContext('confirmed');
+      tx.recentBlockhash = blockhash.value.blockhash;
 
       const signature = await (wallet?.adapter as any)?.signTransaction(tx);
       const signatureEncode = base58.encode(signature?.signature);
 
-      const blockhash =
-        await connection.getLatestBlockhashAndContext('confirmed');
       const blockHeight = await connection.getBlockHeight({
         commitment: 'confirmed',
         minContextSlot: blockhash.context.slot,
@@ -256,9 +285,15 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
           throw new Error('ONCHAIN_TIMEOUT');
         }
 
+        await connection.simulateTransaction(signature, {
+          replaceRecentBlockhash: true,
+          commitment: 'confirmed',
+        });
+
         await connection?.sendRawTransaction(signature.serialize(), {
           skipPreflight: process.env.NODE_ENV === 'development',
           maxRetries: 0,
+          preflightCommitment: 'confirmed',
         });
 
         await waitToConfirm();
@@ -275,6 +310,21 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
 
         await waitToRetry();
       }
+
+      try {
+        await doInvestingSuccess({
+          project__id: projectId,
+          total: numberTicket || 1,
+          signature: signatureEncode,
+        });
+      } catch {
+        //
+      }
+
+      updateInvestedTickets(
+        investedTicketsKey,
+        (investedTickets[investedTicketsKey] || 0) + (numberTicket || 1),
+      );
 
       ShowAlert.success({
         message: (
@@ -294,6 +344,15 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       });
     } catch (e) {
       const error = e as Error;
+
+      const msg =
+        THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
+
+      if (msg) {
+        ShowAlert.error({ message: msg });
+        return;
+      }
+
       if (error?.message !== THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
         ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
       }
@@ -383,6 +442,18 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       );
     }
 
+    if (
+      investmentInfo?.is_invested ||
+      (investedTickets[investedTicketsKey] || 0) >=
+        (investmentInfo?.total_owner_winning_tickets || 0)
+    ) {
+      return (
+        <PrimaryButton block={false} disabled className="min-w-[200px]">
+          Invested
+        </PrimaryButton>
+      );
+    }
+
     if ((investmentInfo?.total_owner_winning_tickets || 0) > 1) {
       return (
         <InvestMorePopup
@@ -391,7 +462,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
           loading={isInVesting}
         >
           <PrimaryButton
-            disabled={isInVesting}
+            disabled={isInVesting || !investmentInfo?.is_active}
             loading={isInVesting}
             block={false}
             className="min-w-[200px]"
@@ -404,9 +475,9 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
 
     return (
       <PrimaryButton
-        disabled={isInVesting}
+        disabled={isInVesting || !investmentInfo?.is_active}
         loading={isInVesting}
-        onClick={handleInvest}
+        onClick={(_: any, numberTicket?: number) => handleInvest(numberTicket)}
         block={false}
         className="min-w-[200px]"
       >
@@ -414,6 +485,10 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       </PrimaryButton>
     );
   }, [
+    investedTickets,
+    investedTicketsKey,
+    investmentInfo?.is_active,
+    investmentInfo?.is_invested,
     investmentInfo?.total_owner_winning_tickets,
     isEnded,
     isInVesting,
@@ -468,10 +543,10 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
               <div className="flex gap-4 justify-between items-center">
                 <span className="text-xl">Number of invested tickets</span>
                 <span className="text-2xl font-bold text-kyu-color-5">
-                  {investmentInfo?.tickets_used
-                    ? investmentInfo?.tickets_used < 10
-                      ? `0${investmentInfo?.tickets_used}`
-                      : investmentInfo?.tickets_used
+                  {investedTickets[investedTicketsKey] || 0
+                    ? investedTickets[investedTicketsKey] < 10
+                      ? `0${investedTickets[investedTicketsKey]}`
+                      : investedTickets[investedTicketsKey]
                     : 0}
                 </span>
               </div>
