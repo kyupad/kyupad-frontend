@@ -18,13 +18,22 @@ import {
 } from '@/utils/constants';
 import { decrypt } from '@/utils/helpers';
 import { AnchorProvider, IdlTypes, Program } from '@coral-xyz/anchor';
-import { getAssociatedTokenAddressSync } from '@solana/spl-token';
+import {
+  getAssociatedTokenAddressSync,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token';
 import {
   useAnchorWallet,
   useConnection,
   useWallet,
 } from '@solana/wallet-adapter-react';
-import { ComputeBudgetProgram, PublicKey, Transaction } from '@solana/web3.js';
+import {
+  AccountMeta,
+  ComputeBudgetProgram,
+  PublicKey,
+  TransactionMessage,
+  VersionedTransaction,
+} from '@solana/web3.js';
 import base58 from 'bs58';
 import { getCookie } from 'cookies-next';
 import dayjs from 'dayjs';
@@ -244,26 +253,66 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       const provider = new AnchorProvider(connection, anchorWallet);
       const program = new Program<KyupadIdo>(IDL as KyupadIdo, provider);
 
-      const investIns = await program.methods
+      let investIns = await program.methods
         .invest(investArgs)
         .accounts({
           investor: publicKey,
           vaultAddress: vaultAddress,
         })
         .instruction();
+      if (
+        currency?.toLowerCase() !== 'sol' &&
+        investmentInfo.currency_address
+      ) {
+        const source = getAssociatedTokenAddressSync(
+          new PublicKey(investmentInfo.currency_address),
+          publicKey,
+        );
+        const remainingAccountsInvest: AccountMeta[] = [
+          {
+            pubkey: TOKEN_PROGRAM_ID,
+            isSigner: false,
+            isWritable: false,
+          },
+          {
+            pubkey: new PublicKey(investmentInfo.currency_address),
+            isSigner: false,
+            isWritable: false,
+          },
+          {
+            pubkey: source,
+            isSigner: false,
+            isWritable: true,
+          },
+        ];
+        investIns = await program.methods
+          .invest(investArgs)
+          .accounts({
+            investor: publicKey,
+            vaultAddress: vaultAddress,
+          })
+          .remainingAccounts(remainingAccountsInvest)
+          .instruction();
+      }
+      const blockhash =
+        await connection.getLatestBlockhashAndContext('confirmed');
 
       const setComputeUnitPriceIx = ComputeBudgetProgram.setComputeUnitPrice({
         microLamports: 100000, // FIXME: set to 100000
       });
 
-      const tx = new Transaction().add(setComputeUnitPriceIx).add(investIns);
-      tx.feePayer = publicKey;
-      const blockhash =
-        await connection.getLatestBlockhashAndContext('confirmed');
-      tx.recentBlockhash = blockhash.value.blockhash;
+      const messageV0 = new TransactionMessage({
+        payerKey: publicKey,
+        recentBlockhash: blockhash.value.blockhash,
+        instructions: [setComputeUnitPriceIx, investIns],
+      }).compileToV0Message();
 
-      const signature = await (wallet?.adapter as any)?.signTransaction(tx);
-      const signatureEncode = base58.encode(signature?.signature);
+      const transactionV0 = new VersionedTransaction(messageV0);
+
+      const signature = await (wallet?.adapter as any)?.signTransaction(
+        transactionV0,
+      );
+      const signatureEncode = base58.encode(signature?.signatures?.[0]);
 
       const blockHeight = await connection.getBlockHeight({
         commitment: 'confirmed',
@@ -285,7 +334,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
           throw new Error('ONCHAIN_TIMEOUT');
         }
 
-        await connection.simulateTransaction(signature, {
+        await connection.simulateTransaction(transactionV0, {
           replaceRecentBlockhash: true,
           commitment: 'confirmed',
         });
@@ -343,6 +392,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
         ),
       });
     } catch (e) {
+      if (env.NEXT_PUBLIC_DEBUG === 'TRUE') console.error(e);
       const error = e as Error;
 
       const msg =
