@@ -181,10 +181,18 @@ function RegistrationStep({
                 changeViewMode('snapshot');
               } else if (activeStep === 3) {
                 changeViewMode('investment');
+              } else if (activeStep === 4) {
+                changeViewMode('claim');
+              } else {
+                //
               }
             }}
           >
-            {activeStep === 3 ? 'Invest Now' : 'View Registration'}
+            {activeStep === 3
+              ? 'Invest Now'
+              : activeStep === 4
+                ? 'Claim'
+                : 'View Registration'}
           </PrimaryButton>
         </div>
       );
