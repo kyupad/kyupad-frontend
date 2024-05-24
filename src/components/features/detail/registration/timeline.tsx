@@ -42,8 +42,36 @@ function Timeline({ data }: { data: any }) {
   ];
 
   return (
-    <div className="flex gap-10 flex-row justify-items-start">
-      <div className="text-xl sm:text-2xl font-bold flex flex-col gap-[60px] justify-between">
+    <div className="flex gap-[60px] flex-col relative">
+      <div className="w-[1px] h-full bg-kyu-color-11 absolute top-0 left-[142px] sm:left-[202px] z-[1]" />
+      {timeline.map((item, index) => {
+        return (
+          <div key={item.step} className="flex gap-10">
+            <div className="text-xl sm:text-2xl font-bold min-w-[80px] max-w-[80px] sm:min-w-[140px] sm:max-w-[140px] w-full">
+              {item.step}
+            </div>
+            <div
+              className="size-[44px] min-w-[44px] min-h-[44px] rounded-[16px] bg-kyu-color-11 text-kyu-color-4 text-2xl font-bold flex justify-center items-center z-[2]"
+              key={item.step}
+            >
+              {index + 1}
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <time className="text-xl sm:text-2xl font-bold">{item.time}</time>
+              {item?.description && (
+                <div
+                  className="font-medium"
+                  dangerouslySetInnerHTML={{
+                    __html: item.description,
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        );
+      })}
+      {/* <div className="text-xl sm:text-2xl font-bold flex flex-col gap-[60px] justify-between">
         {timeline.map((item) => (
           <div key={item.step}>{item.step}</div>
         ))}
@@ -77,7 +105,7 @@ function Timeline({ data }: { data: any }) {
             )}
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

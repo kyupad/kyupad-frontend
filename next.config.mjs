@@ -1,5 +1,6 @@
 import './env.mjs';
 
+import MillionLint from '@million/lint';
 /** @type {import('next').NextConfig} */
 
 import withBundleAnalyzer from '@next/bundle-analyzer';
@@ -8,8 +9,9 @@ import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
 import million from 'million/compiler';
 
 const millionConfig = {
-  // auto: { rsc: true },
+  server: true,
   auto: false,
+  rsc: true,
 };
 
 const runWithBundleAnalyzer = withBundleAnalyzer({
@@ -66,17 +68,22 @@ const nextConfig = runWithBundleAnalyzer({
   },
   swcMinify: true,
   webpack: (config, { webpack }) => {
-    config.devtool = 'source-map';
     config.plugins.push(
       new webpack.DefinePlugin({
         'globalThis.__DEV__': false,
       }),
-      sentryWebpackPlugin({
-        org: 'kyupad',
-        project: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
-        authToken: process.env.NEXT_PUBLIC_SENTRY_AUTH_TOKEN,
-      }),
     );
+
+    if (process.env.NODE_ENV === 'production') {
+      config.devtool = 'source-map';
+      config.plugins.push(
+        sentryWebpackPlugin({
+          org: 'kyupad',
+          project: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
+          authToken: process.env.NEXT_PUBLIC_SENTRY_AUTH_TOKEN,
+        }),
+      );
+    }
 
     return config;
   },
@@ -148,7 +155,5 @@ const sentryNextConfig = withSentryConfig(
 );
 
 export default process.env.NODE_ENV === 'production'
-  ? million.next(nextConfig, millionConfig)
+  ? million.next(MillionLint.next({ rsc: true })(nextConfig), millionConfig)
   : sentryNextConfig;
-
-// next.config.mjs

@@ -19,14 +19,14 @@ function ProjectDetailHeader({ detail }: { detail?: any }) {
       </div>
       <div className="max-w-8xl py-5 px-4 lg:px-[60px] mx-auto flex justify-between gap-5 items-center flex-col md:items-center md:flex-row">
         <div className="flex gap-5 items-center">
-          <div>
+          <div className="relative border-2 border-kyu-color-4 min-w-[100px] sm:min-w-[150px] xl:min-w-[200px] rounded-full min-h-[100px] sm:min-h-[150px] xl:min-h-[200px] overflow-hidden">
             <Image
-              className="max-w-[100px] sm:max-w-[150px] xl:max-w-[200px] rounded-full min-h-[100px] sm:min-h-[150px] xl:min-h-[200px] border-2 border-kyu-color-4"
+              className="absolute"
               src={detail?.logo}
-              width={200}
-              height={200}
+              fill
               alt="project logo"
               draggable={false}
+              style={{ objectFit: 'cover' }}
             />
           </div>
           <div className="flex flex-col gap-2">
