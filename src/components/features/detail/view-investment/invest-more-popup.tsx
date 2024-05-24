@@ -10,6 +10,7 @@ import {
 } from '@/components/common/dialog';
 import { Input } from '@/components/common/input';
 import { ShowAlert } from '@/components/common/toast';
+import { isFloat } from '@/utils/helpers';
 import PrimaryButton from '@components/common/button/primary';
 
 function InvestMorePopup({
@@ -17,11 +18,15 @@ function InvestMorePopup({
   amount,
   handleInvest,
   loading,
+  visible,
+  setVisible,
 }: {
   children: ReactNode;
   amount?: number;
   handleInvest: (_: any, numberTicket: number) => void;
   loading?: boolean;
+  visible: boolean;
+  setVisible: (_: boolean) => void;
 }) {
   const [numberTicket, setNumberTicket] = useState<number>(1);
 
@@ -36,6 +41,14 @@ function InvestMorePopup({
       return (
         <div className="text-red-500 text-sm">
           Please enter the number of tickets
+        </div>
+      );
+    }
+
+    if (isFloat(numberTicket)) {
+      return (
+        <div className="text-red-500 text-sm">
+          The number of tickets must be an integer
         </div>
       );
     }
@@ -63,6 +76,12 @@ function InvestMorePopup({
       });
     }
 
+    if (isFloat(numberTicket)) {
+      return ShowAlert.error({
+        message: 'The number of tickets must be an integer',
+      });
+    }
+
     if (numberTicket < 1) {
       return ShowAlert.error({
         message: 'The number of tickets must be greater than 0',
@@ -76,8 +95,9 @@ function InvestMorePopup({
 
     return cb(undefined, numberTicket);
   };
+
   return (
-    <Dialog>
+    <Dialog open={visible} onOpenChange={setVisible}>
       <DialogTrigger asChild>
         <div>{children}</div>
       </DialogTrigger>
