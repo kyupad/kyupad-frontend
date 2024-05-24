@@ -59,12 +59,16 @@ function ViewRegistration({
   }, [isSolanaConnected]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchData = async () => {
       if (publicKey && slug) {
-        const data = await doViewRegistration({
-          wallet: publicKey?.toBase58(),
-          slug: slug as string,
-        });
+        const data = await doViewRegistration(
+          {
+            wallet: publicKey?.toBase58(),
+            slug: slug as string,
+          },
+          controller.signal,
+        );
 
         if (data?.data?.catnip_info) {
           setCatnipInfo(data.data.catnip_info);
@@ -72,11 +76,15 @@ function ViewRegistration({
       }
     };
 
-    try {
-      fetchData().finally(() => setLoading(false));
-    } catch (e) {
-      console.error(e);
-    }
+    fetchData()
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(() => setLoading(false));
+
+    return () => {
+      controller.abort();
+    };
   }, [publicKey, slug]);
 
   return (

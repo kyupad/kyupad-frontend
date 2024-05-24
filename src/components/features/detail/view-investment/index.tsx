@@ -82,6 +82,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const [isInVesting, setIsInVesting] = useState<boolean>(false);
+  const [visibleMoreInvest, setVisibleMoreInvest] = useState<boolean>(false);
   const investedTickets = useSessionStore((state) => state.investedTickets);
   const updateInvestedTickets = useSessionStore(
     (state) => state.updateInvestedTickets,
@@ -136,13 +137,14 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       }
     };
 
-    try {
-      fetchData().finally(() => {
+    fetchData()
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setLoading(false);
       });
-    } catch (e) {
-      console.error(e);
-    }
 
     return () => {
       controller.abort();
@@ -156,6 +158,10 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
   const now = dayjs.utc();
   const isNotWinner = (investmentInfo?.total_owner_winning_tickets || 0) <= 0;
   const isEnded = dayjs.utc(data?.timeline?.investment_end_at).isBefore(now);
+
+  const handleVisibleMoreInvest = useCallback((value: boolean) => {
+    setVisibleMoreInvest(value);
+  }, []);
 
   const handleInvest = async (_: any, numberTicket?: number) => {
     if (!publicKey || !wallet || !anchorWallet || !connection) {
@@ -245,7 +251,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       }
       const investArgs: InvestArgs = {
         projectId: projectId,
-        ticketAmount: numberTicket || 1,
+        ticketAmount: numberTicket ? Math.floor(Number(numberTicket)) : 1,
         maxTicketAmount: totalWinningTicket,
         merkleProof: merkleProofDecodedParsedArray,
       };
@@ -363,7 +369,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       try {
         await doInvestingSuccess({
           project__id: projectId,
-          total: numberTicket || 1,
+          total: numberTicket ? Math.floor(Number(numberTicket)) : 1,
           signature: signatureEncode,
         });
       } catch {
@@ -372,7 +378,8 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
 
       updateInvestedTickets(
         investedTicketsKey,
-        (investedTickets[investedTicketsKey] || 0) + (numberTicket || 1),
+        (investedTickets[investedTicketsKey] || 0) +
+          (numberTicket ? Math.floor(Number(numberTicket)) : 1),
       );
 
       ShowAlert.success({
@@ -408,6 +415,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       }
     } finally {
       handleSetIsInvesting(false);
+      handleVisibleMoreInvest(false);
     }
   };
 
@@ -507,6 +515,8 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     if ((investmentInfo?.total_owner_winning_tickets || 0) > 1) {
       return (
         <InvestMorePopup
+          setVisible={handleVisibleMoreInvest}
+          visible={visibleMoreInvest}
           amount={investmentInfo?.total_owner_winning_tickets}
           handleInvest={handleInvest}
           loading={isInVesting}
@@ -544,6 +554,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     isInVesting,
     isNotWinner,
     loading,
+    visibleMoreInvest,
   ]);
 
   return (

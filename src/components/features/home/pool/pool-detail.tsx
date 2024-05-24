@@ -148,7 +148,7 @@ const PoolDetail = ({
 
           <div
             className={cn(
-              'text-button-primary-border lg:text-xl line-clamp-6',
+              'text-button-primary-border lg:text-xl line-clamp-3',
               direction === 'column' ? '!text-base' : '',
             )}
           >
