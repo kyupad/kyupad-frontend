@@ -301,6 +301,7 @@ function RegistrationStep({
                   ? dayjs.utc(data?.[0]?.start).valueOf()
                   : dayjs.utc(data?.[0]?.end).valueOf()
               }
+              revalidatePath={revalidatePath}
             />
           ) : (
             <span className="font-bold text-2xl text-kyu-color-18">Ended</span>

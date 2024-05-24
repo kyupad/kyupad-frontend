@@ -21,6 +21,8 @@ function FurtureLoading() {
           <Skeleton className="h-full w-full absolute" />
         </div>
       </div>
+
+      <Skeleton className="h-[56px] mt-8 w-[250px] mx-auto" />
     </div>
   );
 }

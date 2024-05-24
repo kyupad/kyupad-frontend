@@ -552,14 +552,14 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
         <div className="flex flex-col gap-4 w-full">
           <Back />
           <div className="flex gap-5 items-center">
-            <div>
+            <div className="min-w-[100px] min-h-[100px] sm:min-h-[150px] sm:min-w-[150px] xl:min-w-[200px] rounded-full xl:min-h-[200px] border-2 border-kyu-color-4 relative overflow-hidden">
               <ImageNext
-                className="max-w-[100px] min-h-[100px] sm:min-h-[150px] sm:max-w-[150px] xl:max-w-[200px] rounded-full xl:min-h-[200px] border-2 border-kyu-color-4"
+                className="absolute"
                 src={data?.logo}
-                width={200}
-                height={200}
                 alt="project logo"
                 draggable={false}
+                fill
+                style={{ objectFit: 'cover' }}
               />
             </div>
             <div className="flex flex-col gap-2">
