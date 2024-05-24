@@ -92,6 +92,10 @@ const debounce = (func: any, wait: number, immediate?: any) => {
   };
 };
 
+function isFloat(n: any) {
+  return Number(n) && Number(n) % 1 !== 0;
+}
+
 export {
   removeUndefinedAndNull,
   isEmpty,
@@ -101,4 +105,5 @@ export {
   convertUTCtime,
   debounce,
   debounceUseEffect,
+  isFloat,
 };
