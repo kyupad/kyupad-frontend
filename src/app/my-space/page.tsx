@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Image from 'next/image';
 // import PrimaryButton from '@/components/common/button/primary';
 // import { Input } from '@/components/common/input';
 import Tabs from '@/components/common/tabs';
 import MyInvestments from '@/components/features/my-space/my-investments';
+import MyInvestmentsLoading from '@/components/features/my-space/my-investments-loading';
 import MyParticipations from '@/components/features/my-space/my-participations';
 import catLeft from 'public/images/my-space/cat-left.png';
 import MySpaceBalance from '@components/features/my-space/balance';
@@ -39,12 +40,24 @@ const MySpace = () => {
           {
             key: 'My Investments',
             label: 'My Investments',
-            children: <MyInvestments />,
+            children: (
+              <>
+                <Suspense fallback={<MyInvestmentsLoading />}>
+                  <MyInvestments />
+                </Suspense>
+              </>
+            ),
           },
           {
             key: 'My Participations',
             label: 'My Participations',
-            children: <MyParticipations />,
+            children: (
+              <>
+                <Suspense fallback={<MyInvestmentsLoading />}>
+                  <MyParticipations />
+                </Suspense>
+              </>
+            ),
           },
         ]}
       />

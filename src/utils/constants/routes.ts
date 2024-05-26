@@ -12,6 +12,8 @@ const API_ROUTES = {
   GENERATE_REFER_LINK: '/v1/nft/generate-prefer-code',
   VIEW_REGISTRATION: '/v1/projects/[slug]/registration-detail',
   DO_INVESTING_SUCCESS: '/v1/projects/sync-investing-by-signature',
+  GET_MY_INVESTMENTS: '/v1/projects/my-invested',
+  GET_MY_PARTICIPATIONS: '/v1/projects/my-participation',
 };
 
 const WEB_ROUTES = {
