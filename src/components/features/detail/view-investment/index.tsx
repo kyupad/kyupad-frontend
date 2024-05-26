@@ -526,6 +526,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
             loading={isInVesting}
             block={false}
             className="min-w-[200px]"
+            onClick={() => handleVisibleMoreInvest(true)}
           >
             Invest More
           </PrimaryButton>
