@@ -10,6 +10,7 @@ import {
 } from '@/components/common/dialog';
 import { Input } from '@/components/common/input';
 import { ShowAlert } from '@/components/common/toast';
+import { useSessionStore } from '@/contexts/session-store-provider';
 import { isFloat } from '@/utils/helpers';
 import PrimaryButton from '@components/common/button/primary';
 
@@ -29,6 +30,7 @@ function InvestMorePopup({
   setVisible: (_: boolean) => void;
 }) {
   const [numberTicket, setNumberTicket] = useState<number>(1);
+  const investedTickets = useSessionStore((state) => state.investedTickets);
 
   const handleChangeNumberTicket = useCallback((e: any) => {
     const value = e.target.value;
@@ -37,7 +39,7 @@ function InvestMorePopup({
   }, []);
 
   const renderError = useCallback(() => {
-    if (!numberTicket) {
+    if (!Number(numberTicket)) {
       return (
         <div className="text-red-500 text-sm">
           Please enter the number of tickets
@@ -45,7 +47,7 @@ function InvestMorePopup({
       );
     }
 
-    if (isFloat(numberTicket)) {
+    if (isFloat(Number(numberTicket))) {
       return (
         <div className="text-red-500 text-sm">
           The number of tickets must be an integer
@@ -53,21 +55,29 @@ function InvestMorePopup({
       );
     }
 
-    if (numberTicket < 1) {
+    if (Number(numberTicket) < 1) {
       return (
         <div className="text-red-500 text-sm">
           The number of tickets must be greater than 0
         </div>
       );
     }
-    if (amount && numberTicket > amount) {
+    if (amount && Number(numberTicket) > amount) {
       return (
         <div className="text-red-500 text-sm">
           You can&apos;t invest more than {amount} tickets
         </div>
       );
     }
-  }, [amount, numberTicket]);
+
+    if (Number(numberTicket) > (investedTickets || 0)) {
+      return (
+        <div className="text-red-500 text-sm">
+          You can&apos;t invest more than {investedTickets} tickets
+        </div>
+      );
+    }
+  }, [amount, investedTickets, numberTicket]);
 
   const validator = (cb: Function) => {
     if (!numberTicket) {
@@ -90,6 +100,12 @@ function InvestMorePopup({
     if (amount && numberTicket > amount) {
       return ShowAlert.error({
         message: `You can't invest more than ${amount} tickets`,
+      });
+    }
+
+    if (Number(numberTicket) > (investedTickets || 0)) {
+      return ShowAlert.error({
+        message: `You can't invest more than ${investedTickets} tickets`,
       });
     }
 
