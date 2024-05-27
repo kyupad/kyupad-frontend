@@ -10,7 +10,6 @@ import {
 } from '@/components/common/dialog';
 import { Input } from '@/components/common/input';
 import { ShowAlert } from '@/components/common/toast';
-import { useSessionStore } from '@/contexts/session-store-provider';
 import { isFloat } from '@/utils/helpers';
 import PrimaryButton from '@components/common/button/primary';
 
@@ -21,6 +20,7 @@ function InvestMorePopup({
   loading,
   visible,
   setVisible,
+  investedTicket,
 }: {
   children: ReactNode;
   amount?: number;
@@ -28,9 +28,10 @@ function InvestMorePopup({
   loading?: boolean;
   visible: boolean;
   setVisible: (_: boolean) => void;
+  investedTicket: number;
 }) {
   const [numberTicket, setNumberTicket] = useState<number>(1);
-  const investedTickets = useSessionStore((state) => state.investedTickets);
+  const remainingTicket = (amount || 0) - (investedTicket || 0);
 
   const handleChangeNumberTicket = useCallback((e: any) => {
     const value = e.target.value;
@@ -70,14 +71,14 @@ function InvestMorePopup({
       );
     }
 
-    if (Number(numberTicket) > (investedTickets || 0)) {
+    if (Number(numberTicket) > (remainingTicket || 0)) {
       return (
         <div className="text-red-500 text-sm">
-          You can&apos;t invest more than {investedTickets} tickets
+          You can&apos;t invest more than {amount} tickets
         </div>
       );
     }
-  }, [amount, investedTickets, numberTicket]);
+  }, [amount, remainingTicket, numberTicket]);
 
   const validator = (cb: Function) => {
     if (!numberTicket) {
@@ -103,9 +104,9 @@ function InvestMorePopup({
       });
     }
 
-    if (Number(numberTicket) > (investedTickets || 0)) {
+    if (Number(numberTicket) > (remainingTicket || 0)) {
       return ShowAlert.error({
-        message: `You can't invest more than ${investedTickets} tickets`,
+        message: `You can't invest more than ${amount} tickets`,
       });
     }
 
