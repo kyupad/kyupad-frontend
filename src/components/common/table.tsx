@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { cn } from 'src/utils/helpers';
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="w-full overflow-auto scrollbar rounded-[16px] border-2 border-kyu-color-10 bg-kyu-color-12 max-h-[610px]">
+const Table = React.forwardRef<any, any>(({ className, ...props }, ref) => (
+  <div
+    className={cn(
+      'w-full overflow-auto scrollbar rounded-[16px] border-2 border-kyu-color-10 bg-kyu-color-12 max-h-[610px]',
+      props?.parent ? props.parent : '',
+    )}
+  >
     <table
       ref={ref}
       className={cn(
