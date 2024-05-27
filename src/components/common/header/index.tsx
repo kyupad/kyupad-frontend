@@ -32,6 +32,7 @@ const Header = () => {
           doGetSignInData={doGetSignInData}
           doVerifySignInWithSolana={doVerifySignInWithSolana}
           setCookie={setCookie}
+          revalidatePath={revalidateCurrentPath}
         />
       </div>
       <div className="hidden gap-8 items-center flex-wrap lg:flex">

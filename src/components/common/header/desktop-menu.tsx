@@ -3,12 +3,16 @@
 import React, { memo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useGlobalStore } from '@/contexts/global-store-provider';
 import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { env } from 'env.mjs';
 
 function DesktopMenu() {
   const pathName = usePathname();
+  const isSolanaConnected = useGlobalStore(
+    (state) => state.is_solana_connected,
+  );
   return (
     <nav className="flex gap-8 text-xl">
       <Link href={WEB_ROUTES.WHITELIST_PASS} className="relative group">
@@ -20,15 +24,17 @@ function DesktopMenu() {
           )}
         ></span>
       </Link>
-      <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
-        My Space
-        <span
-          className={cn(
-            'absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full',
-            pathName === WEB_ROUTES.MY_SPACE ? 'w-full' : '',
-          )}
-        ></span>
-      </Link>
+      {isSolanaConnected && (
+        <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
+          My Space
+          <span
+            className={cn(
+              'absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full',
+              pathName === WEB_ROUTES.MY_SPACE ? 'w-full' : '',
+            )}
+          ></span>
+        </Link>
+      )}
       {/* <Link href={WEB_ROUTES.CATNIP_POINTS} className="relative group">
         Catnip Points
         <span

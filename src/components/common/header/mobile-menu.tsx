@@ -1,7 +1,9 @@
+'use client';
+
 import React, { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { revalidateCurrentPath } from '@/actions/common';
+import { useGlobalStore } from '@/contexts/global-store-provider';
 import { WEB_ROUTES } from '@/utils/constants';
 import { env } from 'env.mjs';
 import menu from 'public/images/header/menu.svg';
@@ -22,18 +24,26 @@ function MobileMenu({
   doGetSignInData,
   doVerifySignInWithSolana,
   setCookie,
+  revalidatePath,
 }: {
   doGetSignInData: Function;
   doVerifySignInWithSolana: Function;
   setCookie: Function;
+  revalidatePath: Function;
 }) {
+  const isSolanaConnected = useGlobalStore(
+    (state) => state.is_solana_connected,
+  );
+
   return (
     <div>
       <Sheet>
         <SheetTrigger asChild>
-          <PrimaryButton>
-            <Image src={menu} width={24} height={24} alt="Menu" />
-          </PrimaryButton>
+          <div>
+            <PrimaryButton>
+              <Image src={menu} width={24} height={24} alt="Menu" />
+            </PrimaryButton>
+          </div>
         </SheetTrigger>
         <SheetContent side="left">
           <SheetHeader>
@@ -46,10 +56,12 @@ function MobileMenu({
                 Mint NFT
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
               </Link>
-              {/* <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
-                My Space
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-              </Link> */}
+              {isSolanaConnected && (
+                <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
+                  My Space
+                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
+                </Link>
+              )}
               {/* <Link href={WEB_ROUTES.HOME} className="relative group">
                 Catnip Points
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
@@ -68,7 +80,7 @@ function MobileMenu({
               doGetSignInData={doGetSignInData}
               doVerifySignInWithSolana={doVerifySignInWithSolana}
               setCookie={setCookie}
-              revalidatePath={revalidateCurrentPath}
+              revalidatePath={revalidatePath}
             />
 
             <div className="flex gap-3">
