@@ -23,10 +23,12 @@ function MobileMenu({
   doGetSignInData,
   doVerifySignInWithSolana,
   setCookie,
+  revalidatePath,
 }: {
   doGetSignInData: Function;
   doVerifySignInWithSolana: Function;
   setCookie: Function;
+  revalidatePath: Function;
 }) {
   const [host, setHost] = useState<string | null>(null);
 
@@ -40,9 +42,11 @@ function MobileMenu({
     <div>
       <Sheet>
         <SheetTrigger asChild>
-          <PrimaryButton>
-            <Image src={menu} width={24} height={24} alt="Menu" />
-          </PrimaryButton>
+          <div>
+            <PrimaryButton>
+              <Image src={menu} width={24} height={24} alt="Menu" />
+            </PrimaryButton>
+          </div>
         </SheetTrigger>
         <SheetContent side="left">
           <SheetHeader>
