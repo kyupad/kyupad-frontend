@@ -17,6 +17,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '../dialog';
 
 function WalletNotConnect({
@@ -41,17 +42,21 @@ function WalletNotConnect({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <PrimaryButton
-        className="min-h-[52px] w-[220px] flex items-center justify-center text-xl"
-        onClick={() => {
-          handleOpen(!open);
-        }}
-        loading={loading}
-        loadingText="Connecting"
-        block={block}
-      >
-        Connect Wallet
-      </PrimaryButton>
+      <DialogTrigger asChild>
+        <div>
+          <PrimaryButton
+            className="min-h-[52px] w-[220px] flex items-center justify-center text-xl"
+            onClick={() => {
+              handleOpen(!open);
+            }}
+            loading={loading}
+            loadingText="Connecting"
+            block={block}
+          >
+            Connect Wallet
+          </PrimaryButton>
+        </div>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[680px] bg-kyu-color-12 p-10 rounded-[16px] border-2 border-kyu-color-11">
         <DialogHeader>
           <DialogTitle className="font-bold text-2xl">
