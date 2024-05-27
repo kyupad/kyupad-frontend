@@ -29,59 +29,61 @@ async function MyParticipations() {
       {(!myParticipations || myParticipations?.length === 0) && (
         <p className="text-center font-heading text-4xl h-[400px]">No data!</p>
       )}
-      <div className="px-4 py-10 sm:p-10 border-2 border-kyu-color-10 rounded-[16px] max-w-[1080px] mx-auto flex gap-6 flex-col overflow-x-auto">
-        {myParticipations?.map((item: any) => {
-          const statusColor =
-            item?.project_participation_status?.toLowerCase() === 'ongoing'
-              ? 'text-kyu-color-17'
-              : item?.project_participation_status?.toLowerCase() === 'ended'
-                ? 'text-kyu-color-18'
-                : 'text-kyu-color-13';
-          return (
-            <div
-              key={item?.project_id}
-              className="flex items-center justify-between gap-[100px]"
-            >
-              <div className="flex items-center gap-4">
-                <div className="max-w-16 min-w-16 min-h-16 relative rounded-[100px] overflow-hidden">
-                  <Image
-                    src={item?.project_logo || ''}
-                    alt={item?.project_name || ''}
-                    className="absolute"
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    draggable={false}
-                  />
+      {myParticipations && myParticipations?.length > 0 && (
+        <div className="px-4 py-10 sm:p-10 border-2 border-kyu-color-10 rounded-[16px] max-w-[1080px] mx-auto flex gap-6 flex-col overflow-x-auto">
+          {myParticipations?.map((item: any) => {
+            const statusColor =
+              item?.project_participation_status?.toLowerCase() === 'ongoing'
+                ? 'text-kyu-color-17'
+                : item?.project_participation_status?.toLowerCase() === 'ended'
+                  ? 'text-kyu-color-18'
+                  : 'text-kyu-color-13';
+            return (
+              <div
+                key={item?.project_id}
+                className="flex items-center justify-between gap-[100px]"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="max-w-16 min-w-16 min-h-16 relative rounded-[100px] overflow-hidden">
+                    <Image
+                      src={item?.project_logo || ''}
+                      alt={item?.project_name || ''}
+                      className="absolute"
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      draggable={false}
+                    />
+                  </div>
+                  <div className="font-bold text-2xl whitespace-nowrap">
+                    {item?.project_name || ''}
+                  </div>
                 </div>
-                <div className="font-bold text-2xl whitespace-nowrap">
-                  {item?.project_name || ''}
+                <div className="flex items-center gap-[100px]">
+                  <div className="text-2xl whitespace-nowrap">
+                    <span className={cn('font-bold capitalize', statusColor)}>
+                      {item?.project_participation_status || ''}
+                    </span>
+                  </div>
+                  <Link
+                    href={
+                      item?.project_slug
+                        ? WEB_ROUTES.PROJECT_DETAIL?.replace(
+                            '[id]',
+                            item?.project_slug,
+                          )
+                        : '#'
+                    }
+                  >
+                    <SecondaryButton className="min-w-[200px]">
+                      Details
+                    </SecondaryButton>
+                  </Link>
                 </div>
               </div>
-              <div className="flex items-center gap-[100px]">
-                <div className="text-2xl whitespace-nowrap">
-                  <span className={cn('font-bold capitalize', statusColor)}>
-                    {item?.project_participation_status || ''}
-                  </span>
-                </div>
-                <Link
-                  href={
-                    item?.project_slug
-                      ? WEB_ROUTES.PROJECT_DETAIL?.replace(
-                          '[id]',
-                          item?.project_slug,
-                        )
-                      : '#'
-                  }
-                >
-                  <SecondaryButton className="min-w-[200px]">
-                    Details
-                  </SecondaryButton>
-                </Link>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

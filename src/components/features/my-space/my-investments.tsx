@@ -29,62 +29,66 @@ async function MyInvestments() {
       {(!myInvested || myInvested?.length === 0) && (
         <p className="text-center font-heading text-4xl h-[400px]">No data!</p>
       )}
-      <div className="px-4 py-10 sm:p-10 border-2 border-kyu-color-10 rounded-[16px] max-w-[1080px] mx-auto flex gap-6 flex-col overflow-x-auto">
-        {myInvested?.map((item: any) => (
-          <div
-            key={item?.project_id + item?.invested_amount}
-            className="flex items-center justify-between gap-[100px]"
-          >
-            <div className="flex items-center gap-4">
-              <div className="max-w-16 min-w-16 min-h-16 relative rounded-[100px] overflow-hidden">
-                <Image
-                  src={item?.project_logo || ''}
-                  alt={item?.project_name || ''}
-                  className="absolute"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  draggable={false}
-                />
+      {myInvested && myInvested?.length > 0 && (
+        <div className="px-4 py-10 sm:p-10 border-2 border-kyu-color-10 rounded-[16px] max-w-[1080px] mx-auto flex gap-6 flex-col overflow-x-auto">
+          {myInvested?.map((item: any) => (
+            <div
+              key={item?.project_id + item?.invested_amount}
+              className="flex items-center justify-between gap-[100px]"
+            >
+              <div className="flex items-center gap-4">
+                <div className="max-w-16 min-w-16 min-h-16 relative rounded-[100px] overflow-hidden">
+                  <Image
+                    src={item?.project_logo || ''}
+                    alt={item?.project_name || ''}
+                    className="absolute"
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    draggable={false}
+                  />
+                </div>
+                <div className="font-bold text-2xl whitespace-nowrap">
+                  {item?.project_name || ''}
+                </div>
               </div>
-              <div className="font-bold text-2xl whitespace-nowrap">
-                {item?.project_name || ''}
-              </div>
-            </div>
-            <div className="flex items-center gap-[100px]">
-              <div className="text-2xl whitespace-nowrap">
-                <span className="font-bold">{item?.invested_amount || 0}</span>{' '}
-                ${item?.token?.toUpperCase() || ''}
-              </div>
-              {item?.claim_available ? (
-                <Link
-                  href={
-                    item?.project_slug
-                      ? WEB_ROUTES.PROJECT_DETAIL.replace(
-                          '[id]',
-                          item?.project_slug,
-                        )
-                      : '#'
-                  }
-                >
+              <div className="flex items-center gap-[100px]">
+                <div className="text-2xl whitespace-nowrap">
+                  <span className="font-bold">
+                    {item?.invested_amount || 0}
+                  </span>{' '}
+                  ${item?.token?.toUpperCase() || ''}
+                </div>
+                {item?.claim_available ? (
+                  <Link
+                    href={
+                      item?.project_slug
+                        ? WEB_ROUTES.PROJECT_DETAIL.replace(
+                            '[id]',
+                            item?.project_slug,
+                          )
+                        : '#'
+                    }
+                  >
+                    <PrimaryButton
+                      className="min-w-[200px]"
+                      disabled={!item?.claim_available}
+                    >
+                      Claim
+                    </PrimaryButton>
+                  </Link>
+                ) : (
                   <PrimaryButton
                     className="min-w-[200px]"
                     disabled={!item?.claim_available}
                   >
-                    Claim
+                    Claimed
                   </PrimaryButton>
-                </Link>
-              ) : (
-                <PrimaryButton
-                  className="min-w-[200px]"
-                  disabled={!item?.claim_available}
-                >
-                  Claimed
-                </PrimaryButton>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
