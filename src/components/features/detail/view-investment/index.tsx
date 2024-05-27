@@ -520,6 +520,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
           amount={investmentInfo?.total_owner_winning_tickets}
           handleInvest={handleInvest}
           loading={isInVesting}
+          investedTicket={investedTickets?.[investedTicketsKey] || 0}
         >
           <PrimaryButton
             disabled={isInVesting || !investmentInfo?.is_active}
