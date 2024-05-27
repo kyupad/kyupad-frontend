@@ -1,18 +1,10 @@
 import './env.mjs';
 
-import MillionLint from '@million/lint';
 /** @type {import('next').NextConfig} */
 
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
 import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
-import million from 'million/compiler';
-
-const millionConfig = {
-  server: true,
-  auto: false,
-  rsc: true,
-};
 
 const runWithBundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -155,5 +147,5 @@ const sentryNextConfig = withSentryConfig(
 );
 
 export default process.env.NODE_ENV === 'production'
-  ? million.next(MillionLint.next({ rsc: true })(nextConfig), millionConfig)
+  ? nextConfig
   : sentryNextConfig;
