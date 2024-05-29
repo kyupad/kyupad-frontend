@@ -398,8 +398,9 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
           </div>
         ),
       });
+      handleVisibleMoreInvest(false);
     } catch (e) {
-      if (env.NEXT_PUBLIC_DEBUG === 'TRUE') console.error(e);
+      console.error(e);
       const error = e as Error;
 
       const msg =
@@ -415,7 +416,6 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       }
     } finally {
       handleSetIsInvesting(false);
-      handleVisibleMoreInvest(false);
     }
   };
 

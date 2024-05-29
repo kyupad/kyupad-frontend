@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/common/table';
+import { ShowAlert } from '@/components/common/toast';
 import {
   Tooltip,
   TooltipArrow,
@@ -23,9 +24,16 @@ import {
   TooltipTrigger,
 } from '@/components/common/tooltip';
 import { useSessionStore } from '@/contexts/session-store-provider';
-import { UTC_FORMAT_STRING } from '@/utils/constants';
+import { THROW_EXCEPTION, UTC_FORMAT_STRING } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { getMint } from '@solana/spl-token';
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
+import { getBN, IWithdrawData, StreamflowSolana } from '@streamflow/stream';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
@@ -37,13 +45,26 @@ import ClaimMorePopup from './claim-more-popup';
 
 dayjs.extend(utc);
 
+const solanaClient = new StreamflowSolana.SolanaStreamClient(
+  env.NEXT_PUBLIC_RPC_URL!,
+  env.NEXT_PUBLIC_NETWORK,
+);
+
 function ViewClaim() {
   const { slug } = useParams();
   const [loading, setLoading] = useState<boolean>(true);
+  const [isClaiming, setIsClaiming] = useState<boolean>(false);
   const [projectVesting, setProjectVesting] = useState<any>(null);
   const [vestingPool, setVestingPool] = useState<any>(null);
   const [isOpenClaimTooltip, setOpenClaimTooltip] = useState<boolean>(false);
   const { publicKey } = useWallet();
+  const anchorWallet = useAnchorWallet();
+  const { connection } = useConnection();
+
+  const handleSetIsClaiming = useCallback((value: boolean) => {
+    setIsClaiming(value);
+  }, []);
+
   const withdrawnAmount = useSessionStore((state) => state.withdrawnAmount);
   const updateWithdrawnAmount = useSessionStore(
     (state) => state.updateWithdrawnAmount,
@@ -147,6 +168,89 @@ function ViewClaim() {
   const isClaimed =
     (withdrawnAmount[withdrawnAmountKey] || 0) >=
     (vestingPool?.total_amount || 0);
+
+  const handleClaim = async (_: unknown, amountToken: number) => {
+    if (!publicKey || !anchorWallet || !connection) {
+      ShowAlert.warning({ message: 'Please connect to wallet first!' });
+      return;
+    }
+
+    if (!amountToken) {
+      ShowAlert.error({ message: 'Please enter the number of tokens!' });
+      return;
+    }
+
+    if (!vestingPool?.stream_id) {
+      console.error({ message: 'Stream ID not found!' });
+      return;
+    }
+
+    if (!vestingPool?.token) {
+      console.error({ message: 'Token not found!' });
+      return;
+    }
+
+    handleSetIsClaiming(true);
+    try {
+      const mint = new PublicKey(vestingPool?.token);
+      const mintData = await getMint(connection, mint);
+      const decimals = mintData.decimals;
+
+      const withdrawStreamParams: IWithdrawData = {
+        id: vestingPool.stream_id,
+        amount: getBN(
+          Math.floor(Number(amountToken)) / 10 ** decimals,
+          decimals,
+        ),
+      };
+
+      const { txId } = await solanaClient.withdraw(withdrawStreamParams, {
+        invoker: anchorWallet as any,
+      });
+
+      updateWithdrawnAmount(
+        withdrawnAmountKey,
+        (withdrawnAmount[withdrawnAmountKey] || 0) +
+          (amountToken ? Math.floor(Number(amountToken)) : 0),
+      );
+
+      ShowAlert.success({
+        message: (
+          <div className="text-xl">
+            Claim successfully!
+            <br />
+            <a
+              href={`https://explorer.solana.com/tx/${txId}?cluster=${env.NEXT_PUBLIC_NETWORK}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="underline"
+            >
+              View transaction
+            </a>
+          </div>
+        ),
+      });
+
+      handleVisibleClaimPopup(false);
+    } catch (e) {
+      console.error(e);
+      const error = e as Error;
+
+      const msg =
+        THROW_EXCEPTION[error?.message as keyof typeof THROW_EXCEPTION];
+
+      if (msg) {
+        ShowAlert.error({ message: msg });
+        return;
+      }
+
+      if (error?.message !== THROW_EXCEPTION.USER_REJECTED_THE_REQUEST) {
+        ShowAlert.error({ message: THROW_EXCEPTION.UNKNOWN_TRANSACTION });
+      }
+    } finally {
+      handleSetIsClaiming(false);
+    }
+  };
 
   const renderClaimButton = useCallback(() => {
     if (isNotStart) {
@@ -268,23 +372,25 @@ function ViewClaim() {
         visible={isVisibleClaimPopup}
         setVisible={handleVisibleClaimPopup}
         tokenSymbol={projectVesting?.vesting_token_symbol}
-        handleClaim={() => {}}
+        handleClaim={handleClaim}
         withdrawnAmount={withdrawnAmount[withdrawnAmountKey] || 0}
+        loading={isClaiming}
       >
         <PrimaryButton className="min-w-[200px]">Claim Now</PrimaryButton>
       </ClaimMorePopup>
     );
   }, [
-    withdrawnAmountKey,
-    isClaimed,
-    isClaimedPartial,
-    isEnded,
     isNotStart,
-    isOpenClaimTooltip,
+    isEnded,
+    isClaimedPartial,
+    isClaimed,
+    vestingPool?.available_amount,
     isVisibleClaimPopup,
     projectVesting?.vesting_token_symbol,
-    vestingPool?.available_amount,
     withdrawnAmount,
+    withdrawnAmountKey,
+    isClaiming,
+    isOpenClaimTooltip,
   ]);
 
   return (
