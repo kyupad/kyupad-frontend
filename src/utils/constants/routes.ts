@@ -14,6 +14,7 @@ const API_ROUTES = {
   DO_INVESTING_SUCCESS: '/v1/projects/sync-investing-by-signature',
   GET_MY_INVESTMENTS: '/v1/projects/my-invested',
   GET_MY_PARTICIPATIONS: '/v1/projects/my-participation',
+  GET_MY_VESTING: '/v1/projects/my-vesting',
 };
 
 const WEB_ROUTES = {

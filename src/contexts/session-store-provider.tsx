@@ -30,6 +30,7 @@ const SessionStoreProvider = ({ children }: SessionStoreProviderProps) => {
       poolsCounter: {},
       seasonMinted: {},
       investedTickets: {},
+      withdrawnAmount: {},
     }));
   }, []);
 

@@ -60,7 +60,7 @@ async function MyInvestments() {
 
                 <TableCell className="text-2xl whitespace-nowrap text-right">
                   <span className="font-bold">
-                    {item?.invested_amount || 0}
+                    {item?.invested_amount?.toLocaleString('en-US') || 0}
                   </span>{' '}
                   ${item?.token?.toUpperCase() || ''}
                 </TableCell>
@@ -69,10 +69,10 @@ async function MyInvestments() {
                     <Link
                       href={
                         item?.project_slug
-                          ? WEB_ROUTES.PROJECT_DETAIL.replace(
+                          ? `${WEB_ROUTES.PROJECT_DETAIL.replace(
                               '[id]',
                               item?.project_slug,
-                            )
+                            )}?view=claim`
                           : '#'
                       }
                     >
@@ -84,11 +84,8 @@ async function MyInvestments() {
                       </PrimaryButton>
                     </Link>
                   ) : (
-                    <PrimaryButton
-                      className="min-w-[200px]"
-                      disabled={!item?.claim_available}
-                    >
-                      Claimed
+                    <PrimaryButton className="min-w-[200px]" disabled>
+                      Claim
                     </PrimaryButton>
                   )}
                 </TableCell>
