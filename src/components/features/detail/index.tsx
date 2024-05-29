@@ -1,6 +1,7 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
 
 import Registration from './registration';
@@ -29,6 +30,21 @@ function DetailController({
   setCookie,
 }: IDetailControllerProps) {
   const viewMode = useProjectDetailStore((state) => state.viewMode);
+  const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
+  const router = useRouter();
+
+  const searchParanms = useSearchParams();
+  const viewSearchParam = searchParanms.get('view');
+  const pathName = usePathname();
+
+  useEffect(() => {
+    if (viewSearchParam === 'claim' && viewMode === 'claim') {
+      router.replace(pathName, { scroll: false });
+    }
+    if (viewSearchParam === 'claim' && viewMode !== 'claim') {
+      changeViewMode('claim');
+    }
+  }, [viewSearchParam, viewMode, pathName]);
 
   return (
     <div>
