@@ -4,10 +4,14 @@ import { cn } from 'src/utils/helpers';
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  actionMore?: {
+    name: string;
+    onClick: () => void;
+  };
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, ...props }, ref) => {
+  ({ className, type, label, actionMore, ...props }, ref) => {
     return (
       <div className="relative">
         {label && (
@@ -28,6 +32,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           {...props}
         />
+        {actionMore?.name && (
+          <button
+            onClick={actionMore?.onClick}
+            className="absolute right-4 top-1/2 -translate-y-1/2 h-[32px] bg-kyu-color-3 px-2 py-1 leading-none rounded-[8px] font-bold"
+          >
+            {actionMore.name?.toUpperCase() || ''}
+          </button>
+        )}
       </div>
     );
   },
