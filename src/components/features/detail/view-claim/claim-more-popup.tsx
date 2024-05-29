@@ -46,7 +46,7 @@ function ClaimMorePopup({
     if (!Number(amountToken)) {
       return (
         <div className="text-red-500 text-sm">
-          Please enter the number of tokens
+          Please enter the number of tokens.
         </div>
       );
     }
@@ -54,7 +54,7 @@ function ClaimMorePopup({
     if (isFloat(Number(amountToken))) {
       return (
         <div className="text-red-500 text-sm">
-          The number of tokens must be an integer
+          The number of tokens must be an integer.
         </div>
       );
     }
@@ -62,7 +62,7 @@ function ClaimMorePopup({
     if (Number(amountToken) < 1) {
       return (
         <div className="text-red-500 text-sm">
-          The number of tokens must be greater than 0
+          The number of tokens must be greater than 0.
         </div>
       );
     }
@@ -70,7 +70,7 @@ function ClaimMorePopup({
     if (amount && Number(amountToken) > amount) {
       return (
         <div className="text-red-500 text-sm">
-          You can&apos;t claim more than {amount} tokens
+          You can&apos;t claim more than {amount} tokens.
         </div>
       );
     }
@@ -78,7 +78,7 @@ function ClaimMorePopup({
     if (Number(amountToken) > (remainingToken || 0)) {
       return (
         <div className="text-red-500 text-sm">
-          You can&apos;t claim more than {amount} tokens
+          You can&apos;t claim more than {amount} tokens.
         </div>
       );
     }
@@ -87,30 +87,30 @@ function ClaimMorePopup({
   const validator = (cb: Function) => {
     if (!amountToken) {
       return ShowAlert.error({
-        message: 'Please enter the number of tokens',
+        message: 'Please enter the number of tokens!',
       });
     }
 
     if (isFloat(amountToken)) {
       return ShowAlert.error({
-        message: 'The number of tokens must be an integer',
+        message: 'The number of tokens must be an integer!',
       });
     }
 
     if (amountToken < 1) {
       return ShowAlert.error({
-        message: 'The number of tokens must be greater than 0',
+        message: 'The number of tokens must be greater than 0!',
       });
     }
     if (amount && amountToken > amount) {
       return ShowAlert.error({
-        message: `You can't claim more than ${amount} tokens`,
+        message: `You can't claim more than ${amount} tokens!`,
       });
     }
 
     if (Number(amountToken) > (remainingToken || 0)) {
       return ShowAlert.error({
-        message: `You can't claim more than ${amount} tokens`,
+        message: `You can't claim more than ${amount} tokens!`,
       });
     }
 
@@ -127,7 +127,9 @@ function ClaimMorePopup({
           <DialogTitle>
             You have{' '}
             <span className="text-kyu-color-13">
-              {amount && amount < 10 ? `0${amount}` : 0}
+              {amount && amount < 10
+                ? `0${amount?.toLocaleString('en-US')}`
+                : amount?.toLocaleString('en-US')}
             </span>{' '}
             {tokenSymbol?.toUpperCase() || ''} to claim
           </DialogTitle>
@@ -144,7 +146,15 @@ function ClaimMorePopup({
             min={1}
             placeholder="1"
             onChange={handleChangeAmountToken}
+            actionMore={{
+              name: 'Max',
+              onClick: () => {
+                setAmountToken(amount || 1);
+              },
+            }}
+            className="pr-20"
           />
+
           {renderError()}
         </div>
         <DialogFooter className="-mt-3">

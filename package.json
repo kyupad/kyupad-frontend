@@ -55,6 +55,7 @@
     "@solana/wallet-adapter-wallets": "0.19.32",
     "@solana/wallet-standard-util": "1.1.1",
     "@solana/web3.js": "1.91.8",
+    "@streamflow/stream": "6.3.8",
     "@t3-oss/env-nextjs": "0.10.1",
     "aws-amplify": "6.3.4",
     "big.js": "6.2.1",

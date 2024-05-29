@@ -43,7 +43,7 @@ function InvestMorePopup({
     if (!Number(numberTicket)) {
       return (
         <div className="text-red-500 text-sm">
-          Please enter the number of tickets
+          Please enter the number of tickets.
         </div>
       );
     }
@@ -51,7 +51,7 @@ function InvestMorePopup({
     if (isFloat(Number(numberTicket))) {
       return (
         <div className="text-red-500 text-sm">
-          The number of tickets must be an integer
+          The number of tickets must be an integer.
         </div>
       );
     }
@@ -59,14 +59,14 @@ function InvestMorePopup({
     if (Number(numberTicket) < 1) {
       return (
         <div className="text-red-500 text-sm">
-          The number of tickets must be greater than 0
+          The number of tickets must be greater than 0.
         </div>
       );
     }
     if (amount && Number(numberTicket) > amount) {
       return (
         <div className="text-red-500 text-sm">
-          You can&apos;t invest more than {amount} tickets
+          You can&apos;t invest more than {amount} tickets.
         </div>
       );
     }
@@ -74,7 +74,7 @@ function InvestMorePopup({
     if (Number(numberTicket) > (remainingTicket || 0)) {
       return (
         <div className="text-red-500 text-sm">
-          You can&apos;t invest more than {amount} tickets
+          You can&apos;t invest more than {amount} tickets.
         </div>
       );
     }
@@ -83,30 +83,30 @@ function InvestMorePopup({
   const validator = (cb: Function) => {
     if (!numberTicket) {
       return ShowAlert.error({
-        message: 'Please enter the number of tickets',
+        message: 'Please enter the number of tickets!',
       });
     }
 
     if (isFloat(numberTicket)) {
       return ShowAlert.error({
-        message: 'The number of tickets must be an integer',
+        message: 'The number of tickets must be an integer!',
       });
     }
 
     if (numberTicket < 1) {
       return ShowAlert.error({
-        message: 'The number of tickets must be greater than 0',
+        message: 'The number of tickets must be greater than 0!',
       });
     }
     if (amount && numberTicket > amount) {
       return ShowAlert.error({
-        message: `You can't invest more than ${amount} tickets`,
+        message: `You can't invest more than ${amount} tickets!`,
       });
     }
 
     if (Number(numberTicket) > (remainingTicket || 0)) {
       return ShowAlert.error({
-        message: `You can't invest more than ${amount} tickets`,
+        message: `You can't invest more than ${amount} tickets!`,
       });
     }
 
@@ -123,7 +123,7 @@ function InvestMorePopup({
           <DialogTitle>
             You have{' '}
             <span className="text-kyu-color-13">
-              {amount && amount < 10 ? `0${amount}` : 0}
+              {amount && amount < 10 ? `0${amount}` : amount}
             </span>{' '}
             winning tickets
           </DialogTitle>
