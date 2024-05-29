@@ -101,6 +101,20 @@ const doInvestingSuccess = async (payload: {
   return data;
 };
 
+const doGetMyVesting = async (slug: string, signal?: AbortSignal) => {
+  const data = await request(
+    'GET',
+    API_ROUTES.GET_MY_VESTING,
+    { project_slug: slug },
+    {
+      cache: 'no-store',
+      signal,
+    },
+  );
+
+  return data;
+};
+
 export {
   doGetUpcomingProjects,
   doGetSuccessProjects,
@@ -108,4 +122,5 @@ export {
   doViewRegistration,
   doGetFurtureProjects,
   doInvestingSuccess,
+  doGetMyVesting,
 };
