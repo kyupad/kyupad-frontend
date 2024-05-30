@@ -32,7 +32,10 @@ const ProjectDetailStoreProvider = ({
   const pathName = usePathname();
 
   useEffect(() => {
-    if (pathName) {
+    const viewSearchParam = new URLSearchParams(window.location.search).get(
+      'view',
+    );
+    if (pathName && viewSearchParam !== 'claim') {
       storeRef.current && storeRef.current.setState({ viewMode: null });
     }
   }, [pathName]);
