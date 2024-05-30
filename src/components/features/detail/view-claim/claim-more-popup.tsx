@@ -21,7 +21,6 @@ function ClaimMorePopup({
   visible,
   setVisible,
   tokenSymbol,
-  withdrawnAmount,
 }: {
   children: ReactNode;
   amount?: number;
@@ -30,11 +29,8 @@ function ClaimMorePopup({
   visible: boolean;
   setVisible: (_: boolean) => void;
   tokenSymbol: string;
-  withdrawnAmount: number;
 }) {
   const [amountToken, setAmountToken] = useState<number>(1);
-
-  const remainingToken = (amount || 0) - (withdrawnAmount || 0);
 
   const handleChangeAmountToken = useCallback((e: any) => {
     const value = e.target.value;
@@ -70,19 +66,11 @@ function ClaimMorePopup({
     if (amount && Number(amountToken) > amount) {
       return (
         <div className="text-red-500 text-sm">
-          You can&apos;t claim more than {amount} tokens.
+          You can&apos;t claim more than {Math.floor(Number(amount))} tokens.
         </div>
       );
     }
-
-    if (Number(amountToken) > (remainingToken || 0)) {
-      return (
-        <div className="text-red-500 text-sm">
-          You can&apos;t claim more than {amount} tokens.
-        </div>
-      );
-    }
-  }, [amountToken, amount, remainingToken]);
+  }, [amountToken, amount]);
 
   const validator = (cb: Function) => {
     if (!amountToken) {
@@ -102,15 +90,10 @@ function ClaimMorePopup({
         message: 'The number of tokens must be greater than 0!',
       });
     }
+
     if (amount && amountToken > amount) {
       return ShowAlert.error({
-        message: `You can't claim more than ${amount} tokens!`,
-      });
-    }
-
-    if (Number(amountToken) > (remainingToken || 0)) {
-      return ShowAlert.error({
-        message: `You can't claim more than ${amount} tokens!`,
+        message: `You can't claim more than ${Math.floor(Number(amount))} tokens!`,
       });
     }
 
@@ -149,7 +132,7 @@ function ClaimMorePopup({
             actionMore={{
               name: 'Max',
               onClick: () => {
-                setAmountToken(amount || 1);
+                setAmountToken(Math.floor(Number(amount || 1)));
               },
             }}
             className="pr-20"

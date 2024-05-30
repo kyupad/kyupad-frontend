@@ -69,7 +69,7 @@ function DetailController({
 
       {viewMode === 'snapshot' && <ViewSnapshot data={data} />}
       {viewMode === 'investment' && <ViewInvestment data={data} />}
-      {viewMode === 'claim' && <ViewClaim />}
+      {viewMode === 'claim' && <ViewClaim revalidatePath={revalidatePath} />}
     </div>
   );
 }
