@@ -198,10 +198,7 @@ function ViewClaim() {
 
       const withdrawStreamParams: IWithdrawData = {
         id: vestingPool.stream_id,
-        amount: getBN(
-          Math.floor(Number(amountToken)) / 10 ** decimals,
-          decimals,
-        ),
+        amount: getBN(Math.floor(Number(amountToken)), decimals),
       };
 
       const { txId } = await solanaClient.withdraw(withdrawStreamParams, {
@@ -406,7 +403,7 @@ function ViewClaim() {
           ) : (
             <h2 className="text-4xl font-bold text-kyu-color-17">
               Congrats! You are receiving{' '}
-              {vestingPool?.total_amount?.toLocaleString('en-US') || 0}{' '}
+              {projectVesting?.vesting_total?.toLocaleString('en-US') || 0}{' '}
               {projectVesting?.vesting_token_symbol?.toUpperCase() || ''}
             </h2>
           )}
@@ -474,8 +471,6 @@ function ViewClaim() {
           </div>
 
           <div className="flex justify-end gap-4 flex-wrap">
-            {renderClaimButton()}
-
             {vestingPool?.is_active && (
               <a
                 target="_blank"
@@ -487,6 +482,7 @@ function ViewClaim() {
                 </SecondaryButton>
               </a>
             )}
+            {renderClaimButton()}
           </div>
 
           <div className="flex gap-5 flex-col relative">
@@ -498,16 +494,7 @@ function ViewClaim() {
                 <Table parent="max-h-[690px]">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>
-                        <div className="flex items-center gap-2">
-                          <span>Date</span>
-                          {vestingPool?.vesting_schedule?.[0]?.is_cliff ? (
-                            <Badge>Cliff</Badge>
-                          ) : (
-                            ''
-                          )}
-                        </div>
-                      </TableHead>
+                      <TableHead>Date</TableHead>
                       <TableHead>Token Amount</TableHead>
                       <TableHead>Status</TableHead>
                     </TableRow>
@@ -517,11 +504,19 @@ function ViewClaim() {
                       (sc: any, index: number) => (
                         <TableRow key={index}>
                           <TableCell className="whitespace-nowrap">
-                            {sc?.vesting_time
-                              ? dayjs
-                                  .utc(sc.vesting_time)
-                                  .format(UTC_FORMAT_STRING)
-                              : ''}
+                            <div className="flex items-center gap-2">
+                              {sc?.vesting_time
+                                ? dayjs
+                                    .utc(sc.vesting_time)
+                                    .format(UTC_FORMAT_STRING)
+                                : ''}
+                              {index === 0 &&
+                              vestingPool?.vesting_schedule?.[0]?.is_cliff ? (
+                                <Badge>Cliff</Badge>
+                              ) : (
+                                ''
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell className="whitespace-nowrap">
                             {sc?.vesting_total?.toLocaleString('en-US') || 0}{' '}
