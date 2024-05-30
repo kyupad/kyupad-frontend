@@ -36,7 +36,7 @@ async function MyParticipations() {
         <p className="text-center font-heading text-4xl h-[400px]">No data!</p>
       )}
       {myParticipations && myParticipations?.length > 0 && (
-        <Table parent="max-w-[1080px] mx-auto py-[20px] max-h-[520px]">
+        <Table parent="max-w-[1080px] mx-auto py-[20px] max-h-[525px]">
           <TableBody>
             {myParticipations?.map((item: any) => {
               const statusColor =

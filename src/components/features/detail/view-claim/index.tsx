@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import { doGetMyVesting } from '@/adapters/projects';
 import { Badge } from '@/components/common/badge';
 import PrimaryButton from '@/components/common/button/primary';
-import SecondaryButton from '@/components/common/button/secondary';
 import Skeleton from '@/components/common/loading/skeleton';
 import {
   Table,
@@ -50,7 +49,7 @@ const solanaClient = new StreamflowSolana.SolanaStreamClient(
   env.NEXT_PUBLIC_NETWORK,
 );
 
-function ViewClaim() {
+function ViewClaim({ revalidatePath }: { revalidatePath: Function }) {
   const { slug } = useParams();
   const [loading, setLoading] = useState<boolean>(true);
   const [isClaiming, setIsClaiming] = useState<boolean>(false);
@@ -229,6 +228,7 @@ function ViewClaim() {
       });
 
       handleVisibleClaimPopup(false);
+      revalidatePath(window.location.pathname);
     } catch (e) {
       console.error(e);
       const error = e as Error;
@@ -250,6 +250,10 @@ function ViewClaim() {
   };
 
   const renderClaimButton = useCallback(() => {
+    if (loading) {
+      return <Skeleton className="h-[48px] w-[200px]" />;
+    }
+
     if (isNotStart) {
       return (
         <TooltipProvider delayDuration={0}>
@@ -370,22 +374,34 @@ function ViewClaim() {
         setVisible={handleVisibleClaimPopup}
         tokenSymbol={projectVesting?.vesting_token_symbol}
         handleClaim={handleClaim}
-        withdrawnAmount={withdrawnAmount[withdrawnAmountKey] || 0}
         loading={isClaiming}
       >
-        <PrimaryButton className="min-w-[200px]">Claim Now</PrimaryButton>
+        <div className="flex flex-col items-center gap-2">
+          <PrimaryButton className="min-w-[200px]">Claim Now</PrimaryButton>
+          {vestingPool?.is_active && (
+            <a
+              className="underline"
+              target="_blank"
+              rel="noreferrer noopener"
+              href={`https://app.streamflow.finance/contract/solana/${env.NEXT_PUBLIC_NETWORK}/${vestingPool?.stream_id || ''}`}
+            >
+              Claim with Streamflow
+            </a>
+          )}
+        </div>
       </ClaimMorePopup>
     );
   }, [
+    loading,
     isNotStart,
     isEnded,
     isClaimedPartial,
     isClaimed,
     vestingPool?.available_amount,
+    vestingPool?.is_active,
+    vestingPool?.stream_id,
     isVisibleClaimPopup,
     projectVesting?.vesting_token_symbol,
-    withdrawnAmount,
-    withdrawnAmountKey,
     isClaiming,
     isOpenClaimTooltip,
   ]);
@@ -471,17 +487,6 @@ function ViewClaim() {
           </div>
 
           <div className="flex justify-end gap-4 flex-wrap">
-            {vestingPool?.is_active && (
-              <a
-                target="_blank"
-                rel="noreferrer noopener"
-                href={`https://app.streamflow.finance/contract/solana/${env.NEXT_PUBLIC_NETWORK}/${vestingPool?.stream_id || ''}`}
-              >
-                <SecondaryButton className="min-w-[200px]">
-                  Claim with Streamflow
-                </SecondaryButton>
-              </a>
-            )}
             {renderClaimButton()}
           </div>
 
