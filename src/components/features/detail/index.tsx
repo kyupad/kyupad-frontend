@@ -18,6 +18,7 @@ interface IDetailControllerProps {
   doGetSignInData: Function;
   doVerifySignInWithSolana: Function;
   setCookie: Function;
+  notificationEmail?: string;
 }
 
 function DetailController({
@@ -28,6 +29,7 @@ function DetailController({
   doGetSignInData,
   doVerifySignInWithSolana,
   setCookie,
+  notificationEmail,
 }: IDetailControllerProps) {
   const viewMode = useProjectDetailStore((state) => state.viewMode);
   const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
@@ -57,6 +59,7 @@ function DetailController({
           doGetSignInData={doGetSignInData}
           doVerifySignInWithSolana={doVerifySignInWithSolana}
           setCookie={setCookie}
+          notificationEmail={notificationEmail}
         />
       )}
       {viewMode === 'registration' && (

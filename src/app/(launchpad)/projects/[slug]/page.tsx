@@ -16,7 +16,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
   const data = await doGetProjectDetail(slug);
 
   const detail = data?.data?.project;
-
+  const notificationEmail = data?.data?.notification_email;
   const is_applied = data?.data?.is_applied;
   const usersAssets = data?.data?.users_assets;
 
@@ -31,6 +31,7 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
         doGetSignInData={doGetSignInData}
         doVerifySignInWithSolana={doVerifySignInWithSolana}
         setCookie={setCookie}
+        notificationEmail={notificationEmail}
       />
     </div>
   );
