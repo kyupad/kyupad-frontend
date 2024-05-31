@@ -72,7 +72,10 @@ const doGetSuccessProjects = async (
   return data;
 };
 
-const doApplyProject = async (payload: { project_id: string }) => {
+const doApplyProject = async (payload: {
+  project_id: string;
+  notification_email?: string;
+}) => {
   const data = await request('POST', API_ROUTES.APPLY_PROJECT, payload);
   return data;
 };

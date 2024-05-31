@@ -6,8 +6,25 @@ import { doApplyProject } from '@/adapters/projects';
 import PrimaryButton from '@/components/common/button/primary';
 import SecondaryButton from '@/components/common/button/secondary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/common/dialog';
 import WalletConnect from '@/components/common/header/wallet-connect';
+import { Input } from '@/components/common/input';
 import { ShowAlert } from '@/components/common/toast';
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/common/tooltip';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
 import { THROW_EXCEPTION, UTC_FORMAT_STRING } from '@/utils/constants';
@@ -15,6 +32,8 @@ import { cn } from '@/utils/helpers';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import incomingStep from 'public/images/detail/incoming-step.svg';
+import infoIcon from 'public/images/detail/info-icon.svg';
+import { z } from 'zod';
 
 import currentStep from '/public/images/detail/current-step.svg';
 import stepDone from '/public/images/detail/step-done.svg';
@@ -73,6 +92,7 @@ function RegistrationStep({
   doGetSignInData,
   doVerifySignInWithSolana,
   setCookie,
+  notificationEmail,
 }: {
   data: any[];
   projectId: string;
@@ -81,6 +101,7 @@ function RegistrationStep({
   doGetSignInData: Function;
   doVerifySignInWithSolana: Function;
   setCookie: Function;
+  notificationEmail?: string;
 }) {
   const [activeStep] = useState<number>(getActiveStep(data));
   const [loading, setLoading] = useState<boolean>(false);
@@ -88,6 +109,26 @@ function RegistrationStep({
   const isSolanaConnected = useGlobalStore(
     (state) => state.is_solana_connected,
   );
+  const [isOpenRegisterTooltip, setOpenRegisterTooltip] =
+    useState<boolean>(false);
+  const [visibleRegisterEmailPopup, setVisibleRegisterEmailPopup] =
+    useState<boolean>(false);
+  const [email, setEmail] = useState<string>(notificationEmail || '');
+
+  const handleChangeEmail = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEmail(e.target.value);
+    },
+    [],
+  );
+
+  const handleOpenRegisterTooltip = useCallback((value: boolean) => {
+    setOpenRegisterTooltip(value);
+  }, []);
+
+  const handleSetVisibleRegisterEmailPopup = useCallback((value: boolean) => {
+    setVisibleRegisterEmailPopup(value);
+  }, []);
 
   const changeViewMode = useProjectDetailStore((state) => state.changeViewMode);
 
@@ -114,6 +155,50 @@ function RegistrationStep({
       break;
   }
 
+  const handleRegister = async (withEmail?: boolean) => {
+    if (!email) {
+      return ShowAlert.error({
+        message: 'Please enter your email!',
+      });
+    }
+
+    if (email && !z.string().email().safeParse(email).success) {
+      return ShowAlert.error({
+        message: 'Invalid email format!',
+      });
+    }
+
+    handleChangeLoading(true);
+
+    try {
+      const result = await doApplyProject({
+        project_id: projectId,
+        ...(withEmail ? { notification_email: email } : {}),
+      });
+
+      if (!result?.data) {
+        ShowAlert.error({ message: result?.message || '' });
+        return;
+      }
+      changeViewMode('registration');
+      setVisibleRegisterEmailPopup(false);
+      revalidatePath && revalidatePath(window.location.pathname);
+    } catch (e) {
+      console.error(e);
+      ShowAlert.error({
+        message: THROW_EXCEPTION.UNKNOWN_TRANSACTION,
+      });
+    } finally {
+      handleChangeLoading(false);
+    }
+  };
+
+  const renderError = useCallback(() => {
+    if (email && !z.string().email().safeParse(email).success) {
+      return <div className="text-red-500 text-sm">Invalid email format.</div>;
+    }
+  }, [email]);
+
   const renderStepButton = useCallback(() => {
     if (activeStep > 1 && !isApplied) {
       return <SecondaryButton disabled>Registration Ended</SecondaryButton>;
@@ -131,41 +216,133 @@ function RegistrationStep({
     }
 
     if (activeStep === 1 && !isApplied) {
+      if (dayjs.utc(data?.[0]?.start).isAfter(now)) {
+        return (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip open={isOpenRegisterTooltip}>
+              <TooltipTrigger asChild>
+                <div>
+                  <PrimaryButton
+                    disabled
+                    onTouchStart={() => {
+                      handleOpenRegisterTooltip(!isOpenRegisterTooltip);
+                    }}
+                    onMouseOver={() => {
+                      handleOpenRegisterTooltip(true);
+                    }}
+                    onMouseOut={() => {
+                      handleOpenRegisterTooltip(false);
+                    }}
+                    className="min-w-[200px]"
+                  >
+                    Register Now &nbsp;{' '}
+                    <Image src={infoIcon} alt="info" draggable={false} />
+                  </PrimaryButton>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[274px] px-5 py-4">
+                <p className="text-base font-medium text-justify">
+                  Please wait until register time!
+                </p>
+                <TooltipArrow fill="#8E8FA2" />
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      }
+
+      if (dayjs.utc(data?.[0]?.end).isBefore(now)) {
+        return (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip open={isOpenRegisterTooltip}>
+              <TooltipTrigger asChild>
+                <div>
+                  <PrimaryButton
+                    disabled
+                    onTouchStart={() => {
+                      handleOpenRegisterTooltip(!isOpenRegisterTooltip);
+                    }}
+                    onMouseOver={() => {
+                      handleOpenRegisterTooltip(true);
+                    }}
+                    onMouseOut={() => {
+                      handleOpenRegisterTooltip(false);
+                    }}
+                    className="min-w-[200px]"
+                  >
+                    Register Now &nbsp;{' '}
+                    <Image src={infoIcon} alt="info" draggable={false} />
+                  </PrimaryButton>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[274px] px-5 py-4">
+                <p className="text-base font-medium text-justify">
+                  Registration has ended!
+                </p>
+                <TooltipArrow fill="#8E8FA2" />
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      }
+
       return (
-        <PrimaryButton
-          loading={loading}
-          loadingText="Registering..."
-          className="min-w-[200px]"
-          disabled={
-            dayjs.utc(data?.[0]?.start).isAfter(now) ||
-            dayjs.utc(data?.[0]?.end).isBefore(now)
-          }
-          onClick={async () => {
-            handleChangeLoading(true);
-            try {
-              const result = await doApplyProject({
-                project_id: projectId,
-              });
-
-              if (!result?.data) {
-                ShowAlert.error({ message: result?.message || '' });
-                return;
-              }
-
-              changeViewMode('registration');
-              revalidatePath && revalidatePath(window.location.pathname);
-            } catch (e) {
-              console.error(e);
-              ShowAlert.error({
-                message: THROW_EXCEPTION.UNKNOWN_TRANSACTION,
-              });
-            } finally {
-              handleChangeLoading(false);
-            }
-          }}
+        <Dialog
+          open={visibleRegisterEmailPopup}
+          onOpenChange={handleSetVisibleRegisterEmailPopup}
         >
-          Register Now
-        </PrimaryButton>
+          <DialogTrigger asChild>
+            <div>
+              <PrimaryButton
+                loading={loading}
+                loadingText="Registering..."
+                className="min-w-[200px]"
+              >
+                Register Now
+              </PrimaryButton>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-kyu-color-13">
+                You are not register email !!
+              </DialogTitle>
+              <DialogDescription>
+                Enter email here to receive notification
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <Input
+                value={email}
+                label=""
+                type="email"
+                placeholder="example@gmail.com"
+                onChange={handleChangeEmail}
+              />
+
+              {renderError()}
+            </div>
+            <DialogFooter className="-mt-3">
+              <div className="flex flex-col w-full gap-2">
+                <PrimaryButton
+                  disabled={loading}
+                  loading={loading}
+                  block
+                  loadingText="Registering..."
+                  onClick={() => handleRegister(true)}
+                >
+                  Register
+                </PrimaryButton>
+                <button
+                  className="underline"
+                  onClick={() => handleRegister(false)}
+                >
+                  Register without email
+                </button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       );
     }
 
@@ -200,12 +377,13 @@ function RegistrationStep({
   }, [
     activeStep,
     data,
+    email,
     isApplied,
+    isOpenRegisterTooltip,
     isSolanaConnected,
     loading,
     now,
-    projectId,
-    revalidatePath,
+    visibleRegisterEmailPopup,
   ]);
 
   return (
