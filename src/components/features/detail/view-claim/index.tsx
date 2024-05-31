@@ -368,28 +368,28 @@ function ViewClaim({ revalidatePath }: { revalidatePath: Function }) {
     }
 
     return (
-      <ClaimMorePopup
-        amount={vestingPool?.available_amount || 0}
-        visible={isVisibleClaimPopup}
-        setVisible={handleVisibleClaimPopup}
-        tokenSymbol={projectVesting?.vesting_token_symbol}
-        handleClaim={handleClaim}
-        loading={isClaiming}
-      >
-        <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-2">
+        <ClaimMorePopup
+          amount={vestingPool?.available_amount || 0}
+          visible={isVisibleClaimPopup}
+          setVisible={handleVisibleClaimPopup}
+          tokenSymbol={projectVesting?.vesting_token_symbol}
+          handleClaim={handleClaim}
+          loading={isClaiming}
+        >
           <PrimaryButton className="min-w-[200px]">Claim Now</PrimaryButton>
-          {vestingPool?.is_active && (
-            <a
-              className="underline"
-              target="_blank"
-              rel="noreferrer noopener"
-              href={`https://app.streamflow.finance/contract/solana/${env.NEXT_PUBLIC_NETWORK}/${vestingPool?.stream_id || ''}`}
-            >
-              Claim with Streamflow
-            </a>
-          )}
-        </div>
-      </ClaimMorePopup>
+        </ClaimMorePopup>
+        {vestingPool?.is_active && (
+          <a
+            className="underline"
+            target="_blank"
+            rel="noreferrer noopener"
+            href={`https://app.streamflow.finance/contract/solana/${env.NEXT_PUBLIC_NETWORK}/${vestingPool?.stream_id || ''}`}
+          >
+            Claim with Streamflow
+          </a>
+        )}
+      </div>
     );
   }, [
     loading,

@@ -175,7 +175,7 @@ const PoolDetail = ({
                     ATH ROI
                   </span>
                   <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-                    57x
+                    {data?.ath_roi?.toUpperCase() || ''}
                   </span>
                 </div>
 
@@ -184,7 +184,7 @@ const PoolDetail = ({
                     Participants
                   </span>
                   <span className="text-button-primary-border font-bold text-lg sm:text-xl">
-                    5,683
+                    {data?.participants?.toLocaleString('en-US') || 0}
                   </span>
                 </div>
               </>

@@ -16,6 +16,7 @@ interface IRegistrationProps {
   doGetSignInData: Function;
   doVerifySignInWithSolana: Function;
   setCookie: Function;
+  notificationEmail?: string;
 }
 
 const Registation = ({
@@ -26,6 +27,7 @@ const Registation = ({
   doGetSignInData,
   doVerifySignInWithSolana,
   setCookie,
+  notificationEmail,
 }: IRegistrationProps) => {
   const dataStep = [
     {
@@ -66,6 +68,7 @@ const Registation = ({
           doGetSignInData={doGetSignInData}
           doVerifySignInWithSolana={doVerifySignInWithSolana}
           setCookie={setCookie}
+          notificationEmail={notificationEmail}
         />
 
         <div className="p-4 lg:p-10 border-2 border-kyu-color-11 rounded-[16px] bg-kyu-color-2 mt-5 flex flex-col gap-6">
