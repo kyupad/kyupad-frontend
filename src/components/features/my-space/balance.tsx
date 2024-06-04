@@ -84,7 +84,7 @@ function MySpaceBalance() {
           myAssets?.total_assets ? (
             `$${Big(myAssets.total_assets).toFixed(1)}`
           ) : (
-            0
+            `$0`
           )
         ) : (
           <Skeleton className="h-16 w-[320px]" />

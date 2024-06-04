@@ -3,6 +3,7 @@
 import React, { memo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useGlobalStore } from '@/contexts/global-store-provider';
 import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 import { env } from 'env.mjs';
@@ -17,6 +18,10 @@ function DesktopMenu() {
     }
   }, []);
 
+  const isSolanaConnected = useGlobalStore(
+    (state) => state.is_solana_connected,
+  );
+
   return (
     <nav className="flex gap-8 text-xl">
       {env.NEXT_PUBLIC_BASE_URL?.includes(host) && (
@@ -30,7 +35,7 @@ function DesktopMenu() {
           ></span>
         </Link>
       )}
-      {/* {isSolanaConnected && env.NEXT_PUBLIC_APP_URL?.includes(host) && (
+      {isSolanaConnected && env.NEXT_PUBLIC_APP_URL?.includes(host) && (
         <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
           My Space
           <span
@@ -40,7 +45,7 @@ function DesktopMenu() {
             )}
           ></span>
         </Link>
-      )} */}
+      )}
       {/* <Link href={WEB_ROUTES.CATNIP_POINTS} className="relative group">
         Catnip Points
         <span

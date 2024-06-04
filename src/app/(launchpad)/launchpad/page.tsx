@@ -1,8 +1,11 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
+import { revalidateCurrentPath } from '@/actions/common';
 import PrimaryButton from '@/components/common/button/primary';
-import Pool from '@/components/features/home/pool';
+import FurtureLaunch from '@/components/features/home/furture-launch';
+import SuccessLaunch from '@/components/features/home/success-launch';
+import UpcomingLaunch from '@/components/features/home/upcoming-launch';
 import { cn } from '@/utils/helpers';
 
 import catBanner from '/public/images/home/cat-banner.png';
@@ -20,7 +23,7 @@ const fontHeading = Knewave({
   weight: ['400'],
 });
 
-const Home = async () => {
+const Home = () => {
   return (
     <>
       <Image
@@ -67,14 +70,7 @@ const Home = async () => {
           </h3>
 
           <div className="py-5">
-            <Suspense fallback={null}>
-              <Pool
-                title="Fur-ture Launch"
-                active
-                mode="active"
-                direction="row"
-              />
-            </Suspense>
+            <FurtureLaunch revalidatePath={revalidateCurrentPath} />
           </div>
         </div>
 
@@ -88,9 +84,7 @@ const Home = async () => {
             draggable="false"
             className="top-[-40px] left-[40px] max-w-[100px] sm:max-w-[180px] sm:top-[-120px] sm:left-[80px] md:left-[30px] lg:max-w-[237px] lg:top-[-130px] lg:left-[-50px] xl:left-[120px] 2xl:left-[-80px] 2xl:top-[-140px] absolute -translate-x-1/2"
           />
-          <Suspense fallback={null}>
-            <Pool title="Upcoming Launches" mode="upcoming" upcoming />
-          </Suspense>
+          <UpcomingLaunch revalidatePath={revalidateCurrentPath} />
         </div>
 
         <div className="relative w-full">
@@ -103,9 +97,7 @@ const Home = async () => {
             draggable="false"
             className="right-[-475px] top-[-100px] max-w-[403px] absolute"
           />
-          <Suspense fallback={null}>
-            <Pool paging title="Success-fur Launches" mode="success" />
-          </Suspense>
+          <SuccessLaunch />
         </div>
 
         <div className="flex flex-col gap-8 items-center">
