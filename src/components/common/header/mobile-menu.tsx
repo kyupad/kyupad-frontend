@@ -1,7 +1,8 @@
-import React, { memo } from 'react';
+'use client';
+
+import React, { memo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { revalidateProjectDetail } from '@/actions/project';
 import { WEB_ROUTES } from '@/utils/constants';
 import { env } from 'env.mjs';
 import PrimaryButton from '@components/common/button/primary';
@@ -26,6 +27,14 @@ function MobileMenu({
   doVerifySignInWithSolana: Function;
   setCookie: Function;
 }) {
+  const [host, setHost] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setHost(window.location.host || null);
+    }
+  }, []);
+
   return (
     <div>
       <Sheet>
@@ -46,14 +55,21 @@ function MobileMenu({
           </SheetHeader>
           <div className="grid gap-8 py-4">
             <nav className="flex gap-8 text-xl flex-col">
-              <Link href={WEB_ROUTES.WHITELIST_PASS} className="relative group">
-                Mint NFT
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-              </Link>
-              {/* <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
-                My Space
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-              </Link> */}
+              {env.NEXT_PUBLIC_BASE_URL?.includes(host) && (
+                <Link
+                  href={WEB_ROUTES.WHITELIST_PASS}
+                  className="relative group"
+                >
+                  Mint NFT
+                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
+                </Link>
+              )}
+              {/* {isSolanaConnected && env.NEXT_PUBLIC_APP_URL?.includes(host) && (
+                <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
+                  My Space
+                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
+                </Link>
+              )} */}
               {/* <Link href={WEB_ROUTES.HOME} className="relative group">
                 Catnip Points
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
@@ -72,7 +88,7 @@ function MobileMenu({
               doGetSignInData={doGetSignInData}
               doVerifySignInWithSolana={doVerifySignInWithSolana}
               setCookie={setCookie}
-              revalidatePath={revalidateProjectDetail}
+              revalidatePath={() => {}}
             />
 
             <div className="flex gap-3">

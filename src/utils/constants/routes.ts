@@ -24,6 +24,7 @@ const WEB_ROUTES = {
   PROJECTS: '/projects',
   PROJECT_DETAIL: '/projects/[id]',
   HOW_TO_JOIN_OUR_IDOS: '/how-to-join-our-idos',
+  APP: '/launchpad',
 };
 
 export { API_ROUTES, WEB_ROUTES };
