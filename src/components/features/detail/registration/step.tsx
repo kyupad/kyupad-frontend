@@ -156,13 +156,13 @@ function RegistrationStep({
   }
 
   const handleRegister = async (withEmail?: boolean) => {
-    if (!email) {
+    if (!email && withEmail) {
       return ShowAlert.error({
         message: 'Please enter your email!',
       });
     }
 
-    if (email && !z.string().email().safeParse(email).success) {
+    if (email && withEmail && !z.string().email().safeParse(email).success) {
       return ShowAlert.error({
         message: 'Invalid email format!',
       });
