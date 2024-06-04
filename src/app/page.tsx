@@ -1,7 +1,7 @@
 import React from 'react';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
-import Link from 'next/link';
+// import Link from 'next/link';
 import BottomTopAnimation from '@/components/common/animation/bottom-top';
 import { MotionDiv } from '@/components/common/animation/motion-animation';
 import ScaleAnimation from '@/components/common/animation/scale';
@@ -104,9 +104,11 @@ const Home = () => {
               </BottomTopAnimation>
               <div className="flex justify-center sm:justify-start">
                 <BottomTopAnimation delay={1}>
-                  <Link href={env.NEXT_PUBLIC_APP_URL} target="_blank">
-                    <PrimaryButton>Apply for launchpad</PrimaryButton>
-                  </Link>
+                  {/* <Link href={env.NEXT_PUBLIC_APP_URL} target="_blank"> */}
+                  <PrimaryButton disabled>
+                    Apply for launchpad (Coming Soon)
+                  </PrimaryButton>
+                  {/* </Link> */}
                 </BottomTopAnimation>
               </div>
             </div>

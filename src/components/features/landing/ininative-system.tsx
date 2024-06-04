@@ -24,7 +24,7 @@ const IninativeSystem = (props: any) => {
             >
               <Image
                 src={props.nftPass}
-                className="lg:max-w-[400px]"
+                className="lg:max-w-[400px] cursor-pointer"
                 alt="nft pass"
               />
               <h3 className="md:text-3xl text-xl font-bold text-center py-4">
@@ -41,7 +41,7 @@ const IninativeSystem = (props: any) => {
             >
               <Image
                 src={props.multiSystem}
-                className="lg:max-w-[400px]"
+                className="lg:max-w-[400px] cursor-pointer"
                 alt="multi system"
               />
               <h3 className="md:text-3xl text-xl font-bold text-center py-4">
