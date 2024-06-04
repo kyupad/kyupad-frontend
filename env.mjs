@@ -36,6 +36,8 @@ const env = createEnv({
     NEXT_PUBLIC_SENTRY_PROJECT: z.string().min(1).nullish(),
     NEXT_PUBLIC_AWS_S3_BUCKET_URL: z.string().min(1).includes('http').nullish(),
     NEXT_PUBLIC_DEBUG: z.string().nullish(),
+    NEXT_PUBLIC_PARTNER_LENGTH: z.string().min(1).default(11),
+    NEXT_PUBLIC_APP_URL: z.string().min(1).includes('http'),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -67,6 +69,8 @@ const env = createEnv({
     NEXT_PUBLIC_SENTRY_PROJECT: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
     NEXT_PUBLIC_AWS_S3_BUCKET_URL: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_URL,
     NEXT_PUBLIC_DEBUG: process.env.NEXT_PUBLIC_DEBUG,
+    NEXT_PUBLIC_PARTNER_LENGTH: process.env.NEXT_PUBLIC_PARTNER_LENGTH,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
 });
 
