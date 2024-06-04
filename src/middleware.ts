@@ -11,7 +11,10 @@ export function middleware(request: NextRequest) {
   const searchParam = url.search;
   const fullPath = pathName + searchParam;
 
-  if (env.NEXT_PUBLIC_APP_URL?.includes(hostname)) {
+  if (
+    env.NEXT_PUBLIC_APP_URL?.replace('https://', '')?.replace('http://', '') ===
+    hostname
+  ) {
     if (pathName === WEB_ROUTES.HOME) {
       return NextResponse.rewrite(
         new URL(WEB_ROUTES.APP + fullPath, request.url),
@@ -29,25 +32,23 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(WEB_ROUTES.NOTFOUND, request.url));
   }
 
-  if (env.NEXT_PUBLIC_BASE_URL?.includes(hostname)) {
-    if (pathName === WEB_ROUTES.HOME) {
-      return NextResponse.rewrite(new URL(fullPath, request.url));
-    }
-
-    if (pathName === WEB_ROUTES.APP) {
-      return NextResponse.rewrite(new URL(WEB_ROUTES.NOTFOUND, request.url));
-    }
-
-    if (pathName?.includes(`${WEB_ROUTES.PROJECTS}/`)) {
-      return NextResponse.rewrite(new URL(WEB_ROUTES.NOTFOUND, request.url));
-    }
-
-    if (pathName === WEB_ROUTES.MY_SPACE) {
-      return NextResponse.rewrite(new URL(WEB_ROUTES.NOTFOUND, request.url));
-    }
-
-    return;
+  if (pathName === WEB_ROUTES.HOME) {
+    return NextResponse.rewrite(new URL(fullPath, request.url));
   }
+
+  if (pathName === WEB_ROUTES.APP) {
+    return NextResponse.rewrite(new URL(WEB_ROUTES.NOTFOUND, request.url));
+  }
+
+  if (pathName?.includes(`${WEB_ROUTES.PROJECTS}/`)) {
+    return NextResponse.rewrite(new URL(WEB_ROUTES.NOTFOUND, request.url));
+  }
+
+  if (pathName === WEB_ROUTES.MY_SPACE) {
+    return NextResponse.rewrite(new URL(WEB_ROUTES.NOTFOUND, request.url));
+  }
+
+  return;
 }
 
 // eslint-disable-next-line import/no-unused-modules
