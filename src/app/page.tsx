@@ -3,7 +3,7 @@ import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import PrimaryButton from '@/components/common/button/primary';
-import Pool from '@/components/features/landing/pool';
+import Pool from '@/components/features/home/pool';
 import { WEB_ROUTES } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
 
@@ -72,12 +72,7 @@ const Home = async () => {
 
           <div className="py-5">
             <Suspense fallback={null}>
-              <Pool
-                title="Fur-ture Launch"
-                active
-                mode="active"
-                direction="row"
-              />
+              <Pool title="Fur-ture Launch" mode="active" direction="row" />
             </Suspense>
           </div>
         </div>
@@ -108,7 +103,7 @@ const Home = async () => {
             className="right-[-475px] top-[-100px] max-w-[403px] absolute"
           />
           <Suspense fallback={null}>
-            <Pool paging title="Success-fur Launches" mode="success" />
+            <Pool title="Success-fur Launches" mode="success" />
           </Suspense>
         </div>
 

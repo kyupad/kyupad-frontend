@@ -110,6 +110,10 @@ const theme = {
     maxWidth: {
       '8xl': '1440px',
     },
+    backgroundImage: {
+      'golden-cloud': "url('/images/home/golden-cloud.png')",
+      'light-blue-cloud': "url('/images/home/kyupad-bg-home.png')",
+    },
   },
 };
 const plugins = [require('tailwindcss-animate')];
