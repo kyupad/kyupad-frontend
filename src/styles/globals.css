@@ -135,7 +135,7 @@
   -ms-text-fill-color: #fabf52;
 }
 
-@media screen and (width >= 640px) {
+@media screen and (width >=640px) {
   .text-shadow-primary-mobile {
     -webkit-text-stroke: 3px var(--kyu-color-10) !important;
     -moz-text-stroke: 3px var(--kyu-color-10) !important;
