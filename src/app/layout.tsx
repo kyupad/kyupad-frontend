@@ -45,7 +45,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                 <WebVitals />
                 <NextTopLoader color="#f2820e" />
                 <Header />
-                <main className="overflow-hidden relative">{children}</main>
+                <main className="overflow-hidden relative  pt-[40px] md:pt-[80px]">
+                  {children}
+                </main>
                 <Footer />
                 <SonnerToaster position="top-right" closeButton />
                 <Ribbon />
