@@ -3,9 +3,9 @@ import { Knewave } from 'next/font/google';
 import Image from 'next/image';
 import { revalidateCurrentPath } from '@/actions/common';
 import PrimaryButton from '@/components/common/button/primary';
-import FurtureLaunch from '@/components/features/landing/furture-launch';
-import SuccessLaunch from '@/components/features/landing/success-launch';
-import UpcomingLaunch from '@/components/features/landing/upcoming-launch';
+import FurtureLaunch from '@/components/features/home/furture-launch';
+import SuccessLaunch from '@/components/features/home/success-launch';
+import UpcomingLaunch from '@/components/features/home/upcoming-launch';
 import { cn } from '@/utils/helpers';
 
 import catBanner from '/public/images/home/cat-banner.png';
