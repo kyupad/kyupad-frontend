@@ -7,6 +7,7 @@ import { KyupadIdo } from '@/anchor/kyupad_ido';
 import PrimaryButton from '@/components/common/button/primary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
 import Skeleton from '@/components/common/loading/skeleton';
+import { Progress } from '@/components/common/progress/progress';
 import { ShowAlert } from '@/components/common/toast';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
@@ -71,6 +72,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     merkle_proof?: string;
     is_active?: boolean;
     is_invested?: boolean;
+    total_invested?: number;
   }>({});
   const [projectInfo, setProjectInfo] = useState<{
     _id: string;
@@ -591,69 +593,92 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
 
           {renderInvestDescription()}
 
-          {!isNotWinner && (
-            <div className="p-4 lg:p-10 bg-kyu-color-12 border-2 border-kyu-color-10 rounded-[16px] flex gap-4 flex-col lg:max-w-[704px]">
-              <div className="flex gap-4 justify-between items-center">
-                <span className="text-xl">Number of winning tickets</span>
-                <span className="text-2xl font-bold text-kyu-color-13">
-                  {investmentInfo?.total_owner_winning_tickets
-                    ? investmentInfo?.total_owner_winning_tickets < 10
-                      ? `0${investmentInfo?.total_owner_winning_tickets}`
-                      : investmentInfo?.total_owner_winning_tickets
-                    : 0}
+          {loading ? (
+            <Skeleton className="h-[40px] w-full" />
+          ) : (
+            !isNotWinner && (
+              <div className="relative mt-8 mb-3">
+                <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
+                  <span className="text-kyu-color-14 font-medium">
+                    Invested:
+                  </span>{' '}
+                  {investmentInfo?.total_invested?.toLocaleString('en-US') || 0}
                 </span>
-              </div>
-              <div className="flex gap-4 justify-between items-center">
-                <span className="text-xl">Number of invested tickets</span>
-                <span className="text-2xl font-bold text-kyu-color-5">
-                  {investedTickets[investedTicketsKey] || 0
-                    ? investedTickets[investedTicketsKey] < 10
-                      ? `0${investedTickets[investedTicketsKey]}`
-                      : investedTickets[investedTicketsKey]
-                    : 0}
-                </span>
-              </div>
-
-              <div className="flex gap-4 justify-between items-center">
-                <span className="text-xl">Ticket size</span>
-                <span className="text-2xl font-bold text-kyu-color-13">
-                  {investmentInfo?.ticket_size || 0}{' '}
-                  {investmentInfo?.currency?.toUpperCase() || ''}
-                </span>
-              </div>
-
-              <div className="h-[2px] bg-kyu-color-10" />
-
-              <div className="flex gap-4 justify-between items-center">
-                <span className="text-xl">Total Winners</span>
-                <span className="text-2xl font-bold">
-                  {investmentInfo?.total_winner?.toLocaleString('en-US') || 0}
-                </span>
-              </div>
-
-              <div className="flex gap-4 justify-between items-center">
-                <span className="text-xl">Total ticket</span>
-                <span className="text-2xl font-bold">
+                <Progress className="rounded-[100px]" value={80} />
+                <span className="absolute right-0 -top-8 font-bold text-kyu-color-11">
+                  <span className="text-kyu-color-14 font-medium">Total:</span>{' '}
                   {investmentInfo?.token_offered?.toLocaleString('en-US') || 0}
                 </span>
               </div>
-            </div>
+            )
           )}
 
-          {!isNotWinner && (
-            <div className="flex gap-4 md:gap-8 items-center flex-wrap">
-              <div className="text-2xl font-bold">Investment Ends in</div>
-              {dayjs.utc(data?.timeline?.investment_end_at).isAfter(now) ? (
-                <SimpleCountdown
-                  className="!text-xl md:!text-2xl"
-                  time={dayjs.utc(data?.timeline?.investment_end_at).valueOf()}
-                />
-              ) : (
-                <span className="font-bold text-2xl text-kyu-color-18">
-                  Ended
-                </span>
-              )}
-            </div>
+          {loading ? (
+            <Skeleton className="h-[278px] w-full rounded-[16px]" />
+          ) : (
+            !isNotWinner && (
+              <div className="p-4 lg:p-10 bg-kyu-color-12 border-2 border-kyu-color-10 rounded-[16px] flex gap-4 flex-col lg:max-w-[704px]">
+                <div className="flex gap-4 justify-between items-center">
+                  <span className="text-xl">My winning tickets</span>
+                  <span className="text-2xl font-bold text-kyu-color-13">
+                    {investmentInfo?.total_owner_winning_tickets
+                      ? investmentInfo?.total_owner_winning_tickets < 10
+                        ? `0${investmentInfo?.total_owner_winning_tickets}`
+                        : investmentInfo?.total_owner_winning_tickets
+                      : 0}
+                  </span>
+                </div>
+                <div className="flex gap-4 justify-between items-center">
+                  <span className="text-xl">My invested tickets</span>
+                  <span className="text-2xl font-bold text-kyu-color-5">
+                    {investedTickets[investedTicketsKey] || 0
+                      ? investedTickets[investedTicketsKey] < 10
+                        ? `0${investedTickets[investedTicketsKey]}`
+                        : investedTickets[investedTicketsKey]
+                      : 0}
+                  </span>
+                </div>
+
+                <div className="flex gap-4 justify-between items-center">
+                  <span className="text-xl">Ticket size</span>
+                  <span className="text-2xl font-bold text-kyu-color-13">
+                    {investmentInfo?.ticket_size || 0}{' '}
+                    {investmentInfo?.currency?.toUpperCase() || ''}
+                  </span>
+                </div>
+
+                <div className="h-[2px] bg-kyu-color-10" />
+
+                <div className="flex gap-4 justify-between items-center">
+                  <span className="text-xl">Total Winners</span>
+                  <span className="text-2xl font-bold">
+                    {investmentInfo?.total_winner?.toLocaleString('en-US') || 0}
+                  </span>
+                </div>
+              </div>
+            )
+          )}
+
+          {loading ? (
+            <Skeleton className="h-[32px] w-full max-w-[400px]" />
+          ) : (
+            !isNotWinner && (
+              <div className="flex gap-4 md:gap-8 items-center flex-wrap">
+                <div className="text-2xl font-bold">Investment Ends in</div>
+                {dayjs.utc(data?.timeline?.investment_end_at).isAfter(now) ? (
+                  <SimpleCountdown
+                    className="!text-xl md:!text-2xl"
+                    time={dayjs
+                      .utc(data?.timeline?.investment_end_at)
+                      .valueOf()}
+                  />
+                ) : (
+                  <span className="font-bold text-2xl text-kyu-color-18">
+                    Ended
+                  </span>
+                )}
+              </div>
+            )
           )}
 
           <div>{renderInvestButton()}</div>
