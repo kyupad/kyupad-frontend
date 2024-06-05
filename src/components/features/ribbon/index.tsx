@@ -27,7 +27,7 @@ function Ribbon() {
   return (
     <>
       {env && (
-        <div className="fixed left-0 top-0 h-16 w-16">
+        <div className="fixed left-0 top-0 h-16 w-16 z-10">
           <div className="absolute transform -rotate-45 bg-kyu-color-4 text-center text-kyu-color-10 font-bold py-1 left-[-50px] top-[20px] w-[170px] font-sans shadow">
             {env}
           </div>

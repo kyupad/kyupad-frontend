@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const BottomTopAnimation = ({
   children,
@@ -13,15 +13,16 @@ const BottomTopAnimation = ({
   className?: string;
 }) => {
   return (
-    <motion.div
+    <m.div
       className={className}
       initial={{ opacity: 0, y: 100 }}
       transition={{ duration: 0.5, delay: delay ?? 0 }}
       whileInView={{ y: 0, opacity: 1 }}
       viewport={{ once: true }}
+      style={{ willChange: 'opacity, transform' }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 };
 

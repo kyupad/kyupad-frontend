@@ -101,7 +101,12 @@ const Slide = ({
                 paginate(-1);
               }
             }}
-            style={{ position: 'absolute', width: '100%', padding: '10px' }}
+            style={{
+              position: 'absolute',
+              width: '100%',
+              padding: '10px',
+              willChange: 'transform, opacity',
+            }}
           >
             {children[page]}
           </motion.div>

@@ -21,7 +21,7 @@ const WalletConnect = dynamic(() => import('./wallet-connect'), {
 
 const Header = () => {
   return (
-    <header className="absolute z-20 bg-transparent top-0 left-0 w-full">
+    <header className="absolute z-[1] bg-transparent top-0 left-0 w-full">
       <div className="flex w-full max-w-8xl mx-auto justify-between px-4 lg:px-[60px] py-5 flex-wrap gap-8">
         <div className="max-w-[144px] min-w-[144px]">
           <Link href={WEB_ROUTES.HOME}>
