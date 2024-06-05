@@ -45,7 +45,7 @@ const IninativeSystem = (props: any) => {
                 alt="multi system"
               />
               <h3 className="md:text-3xl text-xl font-bold text-center py-4">
-                Multi-system
+                Multiplier System
               </h3>
             </MotionDiv>
           </>
