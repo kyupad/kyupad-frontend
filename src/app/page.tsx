@@ -90,7 +90,7 @@ const PartnersData = [
     url: 'https://x.com/KaminoFinance',
   },
   {
-    title: 'SuperteamDao',
+    title: 'SuperteamDAO',
     image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_2.jpg`,
     url: 'https://x.com/SuperteamDao',
   },
@@ -316,7 +316,7 @@ const Home = () => {
               </div>
               <div className="text-sm text-kyu-color-8 font-bold sm:text-xl text-center">
                 The most user-friendly method to join an IDO. No staking or
-                entry-threshold!
+                entry-threshold required!
               </div>
               <div className="w-fit mt-8 sm:gap-10 flex  flex-wrap xl:flex-nowrap justify-center">
                 {stepData.map((step, index) => (
@@ -356,7 +356,7 @@ const Home = () => {
         </div>
         <div className="px-4 -translate-y-32 sm:-translate-y-56 lg:-translate-y-80">
           <h2 className="text-2xl sm:text-3xl lg:text-5xl font-heading text-center sm:mt-[2vh] py-4">
-            Our Iniatives System{' '}
+            Our Initiatives System{' '}
           </h2>
           <div className="text-sm text-kyu-color-8 font-bold sm:text-xl text-center">
             Give rewards to Solana contributors
