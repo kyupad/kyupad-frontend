@@ -63,7 +63,7 @@ const IninativeSystem = (props: any) => {
                 <Image
                   src={multiSystemOver}
                   alt="multisystem"
-                  className="h-auto object-contain w-auto mx-auto max-h-[467px]"
+                  className="h-auto object-contain w-auto mx-auto max-h-[467px] cursor-pointer"
                   onClick={() => setType('')}
                   onMouseOut={() => setType('')}
                 />
@@ -80,7 +80,7 @@ const IninativeSystem = (props: any) => {
                 <Image
                   src={nftPassOpen}
                   alt="nftpass"
-                  className="h-auto object-contain w-auto mx-auto"
+                  className="h-auto object-contain w-auto mx-auto max-h-[467px] cursor-pointer"
                   onClick={() => setType('')}
                   onMouseOut={() => setType('')}
                 />

@@ -1,11 +1,17 @@
 import React from 'react';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
-// import Link from 'next/link';
 import BottomTopAnimation from '@/components/common/animation/bottom-top';
+import LazyAnimation from '@/components/common/animation/lazy-animation';
 import { MotionDiv } from '@/components/common/animation/motion-animation';
 import ScaleAnimation from '@/components/common/animation/scale';
 import PrimaryButton from '@/components/common/button/primary';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/common/tooltip';
 import ChooseWinner from '@/components/features/landing/choose-winners';
 import IninativeSystem from '@/components/features/landing/ininative-system';
 import { cn } from '@/utils/helpers';
@@ -47,14 +53,13 @@ const stepData = [
   },
   {
     step: 'Step 3',
-    title: 'KYC',
-    description: 'You only need to KYC if you win an allocation',
+    title: 'Invest',
+    description: 'Deposit crypto to buy your winning allocation',
   },
   {
     step: 'Step 4',
-    title: 'Invest',
-    description:
-      'Deposit crypto to buy your winning sale, claim your token upon TGE',
+    title: 'Claim',
+    description: 'Claim your token based on the vesting period',
   },
 ];
 const chooseWinnerData = [
@@ -62,25 +67,83 @@ const chooseWinnerData = [
     title: 'Wallet snapshot',
     image: guard,
     description:
-      'All whitelisted assets will be snapshot. Staked or lended assets will also be counted.',
+      'All whitelisted assets will be snapshot. Staked assets will also be counted.',
   },
   {
     title: 'Catnip Point Calculating',
     image: caculator,
     description:
-      'All whitelisted assets will be snapshot. Staked or lended assets will also be counted.',
+      'This point shows how much you contributed to the Solana ecosystem.',
   },
   {
     title: 'Ranking & Raffling',
     image: tropical,
     description:
-      'All whitelisted assets will be snapshot. Staked or lended assets will also be counted.',
+      'The higher your point, the higher the chance you can win an allocation.',
+  },
+];
+
+const PartnersData = [
+  {
+    title: 'Kamino',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_1.jpg`,
+    url: 'https://x.com/KaminoFinance',
+  },
+  {
+    title: 'SuperteamDao',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_2.jpg`,
+    url: 'https://x.com/SuperteamDao',
+  },
+  {
+    title: 'Pesky Penguins',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_3.jpg`,
+    url: 'https://x.com/PeskyPenguins',
+  },
+  {
+    title: 'SharkyFi',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_4.jpg`,
+    url: 'https://x.com/SharkyFi',
+  },
+  {
+    title: 'Meegos',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_5.jpg`,
+    url: 'https://x.com/MeegosNFT',
+  },
+  {
+    title: 'Blocksmith Labs',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_6.jpg`,
+    url: 'https://x.com/BlocksmithLabs',
+  },
+  {
+    title: 'Claynosaurz',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_7.jpg`,
+    url: 'https://x.com/Claynosaurz',
+  },
+  {
+    title: 'Asset Dash',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_8.jpg`,
+    url: 'https://x.com/assetdash',
+  },
+  {
+    title: 'Bonfida',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_9.jpg`,
+    url: 'https://x.com/bonfida',
+  },
+  {
+    title: 'MonkeDAO',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_10.jpg`,
+    url: 'https://x.com/MonkeDAO',
+  },
+  {
+    title: 'Pyth',
+    image: `${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_11.jpg`,
+    url: 'https://x.com/PythNetwork',
   },
 ];
 
 const Home = () => {
   return (
-    <>
+    <LazyAnimation>
       <div
         className={cn(
           'max-w-8xl  mx-auto flex flex-col items-center mt-[-40px] md:mt-[-70px]  lg:px-[60px] gap-2 sm:gap-[100px]',
@@ -104,37 +167,68 @@ const Home = () => {
               </BottomTopAnimation>
               <div className="flex justify-center sm:justify-start">
                 <BottomTopAnimation delay={1}>
-                  {/* <Link href={env.NEXT_PUBLIC_APP_URL} target="_blank"> */}
                   <PrimaryButton disabled>
-                    Apply for launchpad (Coming Soon)
+                    <div className="flex flex-col gapY-3">
+                      Apply for launchpad{' '}
+                      <span className="text-sm">(Coming Soon)</span>
+                    </div>
                   </PrimaryButton>
-                  {/* </Link> */}
                 </BottomTopAnimation>
               </div>
             </div>
             <div className="flex sm:w-2/4 relative ml-[12vw]">
               <MotionDiv
-                className="absolute -left-11 sm:-left-28 md:-left-32 xl:-left-52  z-20"
-                initial={{ x: 100, rotate: -45, opacity: 0 }}
-                animate={{ x: 0, rotate: 0, opacity: 1 }}
-                transition={{ duration: 2 }}
+                className="absolute -left-11 sm:-left-28 md:-left-32 lg:-left-40 lg:top-0  xl:-left-36 xl:top-10  z-[-1]"
+                style={{ willChange: 'opacity, transform' }}
+                variants={{
+                  initial: { opacity: 0 },
+                  launch: {
+                    x: [100, -10, -300],
+                    y: [50, -10, -200],
+                    opacity: [0, 0.5, 1, 1, 0.9, 0.8, 0.5, 0.25, 0],
+                    transition: {
+                      duration: 8,
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                    },
+                  },
+                }}
+                initial="initial"
+                animate="launch"
               >
                 <Image
                   src={kyupadHeartSpace}
-                  className="h-[25vw] w-auto object-contain sm:h-[180px] lg:h-[240px] xl:h-[40vh]"
+                  className="h-[25vw] w-auto object-contain sm:h-[180px] lg:h-[250px] xl:h-[33vh]"
                   alt="kyupad meow rocket"
                 />
               </MotionDiv>
+
               <MotionDiv
                 initial={{ x: 100, rotate: 45, opacity: 0 }}
                 animate={{ x: 0, rotate: 0, opacity: 1 }}
                 transition={{ duration: 2 }}
+                style={{ willChange: 'opacity, transform' }}
               >
-                <Image
-                  src={kyupadMeowSpace}
-                  className="h-[50vw] w-auto object-cover xl:h-[70vh]"
-                  alt="kyupad meow rocket"
-                />
+                <MotionDiv
+                  variants={{
+                    shake: {
+                      rotate: [0, -5, 5, -5, 5, 0],
+                      transition: {
+                        duration: 6,
+                        ease: 'linear',
+                        repeat: Infinity,
+                        delay: 3,
+                      },
+                    },
+                  }}
+                  animate="shake"
+                >
+                  <Image
+                    src={kyupadMeowSpace}
+                    className="h-[50vw] w-auto object-cover md:h-[40vh] lg:h-[60vh] xl:h-[70vh]"
+                    alt="kyupad meow rocket"
+                  />
+                </MotionDiv>
               </MotionDiv>
             </div>
           </div>
@@ -279,20 +373,29 @@ const Home = () => {
             Our Partners
           </h2>
           <div className="flex gap-x-9 py-5 items-center gap-y-5 flex-wrap justify-center">
-            {Array.from(
-              { length: env.NEXT_PUBLIC_PARTNER_LENGTH },
-              (_, index) => (
-                <BottomTopAnimation delay={index * 0.15} key={index}>
-                  <Image
-                    src={`${env.NEXT_PUBLIC_AWS_S3_BUCKET_URL}/public/images/landing/community/community_${index + 1}.jpg`}
-                    width={56}
-                    height={56}
-                    alt="logo"
-                    className="duration-500 mt-5 max-w-16 w-auto rounded-full shadow-[4px_3px_2px_2px_rgba(0,0,0,0.1)] hover:shadow-[0px_30px_25px_-20px_rgba(0,0,0,1)] hover:-translate-y-4"
-                  />
-                </BottomTopAnimation>
-              ),
-            )}
+            {PartnersData.map((item, index) => (
+              <BottomTopAnimation delay={index * 0.15} key={index}>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a href={item.url} target="_blank">
+                        {' '}
+                        <Image
+                          src={item.image}
+                          width={56}
+                          height={56}
+                          alt="logo"
+                          className="duration-500 mt-5 max-w-16 w-auto rounded-full shadow-[4px_3px_2px_2px_rgba(0,0,0,0.1)] hover:shadow-[0px_30px_25px_-20px_rgba(0,0,0,1)] hover:-translate-y-4"
+                        />
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent className="mb-5">
+                      <div className="text-center">{item.title}</div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </BottomTopAnimation>
+            ))}
           </div>
         </div>
       </div>
@@ -302,7 +405,7 @@ const Home = () => {
         className="mx-auto 2xl:-mt-16 w-full"
         draggable={false}
       />
-    </>
+    </LazyAnimation>
   );
 };
 
