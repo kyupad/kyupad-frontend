@@ -906,14 +906,17 @@ function ExclusivePool({
                     handleChangePoolId(pool?.pool_id);
                   }}
                   className={cn(
-                    'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap active-pool-item',
+                    'py-3 px-4 rounded-[8px] text-xl font-bold text-nowrap whitespace-nowrap text-ellipsis active-pool-item',
                     (currentPoolId || currentPool?.pool_id) === pool?.pool_id
                       ? 'bg-kyu-color-16 border-kyu-color-11 border-2'
                       : 'text-[#8E8FA2]',
                   )}
                   key={pool?.pool_id}
+                  title={pool?.pool_name || ''}
                 >
-                  {pool?.pool_name}
+                  {pool?.pool_name?.length > 16
+                    ? pool?.pool_name?.slice(0, 16) + '...'
+                    : pool?.pool_name || ''}
                 </button>
               );
             })}
@@ -939,7 +942,7 @@ function ExclusivePool({
         </div>
 
         <div
-          className="p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10"
+          className="p-4 sm:p-10 bg-kyu-color-16 rounded-[16px] flex flex-col gap-10"
           id="mint-pool"
         >
           <div className="flex justify-center gap-10 items-center flex-col lg:flex-row">
