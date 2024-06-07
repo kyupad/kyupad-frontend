@@ -7,7 +7,6 @@ import { KyupadIdo } from '@/anchor/kyupad_ido';
 import PrimaryButton from '@/components/common/button/primary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
 import Skeleton from '@/components/common/loading/skeleton';
-import { Progress } from '@/components/common/progress/progress';
 import { ShowAlert } from '@/components/common/toast';
 import { useGlobalStore } from '@/contexts/global-store-provider';
 import { useProjectDetailStore } from '@/contexts/project-detail-store-provider';
@@ -45,6 +44,7 @@ import IDL from 'src/anchor/kyupad_ido.json';
 
 import Back from '../back';
 import InvestMorePopup from './invest-more-popup';
+import InvestingStatus from './investing-status';
 import lossTicketDecor from '/public/images/detail/loss-ticket-decor.svg';
 import lossTicket from '/public/images/detail/loss-ticket.png';
 import wonTicketDecor from '/public/images/detail/won-ticket-decor.svg';
@@ -73,6 +73,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
     is_active?: boolean;
     is_invested?: boolean;
     total_invested?: number;
+    total_ticket?: number;
   }>({});
   const [projectInfo, setProjectInfo] = useState<{
     _id: string;
@@ -384,6 +385,12 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
           (numberTicket ? Math.floor(Number(numberTicket)) : 1),
       );
 
+      updateInvestedTickets(
+        projectInfo._id,
+        (investedTickets[projectInfo._id] || 0) +
+          (numberTicket ? Math.floor(Number(numberTicket)) : 1),
+      );
+
       ShowAlert.success({
         message: (
           <div className="text-xl">
@@ -598,16 +605,16 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
           ) : (
             !isNotWinner && (
               <div className="relative mt-8 mb-3">
-                <span className="absolute left-0 -top-8 font-bold text-kyu-color-11">
-                  <span className="text-kyu-color-14 font-medium">
-                    Invested:
-                  </span>{' '}
-                  {investmentInfo?.total_invested?.toLocaleString('en-US') || 0}
-                </span>
-                <Progress className="rounded-[100px]" value={80} />
+                <InvestingStatus
+                  projectId={projectInfo?._id || ''}
+                  totalInvested={investmentInfo?.total_invested || 0}
+                  totalTicket={investmentInfo?.total_ticket || 0}
+                />
                 <span className="absolute right-0 -top-8 font-bold text-kyu-color-11">
-                  <span className="text-kyu-color-14 font-medium">Total:</span>{' '}
-                  {investmentInfo?.token_offered?.toLocaleString('en-US') || 0}
+                  <span className="text-kyu-color-14 font-medium">
+                    Total ticket:
+                  </span>{' '}
+                  {investmentInfo?.total_ticket?.toLocaleString('en-US') || 0}
                 </span>
               </div>
             )
@@ -653,6 +660,15 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
                   <span className="text-xl">Total Winners</span>
                   <span className="text-2xl font-bold">
                     {investmentInfo?.total_winner?.toLocaleString('en-US') || 0}
+                  </span>
+                </div>
+
+                <div className="flex gap-4 justify-between items-center">
+                  <span className="text-xl">Token Offered</span>
+                  <span className="text-2xl font-bold">
+                    {investmentInfo?.token_offered?.toLocaleString('en-US') ||
+                      0}{' '}
+                    {data?.token_info?.symbol || ''}
                   </span>
                 </div>
               </div>
