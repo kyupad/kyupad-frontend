@@ -74,10 +74,14 @@ const getActiveStep = (data: any[]) => {
   }
 
   if (dayjs.utc(data?.[1]?.start).isAfter(now)) {
-    return 2;
+    return 1;
   }
 
   if (dayjs.utc(data?.[2]?.start).isAfter(now)) {
+    return 2;
+  }
+
+  if (dayjs.utc(data?.[3]?.start).isAfter(now)) {
     return 3;
   }
 
