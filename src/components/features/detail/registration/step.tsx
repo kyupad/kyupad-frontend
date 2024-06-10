@@ -204,7 +204,7 @@ function RegistrationStep({
   }, [email]);
 
   const renderStepButton = useCallback(() => {
-    if (activeStep > 1 && !isApplied) {
+    if (dayjs.utc(data?.[0]?.start).isBefore(now) && !isApplied) {
       return <SecondaryButton disabled>Registration Ended</SecondaryButton>;
     }
 
@@ -475,7 +475,7 @@ function RegistrationStep({
               ? 'Registration Starts in'
               : 'Registration Ends in'}
           </div>
-          {activeStep === 1 ? (
+          {!dayjs.utc(data?.[0]?.end).isBefore(now) ? (
             <SimpleCountdown
               className="!text-xl md:!text-2xl"
               time={

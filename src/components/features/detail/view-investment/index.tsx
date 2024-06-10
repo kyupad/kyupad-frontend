@@ -385,9 +385,13 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
           (numberTicket ? Math.floor(Number(numberTicket)) : 1),
       );
 
+      const investedTicketSS = JSON.parse(
+        sessionStorage.getItem('session-storage') || '{}',
+      )?.state?.investedTickets;
+
       updateInvestedTickets(
         projectInfo._id,
-        (investedTickets[projectInfo._id] || 0) +
+        (investedTicketSS[projectInfo._id] || 0) +
           (numberTicket ? Math.floor(Number(numberTicket)) : 1),
       );
 
