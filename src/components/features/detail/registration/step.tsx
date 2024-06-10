@@ -204,7 +204,7 @@ function RegistrationStep({
   }, [email]);
 
   const renderStepButton = useCallback(() => {
-    if (dayjs.utc(data?.[0]?.start).isBefore(now) && !isApplied) {
+    if (dayjs.utc(data?.[0]?.end).isBefore(now) && !isApplied) {
       return <SecondaryButton disabled>Registration Ended</SecondaryButton>;
     }
 
