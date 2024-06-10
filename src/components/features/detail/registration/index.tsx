@@ -1,5 +1,7 @@
 import React, { memo } from 'react';
 import Tabs from '@/components/common/tabs';
+import { currencyFormatter } from '@/utils/helpers';
+import Big from 'big.js';
 
 import ProjectDescription from './project-description';
 import RegistrationStep from './step';
@@ -9,9 +11,24 @@ import TokenSale from './token-sale';
 interface IRegistrationProps {
   data: any;
   isApplied: boolean;
+  usersAssets?: { total_assets?: number; participants?: number };
+  revalidatePath: Function;
+  doGetSignInData: Function;
+  doVerifySignInWithSolana: Function;
+  setCookie: Function;
+  notificationEmail?: string;
 }
 
-const Registation = ({ isApplied, data }: IRegistrationProps) => {
+const Registation = ({
+  isApplied,
+  data,
+  usersAssets,
+  revalidatePath,
+  doGetSignInData,
+  doVerifySignInWithSolana,
+  setCookie,
+  notificationEmail,
+}: IRegistrationProps) => {
   const dataStep = [
     {
       step: 1,
@@ -35,7 +52,6 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
       step: 4,
       title: 'Claim',
       start: data?.timeline?.claim_start_at,
-      end: data?.timeline?.claim_end_at,
     },
   ];
 
@@ -48,6 +64,11 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
           data={dataStep}
           projectId={data?.id}
           isApplied={isApplied}
+          revalidatePath={revalidatePath}
+          doGetSignInData={doGetSignInData}
+          doVerifySignInWithSolana={doVerifySignInWithSolana}
+          setCookie={setCookie}
+          notificationEmail={notificationEmail}
         />
 
         <div className="p-4 lg:p-10 border-2 border-kyu-color-11 rounded-[16px] bg-kyu-color-2 mt-5 flex flex-col gap-6">
@@ -56,13 +77,24 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
               <div className="flex w-full justify-between items-center gap-4">
                 <span className="text-xl">Total raise</span>
                 <span className="text-xl md:text-2xl font-bold text-end">
-                  $200,000
+                  {data?.info?.total_raise
+                    ? Big(data?.info?.total_raise)
+                        .toNumber()
+                        .toLocaleString('en-US')
+                    : '0'}{' '}
+                  {data?.price?.currency?.toUpperCase() || ''}
                 </span>
               </div>
               <div className="flex w-full justify-between items-center gap-4">
                 <span className="text-xl">Price</span>
                 <span className="text-xl md:text-2xl font-bold text-end">
-                  1 STAR = 0.1 USDT
+                  1 {data?.token_info?.symbol?.toUpperCase() || ''} ={' '}
+                  {data?.price?.amount
+                    ? Big(data?.price?.amount)
+                        .toNumber()
+                        .toLocaleString('en-US')
+                    : '0'}{' '}
+                  {data?.price?.currency?.toUpperCase() || ''}
                 </span>
               </div>
             </div>
@@ -70,13 +102,23 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
               <div className="flex w-full justify-between items-center gap-4">
                 <span className="text-xl">Token Offerred</span>
                 <span className="text-xl md:text-2xl font-bold text-end">
-                  100,000,000 STAR
+                  {data?.info?.token_offered
+                    ? Big(data?.info?.token_offered)
+                        .toNumber()
+                        .toLocaleString('en-US')
+                    : '0'}{' '}
+                  {data?.token_info?.symbol?.toUpperCase() || ''}
                 </span>
               </div>
               <div className="flex w-full justify-between items-center gap-4">
                 <span className="text-xl">Ticket size</span>
                 <span className="text-xl md:text-2xl font-bold text-end">
-                  300 USDT
+                  {data?.info?.ticket_size
+                    ? Big(data?.info.ticket_size)
+                        .toNumber()
+                        .toLocaleString('en-US')
+                    : '0'}{' '}
+                  {data?.price?.currency?.toUpperCase() || ''}
                 </span>
               </div>
             </div>
@@ -88,14 +130,18 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
             <div className="flex justify-between w-full items-center gap-4">
               <span className="text-xl">Total Assets Connected</span>
               <span className="text-xl md:text-2xl font-bold text-end">
-                $11,232,657.13
+                {usersAssets?.total_assets
+                  ? currencyFormatter.format(
+                      Big(usersAssets.total_assets).toNumber(),
+                    )
+                  : '$0'}
               </span>
             </div>
 
             <div className="flex justify-between w-full items-center gap-4">
               <span className="text-xl">Participants</span>
               <span className="text-xl md:text-2xl font-bold text-end">
-                11,342
+                {usersAssets?.participants?.toLocaleString('en-US') || 0}
               </span>
             </div>
           </div>
@@ -107,17 +153,17 @@ const Registation = ({ isApplied, data }: IRegistrationProps) => {
           {
             key: 'Project Description',
             label: 'Project Description',
-            children: <ProjectDescription />,
+            children: <ProjectDescription data={data?.description} />,
           },
           {
             key: 'Timeline',
             label: 'Timeline',
-            children: <Timeline />,
+            children: <Timeline data={data?.timeline} />,
           },
           {
             key: 'Token Sale',
             label: 'Token Sale',
-            children: <TokenSale />,
+            children: <TokenSale data={data?.token_info} />,
           },
         ]}
       />

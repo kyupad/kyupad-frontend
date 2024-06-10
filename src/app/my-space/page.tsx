@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { Suspense } from 'react';
+import { cookies } from 'next/headers';
 import Image from 'next/image';
+import { permanentRedirect } from 'next/navigation';
 // import PrimaryButton from '@/components/common/button/primary';
 // import { Input } from '@/components/common/input';
 import Tabs from '@/components/common/tabs';
 import MyInvestments from '@/components/features/my-space/my-investments';
+import MyInvestmentsLoading from '@/components/features/my-space/my-investments-loading';
 import MyParticipations from '@/components/features/my-space/my-participations';
+import { ACCESS_TOKEN_STORAGE_KEY, WEB_ROUTES } from '@/utils/constants';
 import catLeft from 'public/images/my-space/cat-left.png';
 import MySpaceBalance from '@components/features/my-space/balance';
 
 const MySpace = () => {
+  const cookiesStore = cookies();
+  const accessToken = cookiesStore.get(ACCESS_TOKEN_STORAGE_KEY)?.value;
+
+  if (!accessToken) {
+    permanentRedirect(WEB_ROUTES.HOME);
+  }
   return (
     <div>
       <div className="mx-auto after:fixed after:w-full after:top-0 after:left-0 after:h-full after:bg-kyu-color-1 after:-z-[1] px-4 lg:px-[60px] max-w-8xl">
@@ -39,12 +49,24 @@ const MySpace = () => {
           {
             key: 'My Investments',
             label: 'My Investments',
-            children: <MyInvestments />,
+            children: (
+              <>
+                <Suspense fallback={<MyInvestmentsLoading />}>
+                  <MyInvestments />
+                </Suspense>
+              </>
+            ),
           },
           {
             key: 'My Participations',
             label: 'My Participations',
-            children: <MyParticipations />,
+            children: (
+              <>
+                <Suspense fallback={<MyInvestmentsLoading />}>
+                  <MyParticipations />
+                </Suspense>
+              </>
+            ),
           },
         ]}
       />

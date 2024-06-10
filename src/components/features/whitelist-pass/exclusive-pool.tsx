@@ -9,7 +9,7 @@ import {
   doGetMintingPool,
   doSyncNftbySignature,
 } from '@/adapters/whitelist-pass';
-import { IDL, KyupadSmartContract } from '@/anchor/kyupad_smart_contract';
+import { KyupadSmartContract } from '@/anchor/kyupad_smart_contract';
 import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
 import WalletConnect from '@/components/common/header/wallet-connect';
@@ -30,7 +30,7 @@ import {
   WEB_ROUTES,
 } from '@/utils/constants';
 import { cn } from '@/utils/helpers';
-import { Program } from '@coral-xyz/anchor';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import {
   getMetadataArgsSerializer,
   MetadataArgsArgs,
@@ -41,7 +41,11 @@ import {
 } from '@metaplex-foundation/mpl-bubblegum';
 import { publicKey as publicKeyFn } from '@metaplex-foundation/umi';
 import * as Sentry from '@sentry/nextjs';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from '@solana/wallet-adapter-react';
 import {
   ComputeBudgetProgram,
   PublicKey,
@@ -57,6 +61,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import infoIcon from 'public/images/detail/info-icon.svg';
 import dropdown from 'public/images/whitelist/drop-down.svg';
 import moreArrow from 'public/images/whitelist/more-arrow.svg';
+import IDL from 'src/anchor/kyupad_smart_contract.json';
 import { decrypt } from '@utils/helpers';
 
 import MintedSuccess from './minted-success';
@@ -64,7 +69,6 @@ import UserPoolMinted from './user-pool-minted';
 
 dayjs.extend(utc);
 
-const programId = new PublicKey(env.NEXT_PUBLIC_NFT_PROGRAM_ID);
 const tokenMetaDataProgramId = new PublicKey(
   env.NEXT_PUBLIC_NFT_METADATA_PROGRAM_ID,
 );
@@ -82,6 +86,7 @@ function ExclusivePool({
 }) {
   const [open, setOpen] = useState<boolean>(false);
   const { publicKey, wallet } = useWallet();
+  const anchorWallet = useAnchorWallet();
 
   const searchParams = useSearchParams();
   const [activePool, setActivePool] = useState<any[]>([]);
@@ -139,10 +144,6 @@ function ExclusivePool({
   const poolCounterKey = `${poolId}_${publicKey?.toBase58()}`;
 
   const { connection } = useConnection();
-
-  const program = new Program<KyupadSmartContract>(IDL, programId, {
-    connection,
-  });
 
   const handleSetOpen = useCallback((value: boolean) => {
     setOpen(!value);
@@ -250,7 +251,7 @@ function ExclusivePool({
       controller.abort();
       clearTimeout(debounceFunction);
     };
-  }, [currentPoolId, publicKey, router, searchParams]);
+  }, [currentPoolId, publicKey, refCode, router, searchParams]);
 
   useEffect(() => {
     const checkActivePoolWidth = () => {
@@ -283,7 +284,7 @@ function ExclusivePool({
   }, []);
 
   const handleMint = async () => {
-    if (!publicKey) {
+    if (!publicKey || !wallet || !anchorWallet) {
       ShowAlert.warning({ message: 'Please connect to wallet first!' });
       return;
     }
@@ -373,7 +374,13 @@ function ExclusivePool({
         (item: any) => Array.from(item.data),
       );
 
+      const provider = new AnchorProvider(connection, anchorWallet);
+
       // Mint a compressed NFT
+      const program = new Program<KyupadSmartContract>(
+        IDL as KyupadSmartContract,
+        provider,
+      );
 
       const [poolsPDA] = PublicKey.findProgramAddressSync(
         [Buffer.from('pools'), collectionMint.toBuffer()],
@@ -492,15 +499,6 @@ function ExclusivePool({
         program.programId,
       );
 
-      const [mintCounterCollection] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from('mint_counter_collection'),
-          publicKey.toBuffer(),
-          collectionMint.toBuffer(),
-        ],
-        program.programId,
-      );
-
       const lookupTableAccount = (
         await connection.getAddressLookupTable(lookupTableAddress)
       ).value;
@@ -547,7 +545,6 @@ function ExclusivePool({
         )
         .accounts({
           minter: publicKey,
-          pools: poolsPDA,
           poolMinted: poolMinted,
           merkleTree: merkleTreeAccount,
           treeAuthority,
@@ -561,7 +558,6 @@ function ExclusivePool({
           bubblegumSigner: bgumSigner,
           tokenMetadataProgram: tokenMetaDataProgramId,
           destination: currentPool?.destination_wallet,
-          mintCounterCollection: mintCounterCollection,
         })
         .remainingAccounts(remainingAccounts)
         .instruction();

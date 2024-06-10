@@ -24,6 +24,7 @@ const fontHeading = Knewave({
   weight: ['400'],
 });
 
+// eslint-disable-next-line import/no-unused-modules
 export const metadata: Metadata = {
   title: 'Mint NFT',
 };
@@ -142,4 +143,5 @@ async function Whitelist() {
 // eslint-disable-next-line import/no-unused-modules
 export default Whitelist;
 
+// eslint-disable-next-line import/no-unused-modules
 export const dynamic = 'force-dynamic';

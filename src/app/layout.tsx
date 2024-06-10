@@ -2,6 +2,7 @@ import { revalidateCurrentPath } from '@/actions/common';
 import Header from '@/components/common/header';
 import Ribbon from '@/components/features/ribbon';
 import GlobalStoreProvider from '@/contexts/global-store-provider';
+import ProjectDetailStoreProvider from '@/contexts/project-detail-store-provider';
 import SessionStoreProvider from '@/contexts/session-store-provider';
 import WalletConnectProvider from '@/contexts/wallet-connect-provider';
 import { META_DATA_DEFAULT } from '@/utils/constants/seo';
@@ -33,24 +34,26 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     <WalletConnectProvider>
       <SessionStoreProvider>
         <GlobalStoreProvider revalidatePath={revalidateCurrentPath}>
-          <html lang="en">
-            <body
-              className={cn(
-                'min-h-screen font-sans antialiased scrollbar',
-                fontSans.variable,
-              )}
-            >
-              <WebVitals />
-              <NextTopLoader color="#f2820e" />
-              <Header />
-              <main className="overflow-hidden relative  pt-[40px] md:pt-[80px]">
-                {children}
-              </main>
-              <Footer />
-              <SonnerToaster position="top-right" closeButton />
-              <Ribbon />
-            </body>
-          </html>
+          <ProjectDetailStoreProvider>
+            <html lang="en">
+              <body
+                className={cn(
+                  'min-h-screen font-sans antialiased scrollbar',
+                  fontSans.variable,
+                )}
+              >
+                <WebVitals />
+                <NextTopLoader color="#f2820e" />
+                <Header />
+                <main className="overflow-hidden relative  pt-[40px] md:pt-[80px]">
+                  {children}
+                </main>
+                <Footer />
+                <SonnerToaster position="top-right" closeButton />
+                <Ribbon />
+              </body>
+            </html>
+          </ProjectDetailStoreProvider>
         </GlobalStoreProvider>
       </SessionStoreProvider>
     </WalletConnectProvider>
