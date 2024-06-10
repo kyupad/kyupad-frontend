@@ -33,9 +33,9 @@ function InvestingStatus({
     ).subscribe({
       next: ({ data }: any) => {
         if (
-          (data?.subscribeToIdoAction?.invested_wallet !==
+          data?.subscribeToIdoAction?.invested_wallet !==
             publicKey?.toBase58() &&
-            (investedTickets[projectId] || 0)) < totalTicket &&
+          (investedTickets[projectId] || 0) < totalTicket &&
           data?.subscribeToIdoAction?.project__id === projectId &&
           (investedTickets[projectId] || 0) +
             (data?.subscribeToIdoAction?.invested_total || 0) <=
