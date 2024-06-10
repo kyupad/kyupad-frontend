@@ -8,16 +8,17 @@ import CountdownItem from './item';
 const SimpleCountdown = ({
   time,
   className,
-  action,
+  revalidatePath,
 }: {
   time: number;
   className?: string;
-  action?: Function;
+  revalidatePath?: Function;
 }) => {
   const [days, setDays] = useState<number>(0);
   const [hours, setHours] = useState<number>(0);
   const [minutes, setMinutes] = useState<number>(0);
   const [seconds, setSeconds] = useState<number>(0);
+  const [diff] = useState<number>(time - new Date().getTime());
 
   useEffect(() => {
     let animationFrameId: number;
@@ -43,8 +44,12 @@ const SimpleCountdown = ({
       animationFrameId = requestAnimationFrame(updateTime);
 
       if (difference <= 0) {
-        action && action();
         cancelAnimationFrame(animationFrameId);
+
+        if (revalidatePath && diff > 0) {
+          revalidatePath(window.location.pathname);
+        }
+
         setDays(0);
         setHours(0);
         setMinutes(0);
@@ -55,7 +60,7 @@ const SimpleCountdown = ({
     updateTime();
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [action, time]);
+  }, [diff, time]);
 
   return (
     <div

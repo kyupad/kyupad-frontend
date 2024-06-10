@@ -1,41 +1,78 @@
 import React, { memo } from 'react';
+import { UTC_FORMAT_STRING } from '@/utils/constants';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 
-const data = [
-  {
-    step: 'Registration period',
-    time: 'Sep 1, 2024 13:00 UTC - Sep 5, 2024 13:00 UTC',
-    description:
-      'Participants must have at least $200 USDT tokens (Solana Chain) in their connected wallet. The more you engage on socials, the greater the chances of winning. Create an account to make the checkout process during the lottery phase smoother.',
-  },
+dayjs.extend(utc);
 
-  {
-    step: 'Snapshot period',
-    time: 'Sep 5, 2024 13:00 UTC - 18:00 UTC',
-    list: [
-      'Hold min. $200 USDT tokens (Solana Chain)',
-      'The snapshot will take place at 13:00 UTC on Sep 5, 2024',
-      'Failure to maintain this balance during the Snapshot Period will result in ineligibility.',
-    ],
-  },
+function Timeline({ data }: { data: any }) {
+  const timeline = [
+    {
+      step: 'Registration period',
+      time:
+        dayjs.utc(data?.registration_start_at).format(UTC_FORMAT_STRING) +
+        ' - ' +
+        dayjs.utc(data?.registration_end_at).format(UTC_FORMAT_STRING),
+      description: data?.registration_description || '',
+    },
 
-  {
-    step: 'Investment period',
-    time: 'Sep 5, 2024 18:00 UTC - 23:00 UTC',
-    description: `Kyupad uses a smart contract to randomly select tickets, making it fair for all applicants to win token allocations. At this time, you'll be able to check your participation to see if you're a winner. You can only use USDT to invest. Remember to engage on Twitter/X to increase your chances.`,
-  },
+    {
+      step: 'Snapshot period',
+      time:
+        dayjs.utc(data?.snapshot_start_at).format(UTC_FORMAT_STRING) +
+        ' - ' +
+        dayjs.utc(data?.snapshot_end_at).format(UTC_FORMAT_STRING),
+      description: data?.snapshot_description || '',
+    },
 
-  {
-    step: 'Claim period',
-    time: 'Sep 9, 2024 13:00 UTC',
-    description: `Participants selected in the token allocation lottery can check their allocation and redeem tokens before the Redemption Deadline.`,
-  },
-];
+    {
+      step: 'Investment period',
+      time:
+        dayjs.utc(data?.investment_start_at).format(UTC_FORMAT_STRING) +
+        ' - ' +
+        dayjs.utc(data?.investment_end_at).format(UTC_FORMAT_STRING),
+      description: data?.investment_description || '',
+    },
 
-function Timeline() {
+    {
+      step: 'Claim period',
+      time: dayjs.utc(data?.claim_start_at).format(UTC_FORMAT_STRING),
+      description: data?.claim_description || '',
+    },
+  ];
+
   return (
-    <div className="flex gap-10 flex-row justify-items-start">
-      <div className="text-xl sm:text-2xl font-bold flex flex-col gap-[60px] justify-between">
-        {data.map((item) => (
+    <div className="flex gap-[60px] flex-col relative">
+      <div className="w-[1px] h-full bg-kyu-color-11 absolute top-0 left-[142px] sm:left-[202px] z-[1]" />
+      {timeline.map((item, index) => {
+        return (
+          <div key={item.step} className="flex gap-10">
+            <div className="text-xl sm:text-2xl font-bold min-w-[80px] max-w-[80px] sm:min-w-[140px] sm:max-w-[140px] w-full">
+              {item.step}
+            </div>
+            <div
+              className="size-[44px] min-w-[44px] min-h-[44px] rounded-[16px] bg-kyu-color-11 text-kyu-color-4 text-2xl font-bold flex justify-center items-center z-[2]"
+              key={item.step}
+            >
+              {index + 1}
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <time className="text-xl sm:text-2xl font-bold">{item.time}</time>
+              {item?.description && (
+                <div
+                  className="font-medium"
+                  dangerouslySetInnerHTML={{
+                    __html: item.description,
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        );
+      })}
+      {/* <div className="text-xl sm:text-2xl font-bold flex flex-col gap-[60px] justify-between">
+        {timeline.map((item) => (
           <div key={item.step}>{item.step}</div>
         ))}
       </div>
@@ -43,9 +80,9 @@ function Timeline() {
       <div className="relative">
         <div className="w-[1px] h-full bg-kyu-color-11" />
         <div className="absolute top-0 -left-[22px] h-full flex flex-col justify-between gap-[60px]">
-          {data.map((item, index) => (
+          {timeline.map((item, index) => (
             <div
-              className="size-[44px] rounded-[16px] bg-kyu-color-11 text-kyu-color-4 text-2xl font-bold flex justify-center items-center"
+              className="size-[44px] min-h-[44px] rounded-[16px] bg-kyu-color-11 text-kyu-color-4 text-2xl font-bold flex justify-center items-center"
               key={item.step}
             >
               {index + 1}
@@ -55,24 +92,20 @@ function Timeline() {
       </div>
 
       <div className="flex flex-col justify-between gap-[60px]">
-        {data.map((item) => (
+        {timeline.map((item) => (
           <div key={item.step} className="flex flex-col gap-3">
             <time className="text-xl sm:text-2xl font-bold">{item.time}</time>
             {item?.description && (
-              <div className="font-medium">{item.description}</div>
-            )}
-            {item?.list && (
-              <ul className="pl-4 font-medium">
-                {item.list.map((listItem) => (
-                  <li key={listItem} className="list-disc">
-                    {listItem}
-                  </li>
-                ))}
-              </ul>
+              <div
+                className="font-medium"
+                dangerouslySetInnerHTML={{
+                  __html: item.description,
+                }}
+              />
             )}
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

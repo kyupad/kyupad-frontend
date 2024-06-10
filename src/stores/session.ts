@@ -8,6 +8,10 @@ interface ISessionStore {
   updateUserSeasonMinted: (value: number) => void;
   seasonMinted: any;
   updateSeasonMinted: (key: string, value: number) => void;
+  investedTickets: any;
+  updateInvestedTickets: (key: string, value: number) => void;
+  withdrawnAmount: any;
+  updateWithdrawnAmount: (key: string, value: number) => void;
 }
 
 type StoreWithPersist = Mutate<
@@ -53,6 +57,10 @@ const initialState: ISessionStore = {
   updateUserSeasonMinted: () => {},
   seasonMinted: {},
   updateSeasonMinted: () => {},
+  investedTickets: {},
+  updateInvestedTickets: () => {},
+  withdrawnAmount: {},
+  updateWithdrawnAmount: () => {},
 };
 
 const createSessionStore = createStore<ISessionStore>()(
@@ -73,6 +81,20 @@ const createSessionStore = createStore<ISessionStore>()(
         set((state) => ({
           seasonMinted: {
             ...state.seasonMinted,
+            [`${key}`]: value,
+          },
+        })),
+      updateInvestedTickets: (key: string, value: number) =>
+        set((state) => ({
+          investedTickets: {
+            ...state.investedTickets,
+            [`${key}`]: value,
+          },
+        })),
+      updateWithdrawnAmount: (key: string, value: number) =>
+        set((state) => ({
+          withdrawnAmount: {
+            ...state.withdrawnAmount,
             [`${key}`]: value,
           },
         })),

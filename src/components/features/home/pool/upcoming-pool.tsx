@@ -3,11 +3,11 @@ import Image from 'next/image';
 import { cn } from '@/utils/helpers';
 import catUpcoming from 'public/images/home/cat-upcoming.png';
 
-function UpcomingPoll() {
+function UpcomingPool() {
   return (
     <div
       className={cn(
-        'flex bg-[#FFF9EB] border-4 border-button-primary-border rounded-[12px] shadow-[19px_18px_0px_0px_rgba(42,_39,_58,_0.1)] md:w-full lg:gap-10 flex-col relative p-0 gap-0 justify-center items-center min-h-[700px]',
+        'flex bg-[#FFF9EB] border-4 border-button-primary-border rounded-[12px] shadow-[19px_18px_0px_0px_rgba(42,_39,_58,_0.1)] w-full lg:gap-10 flex-col relative p-0 gap-0 justify-center items-center min-h-[700px] max-w-[410px]',
       )}
     >
       <div className="flex flex-col items-center">
@@ -21,4 +21,4 @@ function UpcomingPoll() {
   );
 }
 
-export default memo(UpcomingPoll);
+export default memo(UpcomingPool);

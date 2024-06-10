@@ -1,9 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import {
-  doGetSuccessProjects,
-  doGetUpcomingProjects,
-} from '@/adapters/projects';
 
 import PoolDetail from './pool-detail';
 import UpcomingPool from './upcoming-pool';
@@ -12,79 +8,70 @@ import arrowRight from '/public/images/home/arrow-right.svg';
 
 interface IPoolProps {
   title?: string;
-  active?: boolean;
-  upcoming?: boolean;
-  paging?: boolean;
+  pagination?: any;
   mode: 'upcoming' | 'active' | 'success';
   direction?: 'row' | 'column';
+  data?: any[];
+  revalidatePath?: Function;
 }
 
-const Pool = async ({
+const Pool = ({
   title,
-  active,
-  upcoming,
-  paging,
+  pagination,
   mode,
   direction = 'column',
+  data,
+  revalidatePath,
 }: IPoolProps) => {
-  const upcomingProjectResponse = doGetUpcomingProjects();
-  const successProjectsResponse = doGetSuccessProjects();
-
-  const getProjects = await Promise.all([
-    upcomingProjectResponse,
-    successProjectsResponse,
-  ]);
-
-  const upcomingProjects = getProjects?.[0]?.data || [];
-  const successProjects = getProjects?.[1]?.data || [];
-  let data = upcomingProjects;
-
-  switch (mode) {
-    case 'upcoming':
-      data = upcomingProjects;
-      break;
-    case 'active':
-      data = upcomingProjects?.slice(0, 1) || [];
-      break;
-    case 'success':
-      data = successProjects;
-      break;
-    default:
-      data = upcomingProjects;
-      break;
-  }
-
   return (
     <div className="w-full">
-      <h4 className="text-sm sm:text-2xl md:text-3xl lg:text-4xl font-heading text-center text-button-primary-border pb-10">
-        {title}
-      </h4>
+      {data && data?.length !== 0 && (
+        <h4 className="text-sm sm:text-2xl md:text-3xl lg:text-4xl font-heading text-center text-button-primary-border pb-10">
+          {title}
+        </h4>
+      )}
 
-      <div className="flex gap-[45px] flex-col xl:flex-row">
-        {data
-          .filter((pool: any, index: number) =>
-            upcoming ? index > 0 && index < 3 : pool,
-          )
-          .map((item: any) => (
-            <PoolDetail
-              key={item.id}
-              active={active}
-              direction={direction}
-              data={item}
-              isSuccess={mode === 'success'}
-            />
-          ))}
-        {upcoming && data && data?.length > 0 && <UpcomingPool />}
+      <div className="flex gap-[45px] flex-col xl:flex-row justify-center items-center xl:items-stretch">
+        {data?.map((item: any) => (
+          <PoolDetail
+            key={item.id}
+            direction={direction}
+            data={item}
+            mode={mode}
+            revalidatePath={revalidatePath}
+          />
+        ))}
+        {mode === 'upcoming' &&
+          data &&
+          data?.length > 0 &&
+          data?.length < 3 &&
+          pagination?.total === 1 && <UpcomingPool />}
       </div>
 
-      {paging && data && data?.length > 0 && (
+      {pagination?.total > 1 && (
         <div className="flex justify-center items-center gap-12 pt-8">
-          <button className="p-4">
-            <Image src={arrowLeft} alt="Previous" />
+          <button
+            disabled={pagination?.page === 1}
+            className="p-4 min-w-[57px]"
+            onClick={() => {
+              pagination?.handlePrevious && pagination.handlePrevious();
+            }}
+          >
+            {pagination?.page > 1 && <Image src={arrowLeft} alt="Previous" />}
           </button>
-          <div className="font-bold text-2xl">1/5</div>
-          <button className="p-4">
-            <Image src={arrowRight} alt="Next" />
+          <div className="font-bold text-2xl">
+            {pagination?.page}/{pagination?.total}
+          </div>
+          <button
+            disabled={pagination?.page === pagination?.total}
+            className="p-4"
+            onClick={() => {
+              pagination?.handleNext && pagination.handleNext();
+            }}
+          >
+            {pagination?.page < pagination?.total && (
+              <Image src={arrowRight} alt="Next" />
+            )}
           </button>
         </div>
       )}

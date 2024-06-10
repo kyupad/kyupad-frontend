@@ -1,10 +1,8 @@
 import { cookies } from 'next/headers';
 import { request } from '@/adapters';
-import { API_ROUTES, WEB_ROUTES } from '@/utils/constants';
+import { API_ROUTES } from '@/utils/constants';
 
 import 'server-only';
-
-import { revalidateTag } from 'next/cache';
 
 const doGetProjectDetail = async (slug: string) => {
   'use server';
@@ -18,15 +16,11 @@ const doGetProjectDetail = async (slug: string) => {
       headers: {
         Cookie: cookieStr,
       },
+      cache: 'no-store',
     },
   );
 
   return data;
 };
 
-const revalidateProjectDetail = async (slug: string) => {
-  'use server';
-  revalidateTag(WEB_ROUTES.PROJECT_DETAIL.replace('[slug]', slug));
-};
-
-export { doGetProjectDetail, revalidateProjectDetail };
+export { doGetProjectDetail };

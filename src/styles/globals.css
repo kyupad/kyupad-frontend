@@ -91,7 +91,7 @@
 
   .scrollbar::-webkit-scrollbar-track {
     border-radius: 100vh;
-    background: var(--kyu-color-12);
+    background: transparent;
   }
 
   .scrollbar::-webkit-scrollbar-thumb {
@@ -102,6 +102,10 @@
 
   .scrollbar::-webkit-scrollbar-thumb:hover {
     background: var(--kyu-color-5);
+  }
+
+  .scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
   }
 }
 
@@ -131,7 +135,7 @@
   -ms-text-fill-color: #fabf52;
 }
 
-@media screen and (width >= 640px) {
+@media screen and (width >=640px) {
   .text-shadow-primary-mobile {
     -webkit-text-stroke: 3px var(--kyu-color-10) !important;
     -moz-text-stroke: 3px var(--kyu-color-10) !important;
