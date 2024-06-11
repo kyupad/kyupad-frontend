@@ -8,6 +8,8 @@ import RegistrationStep from './step';
 import Timeline from './timeline';
 import TokenSale from './token-sale';
 
+import '@/styles/quill.css';
+
 interface IRegistrationProps {
   data: any;
   isApplied: boolean;

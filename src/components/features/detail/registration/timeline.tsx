@@ -61,7 +61,7 @@ function Timeline({ data }: { data: any }) {
               <time className="text-xl sm:text-2xl font-bold">{item.time}</time>
               {item?.description && (
                 <div
-                  className="font-medium"
+                  className="ql-content"
                   dangerouslySetInnerHTML={{
                     __html: item.description,
                   }}

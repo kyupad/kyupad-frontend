@@ -2,31 +2,60 @@
 
 import { useEffect } from 'react';
 import Error from 'next/error';
+import { Knewave } from 'next/font/google';
+import Image from 'next/image';
+import { cn } from '@/utils/helpers';
 import * as Sentry from '@sentry/nextjs';
 
-const GlobalError = ({ error }: { error: Error }) => {
+import '@styles/globals.css';
+
+import meowError from 'public/images/common/kyupad-meow-404.png';
+import yellowCloud from 'public/images/footer/yellow-cloud.png';
+
+const fontHeading = Knewave({
+  subsets: ['latin'],
+  variable: '--font-heading',
+  display: 'swap',
+  weight: ['400'],
+});
+const GlobalError = ({
+  error,
+  reset,
+}: {
+  error: Error & { message?: string };
+  reset: () => void;
+}) => {
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
-
   return (
     <html>
       <body>
-        <section className="bg-white dark:bg-gray-900">
-          <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
-            <div className="mx-auto max-w-screen-sm text-center">
-              <h1 className="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-primary-600 dark:text-primary-500">
-                500
-              </h1>
-              <p className="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">
-                Internal Server Error.
-              </p>
-              <p className="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">
-                We are already working to solve the problem.
-              </p>
-            </div>
+        <div className="size-full py-5">
+          <div
+            className={cn(
+              'flex flex-col items-center px-1',
+              fontHeading.variable,
+            )}
+          >
+            <h1 className="leading-tight pt-[10vh] lg:pt-0 text-kyu-color-11 flex items-center gap-3">
+              <span className="text-4xl sm:text-4xl md:text-4xl lg:text-[72px] font-heading text-shadow-primary-mobile lg:pt-[26px] sm:py-[26px] text-center">
+                Error 500
+              </span>
+            </h1>
+            <b className="text-lg md:text-xl my-2 lg:text-2xl text-center">
+              Something went wrong!
+            </b>
           </div>
-        </section>
+          <div className="fixed max-h-[50vh] bottom-10 z-20 flex justify-center w-full">
+            <Image src={meowError} className="max-w-[600px] px-10" alt="500" />
+          </div>
+          <Image
+            className="max-w-screen w-full fixed bottom-0"
+            src={yellowCloud}
+            alt="500"
+          />
+        </div>
       </body>
     </html>
   );

@@ -69,6 +69,7 @@ function TokenSale({ data }: { data?: any }) {
       </div>
 
       <div
+        className="ql-content"
         dangerouslySetInnerHTML={{
           __html: data?.article || '',
         }}
