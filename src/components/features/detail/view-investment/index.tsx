@@ -349,7 +349,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
         });
 
         await connection?.sendRawTransaction(signature.serialize(), {
-          skipPreflight: process.env.NODE_ENV === 'development',
+          skipPreflight: !!env.NEXT_PUBLIC_DEBUG,
           maxRetries: 0,
           preflightCommitment: 'confirmed',
         });
