@@ -6,6 +6,7 @@ import { doGetMyVesting } from '@/adapters/projects';
 import { Badge } from '@/components/common/badge';
 import PrimaryButton from '@/components/common/button/primary';
 import Skeleton from '@/components/common/loading/skeleton';
+import Popup from '@/components/common/popup';
 import {
   Table,
   TableBody,
@@ -59,6 +60,7 @@ function ViewClaim({ revalidatePath }: { revalidatePath: Function }) {
   const { publicKey } = useWallet();
   const anchorWallet = useAnchorWallet();
   const { connection } = useConnection();
+  const [claimNotFound, setClaimNotFound] = useState<boolean>(false);
 
   const handleSetIsClaiming = useCallback((value: boolean) => {
     setIsClaiming(value);
@@ -79,6 +81,10 @@ function ViewClaim({ revalidatePath }: { revalidatePath: Function }) {
     const controller = new AbortController();
     const fetchData = async () => {
       const data = await doGetMyVesting(slug as string, controller.signal);
+
+      if (data?.statusCode === 400) {
+        setClaimNotFound(true);
+      }
 
       if (data?.data?.project_vesting) {
         setProjectVesting(data.data.project_vesting);
@@ -408,6 +414,12 @@ function ViewClaim({ revalidatePath }: { revalidatePath: Function }) {
 
   return (
     <>
+      <Popup
+        visible={claimNotFound}
+        setVisible={() => {}}
+        id="disabled"
+        description="Please wait until claim time!"
+      />
       <div
         className={cn(
           'w-full max-w-8xl mx-auto px-4 lg:px-[60px] flex gap-4 items-center justify-center flex-col lg:flex-row',

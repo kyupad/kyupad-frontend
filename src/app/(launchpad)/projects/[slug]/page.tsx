@@ -1,4 +1,5 @@
 import React from 'react';
+import { notFound } from 'next/navigation';
 import { doGetSignInData, doVerifySignInWithSolana } from '@/actions/auth';
 import { revalidateCurrentPath } from '@/actions/common';
 import { setCookie } from '@/actions/jwt';
@@ -14,6 +15,10 @@ async function ProjectDetail({ params }: { params: { slug: string } }) {
   const { slug } = params;
 
   const data = await doGetProjectDetail(slug);
+
+  if (data?.statusCode === 404) {
+    return notFound();
+  }
 
   const detail = data?.data?.project;
   const notificationEmail = data?.data?.notification_email;
