@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { doInvestingSuccess, doViewRegistration } from '@/adapters/projects';
 import { KyupadIdo } from '@/anchor/kyupad_ido';
+import { IDO_IDL } from '@/anchor/kyupad_ido.idl';
 import PrimaryButton from '@/components/common/button/primary';
 import SimpleCountdown from '@/components/common/coutdown/simple';
 import Skeleton from '@/components/common/loading/skeleton';
@@ -40,7 +41,6 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { env } from 'env.mjs';
 import jsonwebtoken from 'jsonwebtoken';
-import IDL from 'src/anchor/kyupad_ido.json';
 
 import Back from '../back';
 import InvestMorePopup from './invest-more-popup';
@@ -260,7 +260,7 @@ function ViewInvestment({ data }: IViewSnapshotProps) {
       };
 
       const provider = new AnchorProvider(connection, anchorWallet);
-      const program = new Program<KyupadIdo>(IDL as KyupadIdo, provider);
+      const program = new Program<KyupadIdo>(IDO_IDL as KyupadIdo, provider);
 
       let investIns = await program.methods
         .invest(investArgs)
