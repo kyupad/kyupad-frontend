@@ -245,7 +245,7 @@ function RegistrationStep({
                 </div>
               </TooltipTrigger>
               <TooltipContent className="max-w-[274px] px-5 py-4">
-                <p className="text-base font-medium text-justify">
+                <p className="text-base font-medium">
                   Please wait until register time!
                 </p>
                 <TooltipArrow fill="#8E8FA2" />

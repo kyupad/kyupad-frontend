@@ -21,13 +21,13 @@ const NotFound = () => {
       <div
         className={cn('flex flex-col items-center px-1', fontHeading.variable)}
       >
-        <h1 className="leading-tight pt-[10vh] sm:pt-0 text-kyu-color-11 flex items-center gap-3">
-          <span className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-heading text-shadow-primary-mobile lg:pt-[26px] sm:py-[26px] text-center">
+        <h1 className=" pt-[10vh] sm:pt-0 text-kyu-color-11 flex items-center gap-3">
+          <span className="text-5xl !leading-[88px] md:text-6xl lg:text-[72px] font-heading text-shadow-primary-mobile lg:pt-[26px] sm:pt-[26px] text-center">
             Error 404
           </span>
         </h1>
 
-        <b className="text-lg md:text-xl my-2 lg:text-2xl text-center">
+        <b className="text-lg md:text-xl my-4 leading-8 lg:text-2xl text-center">
           The page you are trying to access does not exist.
         </b>
         <Link href={WEB_ROUTES.HOME}>

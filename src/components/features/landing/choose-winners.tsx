@@ -76,7 +76,7 @@ const ChooseWinner = ({ data }: { data: ChooseWinnerProps[] }) => {
           {data.map((item, index) => (
             <div
               key={index}
-              className="flex px-3 hover:bg-kyu-color-2 duration-500 hover:shadow-sm relative shadow-[9px_8px_0px_0px_rgba(0,0,0,0.1)] flex-col items-start h-auto min-h-[250px] rounded-xl p-5 border-4 border-kyu-color-11 bg-kyu-color-1 "
+              className="flex px-3 mt-3 hover:bg-kyu-color-2 duration-500 hover:shadow-sm relative shadow-[9px_8px_0px_0px_rgba(0,0,0,0.1)] flex-col items-start h-auto min-h-[250px] rounded-xl p-5 border-4 border-kyu-color-11 bg-kyu-color-1 "
             >
               <div className="text-2xl font-heading text-center relative ">
                 <Image src={item.image} className="max-w-10" alt="guard" />
