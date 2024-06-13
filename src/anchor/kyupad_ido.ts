@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/kyupad_ido.json`.
  */
 export type KyupadIdo = {
-  address: 'DwFzHZexbYr1r3uKnh9rgAKwbyHcznXGXceE3dami4nk';
+  address: string;
   metadata: {
     name: 'kyupadIdo';
     version: '0.1.0';
@@ -133,7 +133,7 @@ export type KyupadIdo = {
         },
         {
           name: 'program';
-          address: 'DwFzHZexbYr1r3uKnh9rgAKwbyHcznXGXceE3dami4nk';
+          address: string;
         },
         {
           name: 'programData';

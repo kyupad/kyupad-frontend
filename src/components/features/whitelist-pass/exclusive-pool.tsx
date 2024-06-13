@@ -10,6 +10,7 @@ import {
   doSyncNftbySignature,
 } from '@/adapters/whitelist-pass';
 import { KyupadSmartContract } from '@/anchor/kyupad_smart_contract';
+import { NFT_IDL } from '@/anchor/kyupad_smart_contract.idl';
 import PrimaryButton from '@/components/common/button/primary';
 import CalendarCountdown from '@/components/common/coutdown/calendar';
 import WalletConnect from '@/components/common/header/wallet-connect';
@@ -61,7 +62,6 @@ import jsonwebtoken from 'jsonwebtoken';
 import infoIcon from 'public/images/detail/info-icon.svg';
 import dropdown from 'public/images/whitelist/drop-down.svg';
 import moreArrow from 'public/images/whitelist/more-arrow.svg';
-import IDL from 'src/anchor/kyupad_smart_contract.json';
 import { decrypt } from '@utils/helpers';
 
 import MintedSuccess from './minted-success';
@@ -378,7 +378,7 @@ function ExclusivePool({
 
       // Mint a compressed NFT
       const program = new Program<KyupadSmartContract>(
-        IDL as KyupadSmartContract,
+        NFT_IDL as KyupadSmartContract,
         provider,
       );
 

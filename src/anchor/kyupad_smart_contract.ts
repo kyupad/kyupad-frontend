@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/kyupad_smart_contract.json`.
  */
 export type KyupadSmartContract = {
-  address: 'GJZghSMo1HGLmQGhUUU7a7RSL1VbabwmBiYBbqiJ86sP';
+  address: string;
   metadata: {
     name: 'kyupadSmartContract';
     version: '0.1.1';
