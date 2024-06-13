@@ -1,0 +1,63 @@
+import { revalidateCurrentPath } from '@/actions/common';
+import Header from '@/components/common/header';
+import Ribbon from '@/components/features/ribbon';
+import GlobalStoreProvider from '@/contexts/global-store-provider';
+import ProjectDetailStoreProvider from '@/contexts/project-detail-store-provider';
+import SessionStoreProvider from '@/contexts/session-store-provider';
+import WalletConnectProvider from '@/contexts/wallet-connect-provider';
+import { META_DATA_DEFAULT } from '@/utils/constants/seo';
+import { cn } from '@/utils/helpers';
+
+import '@styles/globals.css';
+
+import dynamic from 'next/dynamic';
+import { Nunito } from 'next/font/google';
+import NextTopLoader from 'nextjs-toploader';
+
+const Footer = dynamic(() => import('@/components/common/footer'));
+const WebVitals = dynamic(() => import('@/components/features/web-vitals'));
+const SonnerToaster = dynamic(() => import('@/components/common/toast/sonner'));
+
+const fontSans = Nunito({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  preload: true,
+  display: 'swap',
+});
+
+const metadata = META_DATA_DEFAULT;
+
+const LauchpadLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <WalletConnectProvider>
+      <SessionStoreProvider>
+        <GlobalStoreProvider revalidatePath={revalidateCurrentPath}>
+          <ProjectDetailStoreProvider>
+            <html lang="en">
+              <body
+                className={cn(
+                  'min-h-screen font-sans antialiased scrollbar',
+                  fontSans.variable,
+                )}
+              >
+                <WebVitals />
+                <Header />
+                <NextTopLoader color="#f2820e" />
+                <main className="overflow-hidden relative  pt-[40px] md:pt-[80px]">
+                  {children}
+                </main>
+                <Footer />
+                <SonnerToaster position="top-right" closeButton />
+                <Ribbon />
+              </body>
+            </html>
+          </ProjectDetailStoreProvider>
+        </GlobalStoreProvider>
+      </SessionStoreProvider>
+    </WalletConnectProvider>
+  );
+};
+// eslint-disable-next-line import/no-unused-modules
+export default LauchpadLayout;
+// eslint-disable-next-line import/no-unused-modules
+export { metadata };

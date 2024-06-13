@@ -15,9 +15,7 @@ import { Nunito } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 
 const Footer = dynamic(() => import('@/components/common/footer'));
-
 const WebVitals = dynamic(() => import('@/components/features/web-vitals'));
-
 const SonnerToaster = dynamic(() => import('@/components/common/toast/sonner'));
 
 const fontSans = Nunito({
@@ -29,7 +27,7 @@ const fontSans = Nunito({
 
 const metadata = META_DATA_DEFAULT;
 
-const RootLayout = ({ children }: { children: React.ReactNode }) => {
+const WebLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <WalletConnectProvider>
       <SessionStoreProvider>
@@ -43,8 +41,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                 )}
               >
                 <WebVitals />
-                <NextTopLoader color="#f2820e" />
                 <Header />
+                <NextTopLoader color="#f2820e" />
                 <main className="overflow-hidden relative  pt-[40px] md:pt-[80px]">
                   {children}
                 </main>
@@ -59,9 +57,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     </WalletConnectProvider>
   );
 };
-
 // eslint-disable-next-line import/no-unused-modules
-export default RootLayout;
-
+export default WebLayout;
 // eslint-disable-next-line import/no-unused-modules
 export { metadata };

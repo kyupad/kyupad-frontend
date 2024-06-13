@@ -150,3 +150,18 @@
 .toast-close-btn svg {
   stroke: #fff;
 }
+
+.ql-content {
+  line-height: 1.75;
+  font-size: 16px;
+}
+
+.ql-content h1 {
+  font-size: 2.125rem;
+  margin-bottom: 0.5em;
+}
+
+.ql-content h2 {
+  font-size: 1.875rem;
+  margin-bottom: 0.5em;
+}
