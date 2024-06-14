@@ -1,7 +1,9 @@
 'use client';
 
 import React, { memo } from 'react';
+import Image from 'next/image';
 import { m } from 'framer-motion';
+import lightbluecloud from 'public/images/home/kyupad-bg-home.png';
 
 const ScaleAnimation = ({ className }: { className: string }) => {
   return (
@@ -18,7 +20,14 @@ const ScaleAnimation = ({ className }: { className: string }) => {
         repeatDelay: 2,
         ease: 'linear',
       }}
-    />
+    >
+      <Image
+        src={lightbluecloud}
+        alt="kyupad cloud"
+        fill
+        className="w-full h-auto  absolute object-cover top-0 left-0"
+      />
+    </m.div>
   );
 };
 

@@ -17,6 +17,7 @@ import ChooseWinner from '@/components/features/landing/choose-winners';
 import IninativeSystem from '@/components/features/landing/ininative-system';
 import { cn } from '@/utils/helpers';
 import { env } from 'env.mjs';
+import goldenCloud from 'public/images/home/golden-cloud.png';
 import meowSpacing from 'public/images/home/meow-spacing.png';
 import catRight from 'public/images/my-space/cat-right.png';
 
@@ -225,6 +226,7 @@ const Home = () => {
                     src={kyupadMeowSpace}
                     className="h-[50vw] w-auto object-cover md:h-[40vh] lg:h-[60vh] xl:h-[70vh]"
                     alt="kyupad meow rocket"
+                    priority
                   />
                 </MotionDiv>
               </MotionDiv>
@@ -232,8 +234,15 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="w-screen -translate-y-32 sm:-translate-y-60 lg:-translate-y-64 bg-golden-cloud py-28 lg:py-36 bg-[length:100vw_540px] sm:bg-[length:100vw_650px] lg:bg-[length:100vw_1100px] bg-no-repeat  max-h-[1100px]">
-          <h2 className="text-2xl sm:text-3xl lg:text-5xl font-heading text-center mt-0 sm:mt-10  py-4 lg:mt-16">
+        <div className="w-screen relative -translate-y-32 sm:-translate-y-60 flex flex-col justify-center my-5 lg:-translate-y-72 h-[400px] sm:h-[500px] lg:h-[900px]">
+          <Image
+            src={goldenCloud}
+            priority
+            fill
+            className="w-full h-full absolute top-0 left-0 -z-[1]"
+            alt="golden cloud"
+          />
+          <h2 className="text-2xl sm:text-3xl lg:text-5xl font-heading text-center mt-5 py-4 lg:mt-16">
             Why KyuPad?
           </h2>
           <div className="flex gap-4 md:gap-14 justify-center my-2 sm:my-6 lg:my-16">
@@ -340,19 +349,25 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="w-screen relative -translate-y-32 sm:-translate-y-56 lg:-translate-y-72 bg-golden-cloud py-20 sm:py-28 lg:py-36 bg-[length:100vw_540px] sm:bg-[length:100vw_830px] lg:bg-[length:100vw_1100px] bg-no-repeat  max-h-[1100px]">
+        <div className="w-screen relative -translate-y-32 sm:-translate-y-60 flex flex-col justify-center my-5 lg:-translate-y-64 h-[550px] sm:h-[700px] lg:h-[900px]">
+          <Image
+            src={goldenCloud}
+            fill
+            className=" w-full h-full absolute top-0 left-0 -z-[1]"
+            alt="golden cloud"
+          />
           <Image
             src={catRight}
             className="absolute -right-16 -top-8 md-top-16 w-28 sm:w-32 md:w-48 lg:w-64"
             alt="cat right"
           />
 
-          <h2 className="text-2xl sm:text-3xl lg:text-5xl font-heading text-center mt-4 sm:mt-10  py-4 lg:mt-16">
+          <h2 className="text-2xl sm:text-3xl lg:text-5xl font-heading text-center mt-16">
             How we choose winners
           </h2>
           <ChooseWinner data={chooseWinnerData} />
         </div>
-        <div className="px-4 -translate-y-32 sm:-translate-y-56 lg:-translate-y-80">
+        <div className="px-4 -translate-y-32 sm:-translate-y-56 lg:-translate-y-72">
           <h2 className="text-2xl sm:text-3xl lg:text-5xl font-heading text-center sm:mt-[2vh] py-4">
             Our Initiatives System{' '}
           </h2>
