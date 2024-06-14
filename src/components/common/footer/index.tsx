@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { env } from 'env.mjs';
 
 import logoFooter from '/public/images/footer/logo-footer.svg';
 
@@ -18,19 +19,21 @@ function Footer() {
 
           <div className="flex gap-5 sm:text-xl xl:gap-[60px] flex-wrap justify-center">
             <Link
-              href={'/privacy-policy'}
+              href={env.NEXT_PUBLIC_DOCS_URL + '/our-product/faq'}
               className="relative group"
               target="_blank"
             >
               FAQ
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
             </Link>
-            <Link href={'#'} className="group relative">
+            {/* <Link href={'#'} className="group relative">
               Performance
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-            </Link>
+            </Link> */}
             <Link
-              href={'/term-conditions'}
+              href={
+                env.NEXT_PUBLIC_DOCS_URL + '/our-product/terms-and-condition'
+              }
               className="group relative"
               target="_blank"
             >
