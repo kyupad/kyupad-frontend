@@ -28,7 +28,12 @@ export function middleware(request: NextRequest) {
     if (pathName === WEB_ROUTES.MY_SPACE) {
       return NextResponse.rewrite(new URL(fullPath, request.url));
     }
-
+    if (pathName === WEB_ROUTES.TERMS) {
+      return NextResponse.rewrite(new URL(fullPath, request.url));
+    }
+    if (pathName === WEB_ROUTES.FAQ) {
+      return NextResponse.rewrite(new URL(fullPath, request.url));
+    }
     return NextResponse.rewrite(new URL(WEB_ROUTES.NOTFOUND, request.url));
   }
 
