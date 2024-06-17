@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { doApplyProject } from '@/adapters/projects';
 import PrimaryButton from '@/components/common/button/primary';
@@ -125,6 +125,34 @@ function RegistrationStep({
     },
     [],
   );
+
+  useEffect(() => {
+    const listTimeouts: NodeJS.Timeout[] = [];
+    if (data && data?.length > 0) {
+      data.forEach((item, index) => {
+        if (
+          index > 0 &&
+          item?.start &&
+          dayjs.utc(item.start).isAfter(now) &&
+          dayjs.utc(item.start).isAfter(data?.[0]?.end)
+        ) {
+          const id = setTimeout(
+            () => {
+              revalidatePath && revalidatePath(window.location.pathname);
+            },
+            dayjs.utc(item.start).valueOf() - now.valueOf(),
+          );
+          listTimeouts.push(id);
+        }
+      });
+    }
+
+    return () => {
+      listTimeouts.forEach((id) => {
+        clearTimeout(id);
+      });
+    };
+  }, [data, now]);
 
   const handleOpenRegisterTooltip = useCallback((value: boolean) => {
     setOpenRegisterTooltip(value);
