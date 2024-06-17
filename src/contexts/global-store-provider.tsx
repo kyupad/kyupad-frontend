@@ -179,6 +179,8 @@ const GlobalStoreProvider = ({
       is_solana_connected: false,
     }));
     revalidatePath && revalidatePath(window.location.pathname);
+
+    window.location.reload();
   };
 
   const checkTokenExpiration = async () => {
