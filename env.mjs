@@ -39,6 +39,7 @@ const env = createEnv({
     NEXT_PUBLIC_DEBUG: z.string().nullish(),
     NEXT_PUBLIC_PARTNER_LENGTH: z.string().min(1).default(11),
     NEXT_PUBLIC_APP_URL: z.string().min(1).includes('http'),
+    NEXT_PUBLIC_APPLY_FORM_URL: z.string().min(1).includes('http'),
   },
   runtimeEnv: {
     NEXT_PUBLIC_API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT,
@@ -72,6 +73,7 @@ const env = createEnv({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_IDO_PROGRAM_ID: process.env.NEXT_PUBLIC_IDO_PROGRAM_ID,
     NEXT_PUBLIC_SENTRY_AUTH_TOKEN: process.env.NEXT_PUBLIC_SENTRY_AUTH_TOKEN,
+    NEXT_PUBLIC_APPLY_FORM_URL: process.env.NEXT_PUBLIC_APPLY_FORM_URL,
   },
 });
 

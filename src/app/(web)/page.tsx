@@ -1,7 +1,6 @@
 import React from 'react';
 import { Knewave } from 'next/font/google';
 import Image from 'next/image';
-import Link from 'next/link';
 import BottomTopAnimation from '@/components/common/animation/bottom-top';
 import LazyAnimation from '@/components/common/animation/lazy-animation';
 import { MotionDiv } from '@/components/common/animation/motion-animation';
@@ -169,9 +168,13 @@ const Home = () => {
               </BottomTopAnimation>
               <div className="flex justify-center sm:justify-start">
                 <BottomTopAnimation delay={1}>
-                  <Link href={env.NEXT_PUBLIC_APP_URL} target="_blank">
+                  <a
+                    href={env.NEXT_PUBLIC_APPLY_FORM_URL}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
                     <PrimaryButton>Apply for launchpad</PrimaryButton>
-                  </Link>
+                  </a>
                 </BottomTopAnimation>
               </div>
             </div>
