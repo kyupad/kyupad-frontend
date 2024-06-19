@@ -167,12 +167,13 @@ const Home = () => {
               </BottomTopAnimation>
               <div className="flex justify-center sm:justify-start">
                 <BottomTopAnimation delay={1}>
-                  <PrimaryButton disabled>
-                    <div className="flex flex-col gapY-3">
-                      Apply for launchpad{' '}
-                      <span className="text-sm">(Coming Soon)</span>
-                    </div>
-                  </PrimaryButton>
+                  <a
+                    href={env.NEXT_PUBLIC_APPLY_FORM_URL}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <PrimaryButton>Apply for launchpad</PrimaryButton>
+                  </a>
                 </BottomTopAnimation>
               </div>
             </div>
