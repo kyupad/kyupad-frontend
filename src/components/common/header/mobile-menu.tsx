@@ -60,15 +60,19 @@ function MobileMenu({
           </SheetHeader>
           <div className="grid gap-8 py-4">
             <nav className="flex gap-8 text-xl flex-col">
-              {env.NEXT_PUBLIC_BASE_URL?.includes(host) && (
-                <Link
-                  href={WEB_ROUTES.WHITELIST_PASS}
-                  className="relative group"
-                >
-                  Mint NFT
-                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
-                </Link>
-              )}
+              {env.NEXT_PUBLIC_BASE_URL?.includes(host) &&
+                env.NEXT_PUBLIC_APP_URL?.replace('https://', '')?.replace(
+                  'http://',
+                  '',
+                ) === window.location.host && (
+                  <Link
+                    href={WEB_ROUTES.WHITELIST_PASS}
+                    className="relative group"
+                  >
+                    Mint NFT
+                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-button-primary-hover transition-all group-hover:w-full"></span>
+                  </Link>
+                )}
               {isSolanaConnected && env.NEXT_PUBLIC_APP_URL?.includes(host) && (
                 <Link href={WEB_ROUTES.MY_SPACE} className="relative group">
                   My Space
