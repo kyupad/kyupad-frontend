@@ -7,6 +7,7 @@ import FurtureLaunch from '@/components/features/home/furture-launch';
 import SuccessLaunch from '@/components/features/home/success-launch';
 import UpcomingLaunch from '@/components/features/home/upcoming-launch';
 import { cn } from '@/utils/helpers';
+import { env } from 'env.mjs';
 
 import catBanner from '/public/images/home/cat-banner.png';
 import catSpace from '/public/images/home/cat-space.png';
@@ -111,7 +112,13 @@ const Home = () => {
             <div className="text-2xl font-bold sm:text-4xl text-center">
               Apply to launch your spaceship at Kyupad
             </div>
-            <PrimaryButton className="min-w-[200px]">Apply now</PrimaryButton>
+            <a
+              href={env.NEXT_PUBLIC_APPLY_FORM_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <PrimaryButton className="min-w-[200px]">Apply now</PrimaryButton>
+            </a>
           </div>
         </div>
       </div>
