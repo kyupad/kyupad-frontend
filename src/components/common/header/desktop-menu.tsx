@@ -24,7 +24,7 @@ function DesktopMenu() {
 
   return (
     <nav className="flex gap-8 text-xl">
-      {env.NEXT_PUBLIC_BASE_URL?.replace('https://', '')?.replace(
+      {/* {env.NEXT_PUBLIC_BASE_URL?.replace('https://', '')?.replace(
         'http://',
         '',
       ) === host && (
@@ -37,7 +37,7 @@ function DesktopMenu() {
             )}
           ></span>
         </Link>
-      )}
+      )} */}
       {isSolanaConnected &&
         env.NEXT_PUBLIC_APP_URL?.replace('https://', '')?.replace(
           'http://',
