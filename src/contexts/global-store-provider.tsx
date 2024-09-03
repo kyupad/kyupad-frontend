@@ -100,6 +100,9 @@ const GlobalStoreProvider = ({
       case EWalletName.Phantom:
         walletName = EWalletName.Phantom;
         break;
+      case EWalletName.Bitget:
+        walletName = EWalletName.Bitget;
+        break;
       default:
         break;
     }
@@ -120,6 +123,10 @@ const GlobalStoreProvider = ({
       w?.backpack?.on('accountChanged', handleAccountChange);
     }
 
+    if (walletName === EWalletName.Bitget) {
+      w?.bitget?.solana?.on('accountChanged', handleAccountChange);
+    }
+
     return () => {
       if (walletName === EWalletName.Phantom) {
         w?.phantom?.solana?.off('accountChanged', handleAccountChange);
@@ -127,6 +134,10 @@ const GlobalStoreProvider = ({
 
       if (walletName === EWalletName.Backpack) {
         w?.backpack?.off('accountChanged', handleAccountChange);
+      }
+
+      if (walletName === EWalletName.Bitget) {
+        w?.bitget?.solana?.off('accountChanged', handleAccountChange);
       }
 
       if (w?.xnft?.solana) {
