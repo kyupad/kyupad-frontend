@@ -89,7 +89,7 @@ function WalletNotConnect({
           ) : (
             <div className="flex flex-col">
               {wallets
-                .filter((wl) => ['Phantom'].includes(wl.adapter.name))
+                .filter((wl) => ['Phantom', 'Bitget'].includes(wl.adapter.name))
                 .map((wl) => {
                   return (
                     <button
@@ -121,9 +121,11 @@ function WalletNotConnect({
                         </div>
 
                         <div className="flex gap-4">
-                          <div className="bg-green-500 rounded-[100px] px-4 text-white">
-                            Recommended
-                          </div>
+                          {wl.adapter.name === 'Bitget' && (
+                            <div className="bg-green-500 rounded-[100px] px-4 text-white">
+                              Recommended
+                            </div>
+                          )}
 
                           <div className="hidden sm:block">
                             {wl.readyState === WalletReadyState.Installed ? (
@@ -157,14 +159,24 @@ function WalletNotConnect({
                   <AccordionTrigger
                     className="text-2xl font-bold hover:no-underline"
                     icon={wallets
-                      .filter((wl) => !['Phantom'].includes(wl.adapter.name))
+                      .filter(
+                        (wl) =>
+                          !['Phantom', 'Bitget', 'Bitget Wallet'].includes(
+                            wl.adapter.name,
+                          ),
+                      )
                       .slice(0, 3)}
                   >
                     <div>Other Wallets</div>
                   </AccordionTrigger>
                   <AccordionContent className="flex flex-col text-xl">
                     {wallets
-                      .filter((wl) => !['Phantom'].includes(wl.adapter.name))
+                      .filter(
+                        (wl) =>
+                          !['Phantom', 'Bitget', 'Bitget Wallet'].includes(
+                            wl.adapter.name,
+                          ),
+                      )
                       .map((wl) => {
                         return (
                           <button

@@ -7,6 +7,7 @@ import {
   WalletProvider,
 } from '@solana/wallet-adapter-react';
 import {
+  BitgetWalletAdapter,
   PhantomWalletAdapter,
   SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
@@ -16,7 +17,11 @@ import AutoConnectProvider from './auto-connect-provider';
 
 function WalletConnectProvider({ children }: { children: React.ReactNode }) {
   const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new BitgetWalletAdapter(),
+    ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
